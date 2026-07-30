@@ -58,7 +58,7 @@
 |---|---|---|---|---|
 | GitHub ID | `alpha-dev` | `vision-bot` | `robot-flow` | `dash-maker` |
 | 프로필 | https://github.com/alpha-dev | https://github.com/vision-bot | https://github.com/robot-flow | https://github.com/dash-maker |
-| 이름 | 김민준 | 이서연 | 박지훈 | 최유진 |
+| 이름 | 김도연 | 김재광 | 정지우 | 홍지수 |
 | 역할 | PM / 시스템 아키텍트 | AI 비전 & 재고 감지 | 로봇 연동(OMX-F/Beagle) | 대시보드 & 데이터 로깅 |
 
 ---
