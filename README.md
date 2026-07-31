@@ -54,12 +54,11 @@
 
 ## 5) 팀원 정보 (더미 데이터, 전치 테이블)
 
-| 구분 | 팀원1 | 팀원2 | 팀원3 | 팀원4 |
+| 구분 | 김도연 | 김재광 | 정지우 | 홍지수 |
 |---|---|---|---|---|
-| GitHub ID | `alpha-dev` | `vision-bot` | `robot-flow` | `dash-maker` |
-| 프로필 | https://github.com/alpha-dev | https://github.com/vision-bot | https://github.com/robot-flow | https://github.com/dash-maker |
-| 이름 | 김도연 | 김재광 | 정지우 | 홍지수 |
-| 역할 | PM / 시스템 아키텍트 | AI 비전 & 재고 감지 | 로봇 연동(OMX-F/Beagle) | 대시보드 & 데이터 로깅 |
+| GitHub ID | noeyod02 | jam0629 | jjupy03 | jisooohh |
+| 프로필 | [https://github.com/alpha-dev](https://github.com/user-attachments/assets/f78bf05c-74a1-41ea-a7b2-15aa729403a8) | [https://github.com/vision-bot](https://github.com/user-attachments/assets/987f6f86-6d04-496b-9299-0f971f4044a7) | [https://github.com/robot-flow](https://github.com/user-attachments/assets/1a5faa53-6e1b-4b72-80de-7c7713b9fac5) | [https://github.com/dash-maker](https://github.com/user-attachments/assets/3e23b93e-eebf-491d-8380-067b2fc6f027) |
+| 역할 | 로봇 제어 | 개발 | 리드 | 개발 |
 
 ---
 
