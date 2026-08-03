@@ -1,3 +1,4 @@
+import { PageHeader } from '../../shared/ui';
 import { AuthPanel } from './AuthPanel';
 import { PermissionSettings } from './PermissionSettings';
 import styles from './SettingsTab.module.css';
@@ -6,8 +7,14 @@ import styles from './SettingsTab.module.css';
 export function SettingsTab() {
   return (
     <div className={styles.page}>
-      <PermissionSettings />
-      <AuthPanel />
+      <PageHeader title="설정" description="로봇 제어 권한과 관리자 계정을 관리합니다." />
+
+      <div className={styles.scroll}>
+        <div className={styles.columns}>
+          <PermissionSettings />
+          <AuthPanel />
+        </div>
+      </div>
     </div>
   );
 }

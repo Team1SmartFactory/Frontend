@@ -1,55 +1,18 @@
-.panel {
-  background: var(--surface-card);
-  border: 1px solid var(--border-hairline);
-  border-radius: 0.75rem;
-  padding: 1.25rem;
-  max-width: 420px;
+.body {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--space-5);
 }
 
-.panel h4 {
-  font-size: 0.95rem;
-}
-
-.toggleRow {
+.form {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.9rem;
+  align-items: flex-end;
+  gap: var(--space-3);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--border-hairline);
 }
 
-.panel form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.panel form label {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-}
-
-.panel form input {
-  padding: 0.5rem 0.6rem;
-  border-radius: 0.4rem;
-  border: 1px solid var(--border-hairline);
-  background: var(--surface-page);
-  color: var(--text-primary);
-}
-
-.panel form button {
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  border: 1px solid var(--border-hairline);
-  background: transparent;
-  color: var(--text-primary);
-  font-weight: 600;
-  align-self: flex-start;
-  padding-left: 1rem;
-  padding-right: 1rem;
+.form > *:first-child {
+  flex: 1;
+  min-width: 0;
 }

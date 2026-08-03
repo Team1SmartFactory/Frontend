@@ -1,85 +1,92 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(11, 11, 11, 0.45);
+  z-index: var(--z-modal);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 100;
-  padding: 1rem;
+  padding: var(--space-4);
+  background: var(--surface-overlay);
+  backdrop-filter: blur(2px);
 }
 
 .dialog {
-  width: min(420px, 100%);
-  background: var(--surface-card);
-  border-radius: 0.75rem;
+  width: min(26rem, 100%);
+  padding: var(--space-6);
   border: 1px solid var(--border-hairline);
-  padding: 1.5rem;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  border-radius: var(--radius-xl);
+  background: var(--surface-card);
+  box-shadow: var(--shadow-lg);
+
+  /* 승인 팝업은 조치가 필요한 상태이므로 상단에 상태색 띠를 얹는다. */
+  border-top: 3px solid var(--status-critical);
 }
 
-.badge {
-  display: inline-block;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--status-critical);
-  margin: 0 0 0.5rem;
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-wide);
+  color: var(--status-critical-text);
+}
+
+.title {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
 }
 
 .details {
-  margin: 1rem 0;
-  display: grid;
-  gap: 0.5rem;
-}
-
-.details div {
+  margin: var(--space-5) 0;
   display: flex;
+  flex-direction: column;
+}
+
+.detailRow {
+  display: flex;
+  align-items: baseline;
   justify-content: space-between;
-  border-bottom: 1px solid var(--gridline);
-  padding-bottom: 0.35rem;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--border-hairline);
 }
 
-.details dt {
-  color: var(--text-secondary);
-  font-weight: 500;
+.detailRow:last-child {
+  border-bottom: none;
 }
 
-.details dd {
-  margin: 0;
-  font-weight: 600;
-}
-
-.queue {
-  font-size: 0.8rem;
+.detailRow dt {
+  font-size: var(--text-xs);
   color: var(--text-muted);
-  margin: 0 0 1rem;
+}
+
+.detailRow dd {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.note {
+  margin-bottom: var(--space-5);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--surface-sunken);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
 }
 
 .actions {
   display: flex;
-  gap: 0.75rem;
+  gap: var(--space-2);
   justify-content: flex-end;
-}
-
-.actions button {
-  padding: 0.55rem 1.1rem;
-  border-radius: 0.5rem;
-  border: 1px solid var(--border-hairline);
-  font-weight: 600;
-}
-
-.reject {
-  background: transparent;
-  color: var(--text-secondary);
-}
-
-.approve {
-  background: var(--status-good);
-  color: #ffffff;
-  border-color: transparent;
-}
-
-.actions button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
 }
