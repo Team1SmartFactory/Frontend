@@ -1,30 +1,65 @@
-.wrapper {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.figure {
+  margin: 0;
 }
 
 .chart {
-  width: 160px;
-  height: 40px;
+  width: 100%;
+  height: 4rem;
   overflow: visible;
+}
+
+/* 기준선은 데이터가 아니므로 점선 + 낮은 대비로 뒤로 물린다. */
+.thresholdLine {
+  stroke: var(--text-muted);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  opacity: 0.6;
+  vector-effect: non-scaling-stroke;
+}
+
+.area {
+  fill: var(--tone-soft);
 }
 
 .line {
   fill: none;
-  stroke: var(--accent);
+  stroke: var(--tone);
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
+  /* preserveAspectRatio="none"으로 늘어나도 선 두께는 유지한다. */
+  vector-effect: non-scaling-stroke;
+}
+
+.marker {
+  fill: var(--tone);
+  /* 선과 겹칠 때 분리돼 보이도록 표면색 링을 두른다. */
+  stroke: var(--surface-card);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.caption {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
 }
 
 .value {
+  font-size: var(--text-md);
+  font-weight: var(--weight-bold);
   font-variant-numeric: tabular-nums;
-  color: var(--text-secondary);
-  font-size: 0.85rem;
+  color: var(--tone-text);
+}
+
+.thresholdLabel {
+  font-size: var(--text-2xs);
+  color: var(--text-muted);
 }
 
 .empty {
+  font-size: var(--text-xs);
   color: var(--text-muted);
-  font-size: 0.85rem;
 }

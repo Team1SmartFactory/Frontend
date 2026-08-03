@@ -39,19 +39,69 @@ function lerp(from: number, to: number, t: number): number {
   return from + (to - from) * t;
 }
 
-const STORAGE_POSITION: Position = { x: 54, y: 78 };
+/**
+ * 좌표는 공장 도면(features/floorplan/floorPlanLayout.ts)의 구역 중심을
+ * 0~100 상대 좌표로 옮긴 값이다. 도면 배치가 바뀌면 두 파일을 함께 고쳐야 한다.
+ */
+const STORAGE_POSITION: Position = { x: 21.8, y: 80.4 };
 
-const INITIAL_LINES: Line[] = [
-  { id: 'line-a', name: 'A라인 (절단)', threshold: SHORTAGE_THRESHOLD, currentQty: 82, status: 'normal', updatedAt: nowIso(), position: { x: 18, y: 30 } },
-  { id: 'line-b', name: 'B라인 (가공)', threshold: SHORTAGE_THRESHOLD, currentQty: 75, status: 'normal', updatedAt: nowIso(), position: { x: 42, y: 30 } },
-  { id: 'line-c', name: 'C라인 (검사)', threshold: SHORTAGE_THRESHOLD, currentQty: 68, status: 'normal', updatedAt: nowIso(), position: { x: 66, y: 30 } },
-  { id: 'line-d', name: 'D라인 (포장)', threshold: SHORTAGE_THRESHOLD, currentQty: 90, status: 'normal', updatedAt: nowIso(), position: { x: 90, y: 30 } },
-];
+/** 보관소 OMX-F가 서 있는 자리. Beagle 대기 위치와 겹치지 않게 왼쪽에 둔다. */
+const STORAGE_ARM_POSITION: Position = { x: 9.6, y: 80.4 };
 
+/** Beagle이 도착하는 각 라인의 하역 지점 (도면상 구역 좌하단 통로). */
+const LINE_POSITIONS: Record<string, Position> = {
+  'line-a': { x: 12.0, y: 44.3 },
+  'line-b': { x: 43.9, y: 44.3 },
+  'line-c': { x: 71.8, y: 44.3 },
+  'line-d': { x: 12.0, y: 72.2 },
+  'line-e': { x: 43.9, y: 72.2 },
+  'line-f': { x: 71.8, y: 72.2 },
+};
+
+/** 라인 OMX-F가 서 있는 자리. 하역 지점 바로 왼쪽. */
+const LINE_ARM_POSITIONS: Record<string, Position> = {
+  'line-a': { x: 6.9, y: 44.3 },
+  'line-b': { x: 38.8, y: 44.3 },
+  'line-c': { x: 66.7, y: 44.3 },
+  'line-d': { x: 6.9, y: 72.2 },
+  'line-e': { x: 38.8, y: 72.2 },
+  'line-f': { x: 66.7, y: 72.2 },
+};
+
+const INITIAL_QTY: Record<string, number> = {
+  'line-a': 82,
+  'line-b': 75,
+  'line-c': 68,
+  'line-d': 90,
+  'line-e': 61,
+  'line-f': 78,
+};
+
+const INITIAL_LINES: Line[] = Object.entries(LINE_POSITIONS).map(([id, position]) => ({
+  id,
+  name: `${id.slice(-1).toUpperCase()}라인`,
+  threshold: SHORTAGE_THRESHOLD,
+  currentQty: INITIAL_QTY[id] ?? 80,
+  status: 'normal',
+  updatedAt: nowIso(),
+  position,
+}));
+
+/**
+ * 보관소 OMX-F 1대 + Beagle 1대 + 라인별 OMX-F 6대.
+ * 라인 하역 로봇은 `omxf-<lineId>` 규칙으로 id를 만들어,
+ * 작업 진행 시 라인 id만으로 담당 로봇을 찾을 수 있게 한다.
+ */
 const INITIAL_ROBOTS: RobotStatus[] = [
-  { robotId: 'omxf-storage-1', type: 'omxf_storage', state: 'idle', position: { ...STORAGE_POSITION }, updatedAt: nowIso() },
+  { robotId: 'omxf-storage-1', type: 'omxf_storage', state: 'idle', position: { ...STORAGE_ARM_POSITION }, updatedAt: nowIso() },
   { robotId: 'beagle-1', type: 'beagle', state: 'idle', position: { ...STORAGE_POSITION }, updatedAt: nowIso() },
-  { robotId: 'omxf-line-1', type: 'omxf_line', state: 'idle', position: { x: 18, y: 30 }, updatedAt: nowIso() },
+  ...Object.entries(LINE_ARM_POSITIONS).map(([lineId, position]) => ({
+    robotId: `omxf-${lineId}`,
+    type: 'omxf_line' as const,
+    state: 'idle' as const,
+    position: { ...position },
+    updatedAt: nowIso(),
+  })),
 ];
 
 const PART_NAMES = ['M6 볼트 세트', '베어링 유닛', '알루미늄 브래킷', '센서 하우징'];
@@ -206,7 +256,7 @@ class MockFactoryBackend {
     const line = this.lines.get(task.lineId);
     const storage = this.robots.get('omxf-storage-1');
     const beagle = this.robots.get('beagle-1');
-    const lineRobot = this.robots.get('omxf-line-1');
+    const lineRobot = this.robots.get(`omxf-${task.lineId}`);
     if (!line || !storage || !beagle || !lineRobot) {
       this.activeTasks.delete(task.lineId);
       return;

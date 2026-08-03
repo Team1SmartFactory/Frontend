@@ -1,0 +1,57 @@
+.led {
+  pointer-events: none;
+}
+
+/* 가장 바깥 확산광. 넓고 옅게 깔아 어두운 배경에서 존재감을 만든다. */
+.halo {
+  fill: var(--tone);
+  opacity: 0.16;
+}
+
+/* 코어 주변의 중간 광량. 코어와 헤일로 사이 밝기 단차를 메운다. */
+.bloom {
+  fill: var(--tone);
+  opacity: 0.4;
+}
+
+/* 실제 광원. 흰빛을 살짝 섞어 "발광 중"으로 읽히게 한다. */
+.core {
+  fill: color-mix(in srgb, var(--tone) 78%, white);
+  filter: drop-shadow(0 0 0.6px var(--tone)) drop-shadow(0 0 1.6px var(--tone));
+}
+
+.ledPulse {
+  composes: led;
+}
+
+/* 코어는 밝기만, 헤일로는 크기까지 변화시켜 실제 표시등의 맥동을 흉내낸다. */
+.ledPulse .halo {
+  animation: haloBreathe 1.5s var(--ease-out) infinite;
+  transform-origin: center;
+}
+
+.ledPulse .core {
+  animation: coreBreathe 1.5s var(--ease-out) infinite;
+}
+
+@keyframes haloBreathe {
+  0%,
+  100% {
+    opacity: 0.16;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.34;
+    transform: scale(1.35);
+  }
+}
+
+@keyframes coreBreathe {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.65;
+  }
+}

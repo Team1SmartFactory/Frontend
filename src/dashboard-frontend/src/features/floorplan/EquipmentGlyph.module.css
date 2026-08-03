@@ -1,0 +1,17 @@
+/*
+ * 설비는 도면 선화이므로 채움 없이 얇은 선으로만 그린다.
+ * 상태 색은 구역(zone)이 담당하고, 설비는 항상 중립색을 유지해
+ * 색이 의미를 갖는 자리를 구역과 LED로 한정한다.
+ */
+.glyph {
+  fill: var(--surface-card);
+  stroke: var(--floorplan-ink);
+  stroke-width: 1.1;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.glyph line,
+.glyph path {
+  stroke-width: 1;
+}
