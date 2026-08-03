@@ -1,0 +1,57 @@
+import type { Tone } from '../ui/tone';
+import type { Line, RobotState, ShortageEventStatus } from './types';
+
+/**
+ * 도메인 상태 → Tone 매핑을 이 파일 하나로 통제한다.
+ * "부족은 무슨 색인가"를 화면마다 다시 판단하지 않게 하려는 목적이며,
+ * 색 기준이 바뀌면 여기만 고치면 전 화면에 반영된다.
+ */
+
+/** 임계치 대비 여유분으로 심각도를 나눈다. (임계치 이하 = 부족) */
+export function toneForLine(line: Line): Tone {
+  if (line.status === 'restocking') return 'accent';
+  if (line.currentQty <= line.threshold) return 'critical';
+  if (line.currentQty <= line.threshold * 1.5) return 'serious';
+  if (line.currentQty <= line.threshold * 2.5) return 'warning';
+  return 'good';
+}
+
+const ROBOT_STATE_TONE: Record<RobotState, Tone> = {
+  idle: 'idle',
+  moving: 'accent',
+  working: 'accent',
+  error: 'critical',
+  offline: 'idle',
+};
+
+export function toneForRobotState(state: RobotState): Tone {
+  return ROBOT_STATE_TONE[state];
+}
+
+const SHORTAGE_STATUS_TONE: Record<ShortageEventStatus, Tone> = {
+  pending_approval: 'critical',
+  dispatched: 'warning',
+  in_transit: 'accent',
+  completed: 'good',
+  rejected: 'idle',
+};
+
+export function toneForShortageStatus(status: ShortageEventStatus): Tone {
+  return SHORTAGE_STATUS_TONE[status];
+}
+
+export const ROBOT_STATE_LABEL: Record<RobotState, string> = {
+  idle: '대기',
+  moving: '이동 중',
+  working: '작업 중',
+  error: '오류',
+  offline: '오프라인',
+};
+
+export const SHORTAGE_STATUS_LABEL: Record<ShortageEventStatus, string> = {
+  pending_approval: '승인 대기',
+  dispatched: '보충 지시됨',
+  in_transit: '운반 중',
+  completed: '완료',
+  rejected: '반려됨',
+};
