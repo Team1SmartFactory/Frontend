@@ -1,0 +1,98 @@
+.panel {
+  width: 320px;
+  flex-shrink: 0;
+  border-left: 1px solid var(--border-hairline);
+  background: var(--surface-card);
+  padding: 1.25rem;
+  overflow-y: auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.header button {
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.qty {
+  color: var(--text-secondary);
+  margin: 0 0 1rem;
+}
+
+.qty strong {
+  color: var(--text-primary);
+}
+
+section {
+  margin-bottom: 1.25rem;
+}
+
+section h4 {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.cameraPlaceholder {
+  height: 120px;
+  border-radius: 0.5rem;
+  background: var(--surface-page);
+  border: 1px dashed var(--border-hairline);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.empty {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.eventList li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--gridline);
+  font-size: 0.85rem;
+}
+
+.eventPart {
+  font-weight: 600;
+  flex: 1;
+}
+
+.eventQty {
+  color: var(--text-secondary);
+}
+
+.eventStatus {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.eventStatus[data-status='pending_approval'] {
+  color: var(--status-warning);
+}
+
+.eventStatus[data-status='dispatched'],
+.eventStatus[data-status='in_transit'] {
+  color: var(--accent);
+}
+
+.eventStatus[data-status='completed'] {
+  color: var(--status-good);
+}
+
+.eventStatus[data-status='rejected'] {
+  color: var(--text-muted);
+}

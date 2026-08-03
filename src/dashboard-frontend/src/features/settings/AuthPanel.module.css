@@ -1,0 +1,46 @@
+.panel {
+  background: var(--surface-card);
+  border: 1px solid var(--border-hairline);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.panel h4 {
+  font-size: 0.95rem;
+}
+
+.panel label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.panel input {
+  padding: 0.5rem 0.6rem;
+  border-radius: 0.4rem;
+  border: 1px solid var(--border-hairline);
+  background: var(--surface-page);
+  color: var(--text-primary);
+}
+
+.panel button {
+  margin-top: 0.25rem;
+  padding: 0.55rem;
+  border-radius: 0.5rem;
+  border: none;
+  background: var(--accent);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.note {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 0;
+}

@@ -1,0 +1,63 @@
+.timeline {
+  background: var(--surface-card);
+  border: 1px solid var(--border-hairline);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.timeline h3 {
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+}
+
+.timeline ol {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.timeline li {
+  display: flex;
+  gap: 0.6rem;
+  font-size: 0.8rem;
+  align-items: baseline;
+  border-bottom: 1px solid var(--gridline);
+  padding-bottom: 0.4rem;
+}
+
+.timeline time {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.timeline li span[data-status] {
+  margin-left: auto;
+  font-weight: 600;
+}
+
+.timeline li span[data-status='pending_approval'] {
+  color: var(--status-warning);
+}
+
+.timeline li span[data-status='dispatched'],
+.timeline li span[data-status='in_transit'] {
+  color: var(--accent);
+}
+
+.timeline li span[data-status='completed'] {
+  color: var(--status-good);
+}
+
+.timeline li span[data-status='rejected'] {
+  color: var(--text-muted);
+}
+
+.empty {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}

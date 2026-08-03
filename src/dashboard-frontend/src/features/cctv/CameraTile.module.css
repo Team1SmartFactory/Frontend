@@ -1,0 +1,30 @@
+.tile {
+  aspect-ratio: 16 / 9;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-hairline);
+  background: repeating-linear-gradient(135deg, #14161a, #14161a 10px, #1b1e24 10px, #1b1e24 20px);
+  color: #ffffff;
+  display: flex;
+  align-items: flex-end;
+  padding: 0.75rem;
+  cursor: pointer;
+  position: relative;
+}
+
+.label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.35rem;
+}
+
+.liveDot {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--status-critical);
+}

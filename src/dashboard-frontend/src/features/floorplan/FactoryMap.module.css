@@ -1,0 +1,76 @@
+.mapWrapper {
+  flex: 1;
+  min-width: 0;
+  padding: 1rem;
+  display: flex;
+}
+
+.map {
+  width: 100%;
+  height: 100%;
+}
+
+.floor {
+  fill: var(--surface-card);
+  stroke: var(--gridline);
+  stroke-width: 0.3;
+}
+
+.lineGroup {
+  cursor: pointer;
+}
+
+.lineBox {
+  fill: var(--accent);
+  opacity: 0.15;
+  stroke: var(--accent);
+  stroke-width: 0.4;
+}
+
+.lineBoxSelected {
+  fill: var(--accent);
+  opacity: 0.35;
+  stroke: var(--accent);
+  stroke-width: 0.6;
+}
+
+.lineLabel {
+  font-size: 3px;
+  fill: var(--text-primary);
+}
+
+.shortageDot {
+  fill: var(--status-critical);
+  transform: translate(6px, -6px);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    r: 2.4px;
+  }
+  50% {
+    opacity: 0.4;
+    r: 3.2px;
+  }
+}
+
+.robotGroup {
+  transition: transform 1s linear;
+}
+
+.robotLabel {
+  font-size: 2.4px;
+  fill: var(--text-secondary);
+}
+
+.robot_beagle {
+  fill: var(--accent);
+}
+
+.robot_omxf_storage,
+.robot_omxf_line {
+  fill: var(--status-warning);
+}

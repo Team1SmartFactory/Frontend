@@ -1,0 +1,56 @@
+.page {
+  padding: 1.25rem;
+}
+
+.lineGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.widgets {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.robotWidget {
+  background: var(--surface-card);
+  border: 1px solid var(--border-hairline);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  width: 260px;
+  flex-shrink: 0;
+}
+
+.robotWidget h3 {
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+}
+
+.robotWidget li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid var(--gridline);
+  font-size: 0.85rem;
+}
+
+.robotWidget span[data-state] {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.robotWidget span[data-state='working'],
+.robotWidget span[data-state='moving'] {
+  color: var(--accent);
+}
+
+.robotWidget span[data-state='error'] {
+  color: var(--status-critical);
+}
+
+.robotWidget span[data-state='offline'] {
+  color: var(--text-muted);
+}
