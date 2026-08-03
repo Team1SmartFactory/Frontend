@@ -47,6 +47,30 @@ describe('sortLinesByPriority', () => {
 
     expect(sorted.map((line) => line.id)).toEqual(['a', 'b']);
   });
+
+  it('임계치 이하 라인을 보충 중인 라인보다 앞에 둔다', () => {
+    // 아직 아무도 손대지 않은 라인이, 이미 조치가 진행 중인 라인보다 급하다.
+    const lines = [
+      makeLine({ id: 'restocking', name: 'A', status: 'restocking' }),
+      makeLine({ id: 'shortage', name: 'B', currentQty: 8 }),
+    ];
+
+    const sorted = sortLinesByPriority(lines);
+
+    expect(sorted.map((line) => line.id)).toEqual(['shortage', 'restocking']);
+  });
+
+  it('재고가 적을수록 앞에 온다', () => {
+    const lines = [
+      makeLine({ id: 'plenty', name: 'A', currentQty: 90 }),
+      makeLine({ id: 'low', name: 'B', currentQty: 30 }),
+      makeLine({ id: 'empty', name: 'C', currentQty: 10 }),
+    ];
+
+    const sorted = sortLinesByPriority(lines);
+
+    expect(sorted.map((line) => line.id)).toEqual(['empty', 'low', 'plenty']);
+  });
 });
 
 describe('selectPendingApprovals', () => {

@@ -1,0 +1,57 @@
+.groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.groupTitle {
+  margin-bottom: var(--space-2);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-wide);
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--tone-soft);
+  font-size: var(--text-sm);
+}
+
+.robotId {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.state {
+  flex-shrink: 0;
+  font-weight: var(--weight-semibold);
+  color: var(--tone-text);
+  font-size: var(--text-xs);
+}
+
+.allIdle,
+.idleNote {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.idleNote {
+  margin-top: var(--space-2);
+}

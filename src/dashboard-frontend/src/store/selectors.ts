@@ -1,4 +1,6 @@
 import type { Line, ShortageEvent } from '../shared/domain/types';
+import { toneForLine } from '../shared/domain/statusTone';
+import type { Tone } from '../shared/ui/tone';
 
 const ACTIVE_SHORTAGE_STATUSES = new Set<ShortageEvent['status']>([
   'pending_approval',
@@ -6,11 +8,25 @@ const ACTIVE_SHORTAGE_STATUSES = new Set<ShortageEvent['status']>([
   'in_transit',
 ]);
 
-/** 부족(보충 중) 라인이 항상 최상단에 오도록 정렬한다. (기본 대시보드 탭 요구사항) */
+/**
+ * 조치 시급도 순서.
+ * 부족(critical)이 최우선이고, 보충 지시가 나간 라인(accent)이 그다음이다.
+ * "이미 손을 쓴 라인"보다 "아직 손을 못 쓴 라인"이 위로 오게 하려는 의도다.
+ */
+const TONE_PRIORITY: Record<Tone, number> = {
+  critical: 0,
+  accent: 1,
+  serious: 2,
+  warning: 3,
+  good: 4,
+  idle: 5,
+};
+
+/** 부족 라인이 항상 최상단에 오도록 정렬한다. (기본 대시보드 탭 요구사항) */
 export function sortLinesByPriority(lines: Line[]): Line[] {
   return [...lines].sort((a, b) => {
-    if (a.status === b.status) return a.name.localeCompare(b.name);
-    return a.status === 'restocking' ? -1 : 1;
+    const diff = TONE_PRIORITY[toneForLine(a)] - TONE_PRIORITY[toneForLine(b)];
+    return diff !== 0 ? diff : a.name.localeCompare(b.name);
   });
 }
 

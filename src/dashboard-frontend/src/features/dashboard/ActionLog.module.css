@@ -1,0 +1,43 @@
+.log {
+  display: flex;
+  flex-direction: column;
+}
+
+.entry {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.entry:last-child {
+  border-bottom: none;
+}
+
+.time {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.body {
+  flex: 1;
+  min-width: 0;
+}
+
+.headline {
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.actor {
+  margin-top: var(--space-1);
+  font-size: var(--text-2xs);
+  color: var(--text-muted);
+}
