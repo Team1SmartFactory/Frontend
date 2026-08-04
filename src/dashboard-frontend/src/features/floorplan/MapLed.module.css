@@ -24,10 +24,20 @@
   composes: led;
 }
 
-/* 코어는 밝기만, 헤일로는 크기까지 변화시켜 실제 표시등의 맥동을 흉내낸다. */
+/*
+ * 맥동은 밝기로만 표현한다.
+ *
+ * 헤일로를 scale()로 키우면 SVG에서는 점이 제자리에서 커지지 않고
+ * 대각선으로 밀려나 보인다. transform-box 기본값이 view-box라
+ * transform-origin: center가 원 자신의 중심이 아니라 viewBox 중심으로
+ * 잡히기 때문이다. 로봇 마커는 translate로 배치되어 원의 로컬 좌표가
+ * (0,0)이므로, 확대할수록 viewBox 중심 반대편으로 멀어진다.
+ *
+ * transform-box: fill-box로 고칠 수도 있으나, 위치를 가리키는 표시에서는
+ * 크기가 변하지 않는 편이 읽기 쉬워 밝기 변화만 남겼다.
+ */
 .ledPulse .halo {
   animation: haloBreathe 1.5s var(--ease-out) infinite;
-  transform-origin: center;
 }
 
 .ledPulse .core {
@@ -38,11 +48,9 @@
   0%,
   100% {
     opacity: 0.16;
-    transform: scale(1);
   }
   50% {
-    opacity: 0.34;
-    transform: scale(1.35);
+    opacity: 0.38;
   }
 }
 
