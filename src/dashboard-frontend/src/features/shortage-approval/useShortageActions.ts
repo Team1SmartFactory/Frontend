@@ -1,46 +1,49 @@
-import { useCallback, useState } from 'react';
-import { apiClient } from '../../shared/api/apiClientFactory';
-import { useFactoryStore } from '../../store/useFactoryStore';
+import { useCallback } from 'react';
+import { useApproveShortage, useRejectShortage } from '../../shared/query/useShortageMutations';
 import { useAuthStore } from '../../store/useAuthStore';
 
 /**
- * 승인/반려 액션을 캡슐화한다. 실패 시 예외를 삼키고 콘솔에만 기록해,
- * 네트워크 오류가 승인 팝업 자체를 멈추게 하지 않는다 (사용자는 버튼을 다시 누를 수 있다).
+ * 승인/반려 액션을 화면이 쓰기 좋은 형태로 감싼다.
+ *
+ * 실제 요청과 캐시 갱신은 Query mutation이 담당하고, 여기서는
+ * "누가 승인했는가"를 채워 넣는 일만 한다. 실패해도 예외를 던지지 않아
+ * 네트워크 오류가 팝업 자체를 멈추지 않는다. (사용자는 버튼을 다시 누를 수 있다)
  */
 export function useShortageActions() {
-  const upsertShortageEvent = useFactoryStore((state) => state.upsertShortageEvent);
+  const approveMutation = useApproveShortage();
+  const rejectMutation = useRejectShortage();
   const currentUser = useAuthStore((state) => state.currentUser);
-  const [pendingId, setPendingId] = useState<string | null>(null);
+
+  const approvedBy = currentUser?.displayName ?? '관리자';
 
   const approve = useCallback(
     async (id: string) => {
-      setPendingId(id);
       try {
-        const updated = await apiClient.approveShortage(id, currentUser?.displayName ?? '관리자');
-        upsertShortageEvent(updated);
+        await approveMutation.mutateAsync({ id, approvedBy });
       } catch (error) {
         console.error('[shortage] 승인 처리 실패:', error);
-      } finally {
-        setPendingId(null);
       }
     },
-    [currentUser, upsertShortageEvent],
+    [approveMutation, approvedBy],
   );
 
   const reject = useCallback(
     async (id: string) => {
-      setPendingId(id);
       try {
-        const updated = await apiClient.rejectShortage(id);
-        upsertShortageEvent(updated);
+        await rejectMutation.mutateAsync({ id });
       } catch (error) {
         console.error('[shortage] 반려 처리 실패:', error);
-      } finally {
-        setPendingId(null);
       }
     },
-    [upsertShortageEvent],
+    [rejectMutation],
   );
 
-  return { approve, reject, pendingId };
+  return {
+    approve,
+    reject,
+    /** 요청이 진행 중인 이벤트 id. 버튼 비활성화에 쓴다. */
+    pendingId: approveMutation.variables?.id ?? rejectMutation.variables?.id ?? null,
+    isBusy: approveMutation.isPending || rejectMutation.isPending,
+    error: approveMutation.error ?? rejectMutation.error,
+  };
 }

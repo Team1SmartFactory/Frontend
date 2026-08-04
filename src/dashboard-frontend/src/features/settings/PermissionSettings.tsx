@@ -1,16 +1,24 @@
-import { useState, type FormEvent } from 'react';
-import { useUiStore } from '../../store/useUiStore';
+import { useEffect, useState, type FormEvent } from 'react';
+import { usePermissions, useUpdatePermissions } from '../../shared/query/useSettings';
 import { Button, Card, Switch, TextField } from '../../shared/ui';
 import styles from './PermissionSettings.module.css';
 
 /** 설정 탭의 "로봇 제어 승인 권한 설정". */
 export function PermissionSettings() {
-  const permissions = useUiStore((state) => state.permissions);
-  const setPermissions = useUiStore((state) => state.setPermissions);
-  const [approverInput, setApproverInput] = useState(permissions.authorizedApprovers.join(', '));
+  const { permissions, isPending } = usePermissions();
+  const updatePermissions = useUpdatePermissions();
 
   const savedApprovers = permissions.authorizedApprovers.join(', ');
+  const [approverInput, setApproverInput] = useState(savedApprovers);
+
+  // 서버 값이 늦게 도착하거나 다른 창에서 바뀌면 입력란을 따라가게 한다.
+  // 사용자가 편집 중일 때는 덮어쓰지 않도록 저장된 값과 같을 때만 동기화한다.
+  useEffect(() => {
+    setApproverInput((current) => (current === '' ? savedApprovers : current));
+  }, [savedApprovers]);
+
   const isDirty = approverInput.trim() !== savedApprovers;
+  const isSaving = updatePermissions.isPending;
 
   function handleApproverSubmit(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
@@ -18,7 +26,7 @@ export function PermissionSettings() {
       .split(',')
       .map((name) => name.trim())
       .filter(Boolean);
-    setPermissions({ ...permissions, authorizedApprovers: approvers });
+    updatePermissions.mutate({ ...permissions, authorizedApprovers: approvers });
   }
 
   return (
@@ -26,7 +34,10 @@ export function PermissionSettings() {
       <div className={styles.body}>
         <Switch
           checked={permissions.approvalRequired}
-          onChange={(approvalRequired) => setPermissions({ ...permissions, approvalRequired })}
+          disabled={isPending || isSaving}
+          onChange={(approvalRequired) =>
+            updatePermissions.mutate({ ...permissions, approvalRequired })
+          }
           label="관리자 승인 필수"
           description={
             permissions.approvalRequired
@@ -40,12 +51,19 @@ export function PermissionSettings() {
             label="승인 권한 보유자"
             hint="쉼표로 구분해 입력합니다. 예: admin, manager"
             value={approverInput}
+            disabled={isPending}
             onChange={(event) => setApproverInput(event.target.value)}
           />
-          <Button type="submit" variant="primary" size="sm" disabled={!isDirty}>
-            {isDirty ? '저장' : '저장됨'}
+          <Button type="submit" variant="primary" size="sm" disabled={!isDirty || isSaving}>
+            {isSaving ? '저장 중…' : isDirty ? '저장' : '저장됨'}
           </Button>
         </form>
+
+        {updatePermissions.isError && (
+          <p className={styles.error} role="alert">
+            설정을 저장하지 못했습니다. {updatePermissions.error.message}
+          </p>
+        )}
       </div>
     </Card>
   );

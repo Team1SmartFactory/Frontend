@@ -1,6 +1,7 @@
 import type { ComponentType } from 'react';
 import { NavLink } from 'react-router-dom';
-import { useFactoryStore } from '../store/useFactoryStore';
+import { useConnectionStore } from '../store/useConnectionStore';
+import { useShortageEvents } from '../shared/query/useFactoryData';
 import { useUiStore } from '../store/useUiStore';
 import { selectPendingApprovals } from '../store/selectors';
 import { StatusLed } from '../shared/ui';
@@ -43,8 +44,8 @@ const CONNECTION: Record<ConnectionStatus, { label: string; tone: Tone }> = {
 export function SideNav() {
   const navCollapsed = useUiStore((state) => state.navCollapsed);
   const toggleNav = useUiStore((state) => state.toggleNav);
-  const connectionStatus = useFactoryStore((state) => state.connectionStatus);
-  const shortageEvents = useFactoryStore((state) => state.shortageEvents);
+  const connectionStatus = useConnectionStore((state) => state.status);
+  const { shortageEvents } = useShortageEvents();
 
   const pendingCount = selectPendingApprovals(shortageEvents).length;
   const connection = CONNECTION[connectionStatus];

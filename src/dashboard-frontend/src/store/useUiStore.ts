@@ -1,31 +1,18 @@
 import { create } from 'zustand';
 
-export interface Permissions {
-  approvalRequired: boolean;
-  authorizedApprovers: string[];
-}
-
 interface UiState {
   selectedLineId: string | null;
   zoomedCameraId: string | null;
   /** 좌측 네비게이션 접힘 여부. 평면도/CCTV에서 화면을 넓게 쓰기 위한 설정. */
   navCollapsed: boolean;
-  permissions: Permissions;
   selectLine: (lineId: string | null) => void;
   zoomCamera: (cameraId: string | null) => void;
   toggleNav: () => void;
-  setPermissions: (permissions: Permissions) => void;
 }
 
 const STORAGE_KEYS = {
-  permissions: 'sfsc.settings.permissions',
   navCollapsed: 'sfsc.ui.navCollapsed',
 } as const;
-
-const DEFAULT_PERMISSIONS: Permissions = {
-  approvalRequired: true,
-  authorizedApprovers: ['admin'],
-};
 
 /**
  * localStorage 접근을 한 쌍의 헬퍼로 감싼다.
@@ -49,12 +36,16 @@ function writeJson(key: string, value: unknown): void {
   }
 }
 
-/** 평면도/CCTV 탭의 선택 상태, 네비게이션 접힘, 설정 탭의 승인 권한을 담당한다. */
+/**
+ * 순수 클라이언트 상태만 담는다.
+ *
+ * 서버에서 받아오는 값(라인·로봇·부족 이벤트·승인 권한)은 Query 캐시가 맡는다.
+ * 승인 권한이 여기 있었을 때는 관리자마다 설정이 달라지는 문제가 있었다.
+ */
 export const useUiStore = create<UiState>((set, get) => ({
   selectedLineId: null,
   zoomedCameraId: null,
   navCollapsed: readJson(STORAGE_KEYS.navCollapsed, false),
-  permissions: { ...DEFAULT_PERMISSIONS, ...readJson<Partial<Permissions>>(STORAGE_KEYS.permissions, {}) },
 
   selectLine: (lineId) => set({ selectedLineId: lineId }),
   zoomCamera: (cameraId) => set({ zoomedCameraId: cameraId }),
@@ -63,10 +54,5 @@ export const useUiStore = create<UiState>((set, get) => ({
     const navCollapsed = !get().navCollapsed;
     writeJson(STORAGE_KEYS.navCollapsed, navCollapsed);
     set({ navCollapsed });
-  },
-
-  setPermissions: (permissions) => {
-    writeJson(STORAGE_KEYS.permissions, permissions);
-    set({ permissions });
   },
 }));

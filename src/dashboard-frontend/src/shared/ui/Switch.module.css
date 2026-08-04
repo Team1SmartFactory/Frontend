@@ -72,3 +72,9 @@
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
+
+/* 저장 중에는 조작이 막혔음을 색으로 알린다. */
+.row[data-disabled='true'] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

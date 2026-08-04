@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useFactoryStore } from '../../store/useFactoryStore';
+import { useConnectionStore } from '../../store/useConnectionStore';
 import styles from './SplashScreen.module.css';
 
 const FALLBACK_DELAY_MS = 2500;
@@ -18,7 +18,7 @@ const STATUS_MESSAGE: Record<string, string> = {
  * 사용자가 스플래시에 무한정 갇히지 않게 한다.
  */
 export function SplashScreen() {
-  const connectionStatus = useFactoryStore((state) => state.connectionStatus);
+  const connectionStatus = useConnectionStore((state) => state.status);
   const navigate = useNavigate();
 
   useEffect(() => {
