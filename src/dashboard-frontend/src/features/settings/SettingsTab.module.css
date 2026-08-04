@@ -12,11 +12,7 @@
   padding: var(--space-5) var(--space-6) var(--space-8);
 }
 
-/* 설정은 읽는 폭이 넓어지면 가독성이 떨어지므로 최대 폭을 제한한다. */
-.columns {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
-  gap: var(--space-4);
-  max-width: 56rem;
-  align-items: start;
+/* 설정 카드는 읽는 폭이 넓어지면 가독성이 떨어지므로 최대 폭을 제한한다. */
+.scroll > * {
+  max-width: 32rem;
 }

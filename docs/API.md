@@ -181,19 +181,14 @@
 화면 기능은 이미 있으나 현재 **브라우저 로컬(localStorage) 또는 자리표시자**로 동작 중인 영역입니다.
 실서비스 전환 시 아래가 필요하며, 경로·형태는 제안값입니다.
 
-### 7.1 관리자 인증 (설정 탭)
+### 7.1 관리자 인증 (도입하지 않음)
 
-현재: `useAuthStore`가 localStorage에만 저장. 검증 없음.
+로그인 기능은 없습니다. 승인 API의 `approvedBy`는 고정 문자열(`"관리자"`)을 보냅니다.
 
-| 기능 | Method | Path (제안) | 요청 | 응답 |
-|---|---|---|---|---|
-| 회원가입 | `POST` | `/auth/signup` | `{ username, password, displayName }` | `{ user }` |
-| 로그인 | `POST` | `/auth/login` | `{ username, password }` | `{ user, token }` |
-| 로그아웃 | `POST` | `/auth/logout` | — | `204` |
-| 세션 조회 | `GET` | `/auth/me` | — | `{ user }` |
-
-> 승인 API의 `approvedBy`는 현재 클라이언트가 보냅니다. 인증 도입 후에는
-> **서버가 토큰에서 판정**해야 합니다(위조 방지). 그때 요청 Body에서 `approvedBy` 제거.
+인증을 나중에 도입한다면 `POST /auth/login` 등 세션 API가 필요하고,
+그때는 **서버가 토큰에서 승인자를 판정**해야 합니다(클라이언트가 이름을
+보내는 지금 방식은 위조가 가능하므로, 인증 도입과 동시에 요청 Body의
+`approvedBy`는 제거해야 합니다).
 
 ### 7.2 승인 권한 설정 (설정 탭)
 

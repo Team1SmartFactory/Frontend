@@ -1,6 +1,8 @@
 import { useCallback } from 'react';
 import { useApproveShortage, useRejectShortage } from '../../shared/query/useShortageMutations';
-import { useAuthStore } from '../../store/useAuthStore';
+
+/** 로그인 기능이 없으므로 승인자 이름은 고정값을 쓴다. 인증 도입 시 실제 사용자로 교체한다. */
+const APPROVED_BY = '관리자';
 
 /**
  * 승인/반려 액션을 화면이 쓰기 좋은 형태로 감싼다.
@@ -12,19 +14,16 @@ import { useAuthStore } from '../../store/useAuthStore';
 export function useShortageActions() {
   const approveMutation = useApproveShortage();
   const rejectMutation = useRejectShortage();
-  const currentUser = useAuthStore((state) => state.currentUser);
-
-  const approvedBy = currentUser?.displayName ?? '관리자';
 
   const approve = useCallback(
     async (id: string) => {
       try {
-        await approveMutation.mutateAsync({ id, approvedBy });
+        await approveMutation.mutateAsync({ id, approvedBy: APPROVED_BY });
       } catch (error) {
         console.error('[shortage] 승인 처리 실패:', error);
       }
     },
-    [approveMutation, approvedBy],
+    [approveMutation],
   );
 
   const reject = useCallback(

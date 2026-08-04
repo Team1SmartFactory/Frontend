@@ -179,7 +179,7 @@ export function useLines() {
 
 | 영역 | 현재 상태 | 필요한 것 |
 |---|---|---|
-| 인증 | `useAuthStore`가 localStorage에만 저장. 검증 없음 | 로그인/세션 API. 도입 후 `approvedBy`는 **서버가 토큰에서 판정**해야 함(위조 방지) |
+| 인증 | 로그인 기능 없음. `approvedBy`는 고정 문자열(`"관리자"`) | 나중에 도입한다면 로그인/세션 API 필요. 그때는 `approvedBy`를 **서버가 토큰에서 판정**해야 함(위조 방지) |
 | 카메라 스트림 | 목록 API는 준비됨, 영상은 자리표시자 | `streamUrl` (RTSP/HLS/WebRTC) |
 
 `Camera.streamUrl`은 스키마에 이미 선택 필드로 있습니다. 백엔드가 채워 보내면
