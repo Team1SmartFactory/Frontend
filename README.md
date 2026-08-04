@@ -66,3 +66,10 @@
 
 - Beagle AI Robot: https://robomation-shop.co.kr/category/%EB%B9%84%EA%B8%80ai%EB%A1%9C%EB%B4%87/140/
 - OMX-F Introduction (ROBOTIS Docs): https://docs.robotis.com/docs/systems/omx/introduction/
+
+---
+
+## 7) 대시보드 프론트엔드
+
+`src/dashboard-frontend/` 에 MVP 탭 구조(평면도 / 대시보드 / CCTV / 설정)를 구현한
+React + TypeScript 웹앱이 있습니다. 실행 방법과 아키텍처 설명은 해당 폴더의 README를 참고하세요.

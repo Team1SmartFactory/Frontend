@@ -1,0 +1,18 @@
+.tile {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  border-radius: var(--radius-md);
+  text-align: left;
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.tile:hover {
+  transform: translateY(-2px);
+}
+
+.tile > * {
+  aspect-ratio: 16 / 10;
+}

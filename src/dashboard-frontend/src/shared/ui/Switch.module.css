@@ -1,0 +1,74 @@
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.text {
+  min-width: 0;
+}
+
+.label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+}
+
+.description {
+  margin-top: var(--space-1);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.control {
+  position: relative;
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 1.5rem;
+}
+
+/* 네이티브 입력은 투명하게 덮어 두고 히트 영역·키보드 동작을 그대로 쓴다. */
+.input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.track {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--border-strong);
+  transition: background var(--duration-base) var(--ease-out);
+}
+
+.knob {
+  display: block;
+  width: 1.125rem;
+  height: 1.125rem;
+  margin: 0.1875rem;
+  border-radius: var(--radius-full);
+  background: var(--c-neutral-0);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--duration-base) var(--ease-out);
+}
+
+.input:checked + .track {
+  background: var(--accent);
+}
+
+.input:checked + .track .knob {
+  transform: translateX(1rem);
+}
+
+.input:focus-visible + .track {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}

@@ -1,0 +1,120 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  width: var(--panel-width);
+  min-height: 0;
+  background: var(--surface-card);
+  border-left: 1px solid var(--border-hairline);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  flex-shrink: 0;
+  padding: var(--space-4) var(--space-3) var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.title {
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.sectionTitle {
+  margin-bottom: var(--space-3);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-wide);
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+/* ─── 가져올 부품 ───────────────────────────────────────────── */
+.partList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.part {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--tone-soft);
+}
+
+.partBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.partName {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.partMeta {
+  margin-top: var(--space-1);
+  font-size: var(--text-2xs);
+  color: var(--text-muted);
+}
+
+.partQty {
+  flex-shrink: 0;
+  font-size: var(--text-md);
+  font-weight: var(--weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── 지난 이력 ─────────────────────────────────────────────── */
+.historyList {
+  display: flex;
+  flex-direction: column;
+}
+
+.historyItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--border-hairline);
+  font-size: var(--text-sm);
+}
+
+.historyItem:last-child {
+  border-bottom: none;
+}
+
+.historyPart {
+  min-width: 0;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
