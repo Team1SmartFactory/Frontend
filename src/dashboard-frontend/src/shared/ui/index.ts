@@ -6,6 +6,7 @@ export { Card } from './Card';
 export { EmptyState } from './EmptyState';
 export { Meter } from './Meter';
 export { PageHeader } from './PageHeader';
+export { ErrorState, LoadingState, QueryState } from './QueryState';
 export { StatusLed } from './StatusLed';
 export { Switch } from './Switch';
 export { TextField } from './TextField';
