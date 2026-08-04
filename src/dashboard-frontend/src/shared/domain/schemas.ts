@@ -89,3 +89,23 @@ export const SnapshotSchema = z.object({
   shortageEvents: z.array(ShortageEventSchema),
 });
 export type Snapshot = z.infer<typeof SnapshotSchema>;
+
+export const CameraSchema = z.object({
+  id: z.string(),
+  lineId: z.string(),
+  label: z.string(),
+  streamUrl: z.string().optional(),
+  online: z.boolean(),
+});
+export const CameraListSchema = z.array(CameraSchema);
+
+export const PermissionsSchema = z.object({
+  approvalRequired: z.boolean(),
+  authorizedApprovers: z.array(z.string()),
+});
+
+export const InventoryPointSchema = z.object({
+  qty: z.number(),
+  at: z.string(),
+});
+export const InventoryHistorySchema = z.array(InventoryPointSchema);

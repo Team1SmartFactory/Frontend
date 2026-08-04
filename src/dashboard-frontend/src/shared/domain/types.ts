@@ -54,3 +54,29 @@ export interface RobotStatus {
   position: Position;
   updatedAt: string;
 }
+
+/**
+ * 설치된 카메라.
+ * 라인당 1대를 가정하지 않는다. 실제로는 한 라인에 여러 대가 붙을 수 있어
+ * lineId를 필드로 두고 화면에서 묶는다.
+ */
+export interface Camera {
+  id: string;
+  lineId: string;
+  label: string;
+  /** RTSP/HLS/WebRTC 주소. 아직 스트림이 없으면 비어 있다. */
+  streamUrl?: string;
+  online: boolean;
+}
+
+/** 승인 권한 설정. 로봇 자동 동작 여부를 결정하므로 서버가 보관해야 한다. */
+export interface Permissions {
+  approvalRequired: boolean;
+  authorizedApprovers: string[];
+}
+
+/** 재고 추이 그래프의 한 점. */
+export interface InventoryPoint {
+  qty: number;
+  at: string;
+}
