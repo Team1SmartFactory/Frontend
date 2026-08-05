@@ -96,3 +96,32 @@ export function CloseIcon(props: IconProps) {
     </Svg>
   );
 }
+
+/* ─── 테마 선택 (설정 탭 화면 표시) ────────────────────────────── */
+
+export function SunIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <circle cx="12" cy="12" r="4.5" />
+      <path d="M12 2.5v2.5M12 19v2.5M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M2.5 12H5M19 12h2.5M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" />
+    </Svg>
+  );
+}
+
+export function MoonIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z" />
+    </Svg>
+  );
+}
+
+/** 시스템 설정 따라가기 — 모니터 화면 형태로 'OS 값을 그대로 따른다'는 뜻을 전달한다. */
+export function SystemIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <rect x="3" y="4.5" width="18" height="12" rx="2" />
+      <path d="M8.5 20.5h7M12 16.5v4" />
+    </Svg>
+  );
+}

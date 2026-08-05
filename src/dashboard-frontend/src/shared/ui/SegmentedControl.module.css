@@ -1,0 +1,53 @@
+/**
+ * TDS 문법: 회색 트랙 위에 흰 pill이 얹혀 선택 상태를 보여준다.
+ * 토글(Switch)의 트랙/노브 관계를 3지선다로 확장한 형태다.
+ */
+.track {
+  display: inline-flex;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  background: var(--surface-sunken);
+  border-radius: var(--radius-md);
+}
+
+.segment {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: 2.25rem;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  white-space: nowrap;
+  transition:
+    background var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.segment:hover {
+  color: var(--text-primary);
+}
+
+.segment[data-selected='true'] {
+  background: var(--surface-card);
+  color: var(--text-primary);
+  font-weight: var(--weight-semibold);
+  box-shadow: var(--shadow-sm);
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+/* 공장 현장 태블릿(터치) 대응 — 44px 최소 탭 타깃. */
+@media (pointer: coarse) {
+  .segment {
+    height: 2.75rem;
+  }
+}
