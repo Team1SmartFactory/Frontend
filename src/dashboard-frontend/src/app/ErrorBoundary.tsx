@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { Button } from '../shared/ui';
 import styles from './ErrorBoundary.module.css';
 
 interface ErrorBoundaryProps {
@@ -34,9 +35,9 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       return (
         <div className={styles.fallback} role="alert">
           <p>{this.props.label} 화면을 불러오는 중 오류가 발생했습니다.</p>
-          <button type="button" onClick={this.handleRetry}>
+          <Button variant="secondary" onClick={this.handleRetry}>
             다시 시도
-          </button>
+          </Button>
         </div>
       );
     }

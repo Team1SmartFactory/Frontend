@@ -1,5 +1,5 @@
-import { useFactoryStore } from '../../store/useFactoryStore';
-import { useUiStore } from '../../store/useUiStore';
+import { useLines, useShortageEvents } from '../../shared/query/useFactoryData';
+import { usePermissions } from '../../shared/query/useSettings';
 import { selectPendingApprovals } from '../../store/selectors';
 import { Badge, Button, StatusLed } from '../../shared/ui';
 import { formatClock } from '../../shared/utils/formatTime';
@@ -14,11 +14,12 @@ import styles from './ShortageApprovalModal.module.css';
  * 설정에서 승인 필수를 끄면 팝업 대신 자동 승인으로 넘어간다.
  */
 export function ShortageApprovalModal() {
-  const shortageEvents = useFactoryStore((state) => state.shortageEvents);
-  const lines = useFactoryStore((state) => state.lines);
-  const approvalRequired = useUiStore((state) => state.permissions.approvalRequired);
+  const { shortageEvents } = useShortageEvents();
+  const { lines } = useLines();
+  const { permissions } = usePermissions();
   const { approve, reject, pendingId } = useShortageActions();
 
+  const approvalRequired = permissions.approvalRequired;
   const pending = selectPendingApprovals(shortageEvents);
 
   useAutoApproval(pending, !approvalRequired, approve);

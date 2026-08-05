@@ -1,6 +1,15 @@
 import { Emitter } from '../utils/emitter';
 import type { RealtimeMessage } from '../domain/schemas';
-import type { Line, Position, RobotStatus, ShortageEvent } from '../domain/types';
+import {
+  DEFAULT_PERMISSIONS,
+  type Camera,
+  type InventoryPoint,
+  type Line,
+  type Permissions,
+  type Position,
+  type RobotStatus,
+  type ShortageEvent,
+} from '../domain/types';
 import type { Snapshot } from '../domain/schemas';
 
 /**
@@ -8,15 +17,17 @@ import type { Snapshot } from '../domain/schemas';
  * 대시보드 MVP를 그대로 시연할 수 있도록, 설계 문서의 5단계 프레임워크를
  * 브라우저 메모리 안에서 흉내내는 시뮬레이터.
  *
- * ApiClient/RealtimeClient 계약을 그대로 따르므로, 실제 백엔드가 준비되면
- * mockApiClient/mockRealtimeClient를 httpApiClient/webSocketRealtimeClient로
- * 바꾸는 것만으로 이 파일 전체를 걷어낼 수 있다.
+ * FactoryApi/RealtimeClient 계약을 그대로 따르므로, 실제 백엔드가 준비되면
+ * .env의 VITE_USE_MOCK=false 한 줄로 전환되고 이 파일 전체를 걷어낼 수 있다.
  */
 
 const TICK_MS = 1200;
 const SHORTAGE_THRESHOLD = 20;
 const STEP_TICKS = 3;
 const REJECT_COOLDOWN_TICKS = 3;
+const MAX_HISTORY_POINTS = 30;
+
+const PERMISSIONS_STORAGE_KEY = 'sfsc.settings.permissions';
 
 type TaskStep = 'dispatch_storage' | 'beagle_to_line' | 'unload' | 'done';
 
@@ -112,12 +123,35 @@ const ACTIVE_SHORTAGE_STATUSES = new Set<ShortageEvent['status']>([
   'in_transit',
 ]);
 
+/** 라인당 천장 카메라 1대. 실제 백엔드에서는 카메라 테이블이 대신한다. */
+const INITIAL_CAMERAS: Camera[] = INITIAL_LINES.map((line) => ({
+  id: `cam-${line.id}`,
+  lineId: line.id,
+  label: `${line.name} 천장 카메라`,
+  online: true,
+}));
+
+function readStoredPermissions(): Permissions {
+  try {
+    const raw = localStorage.getItem(PERMISSIONS_STORAGE_KEY);
+    return raw
+      ? { ...DEFAULT_PERMISSIONS, ...(JSON.parse(raw) as Partial<Permissions>) }
+      : DEFAULT_PERMISSIONS;
+  } catch {
+    return DEFAULT_PERMISSIONS;
+  }
+}
+
 class MockFactoryBackend {
   private lines = new Map<string, Line>(INITIAL_LINES.map((line) => [line.id, { ...line }]));
   private robots = new Map<string, RobotStatus>(INITIAL_ROBOTS.map((robot) => [robot.robotId, { ...robot }]));
   private shortageEvents = new Map<string, ShortageEvent>();
   private activeTasks = new Map<string, ActiveTask>();
   private cooldownUntilTick = new Map<string, number>();
+  private cameras: Camera[] = INITIAL_CAMERAS.map((camera) => ({ ...camera }));
+  private permissions: Permissions = readStoredPermissions();
+  /** 라인별 재고 추이. 실제 백엔드에서는 시계열 테이블이 대신한다. */
+  private inventoryHistory = new Map<string, InventoryPoint[]>();
   private emitter = new Emitter<RealtimeMessage>();
   private timer: ReturnType<typeof setInterval> | null = null;
   private tick = 0;
@@ -142,6 +176,28 @@ class MockFactoryBackend {
       robots: Array.from(this.robots.values()).map((robot) => ({ ...robot })),
       shortageEvents: Array.from(this.shortageEvents.values()).map((event) => ({ ...event })),
     };
+  }
+
+  getCameras(): Camera[] {
+    return this.cameras.map((camera) => ({ ...camera }));
+  }
+
+  getPermissions(): Permissions {
+    return { ...this.permissions, authorizedApprovers: [...this.permissions.authorizedApprovers] };
+  }
+
+  setPermissions(permissions: Permissions): Permissions {
+    this.permissions = permissions;
+    try {
+      localStorage.setItem(PERMISSIONS_STORAGE_KEY, JSON.stringify(permissions));
+    } catch {
+      // 저장 실패는 세션 내 동작에 영향을 주지 않으므로 무시한다.
+    }
+    return this.getPermissions();
+  }
+
+  getInventoryHistory(lineId: string): InventoryPoint[] {
+    return (this.inventoryHistory.get(lineId) ?? []).map((point) => ({ ...point }));
   }
 
   async approveShortage(id: string, approvedBy: string): Promise<ShortageEvent> {
@@ -182,6 +238,14 @@ class MockFactoryBackend {
   }
 
   private emitInventory(line: Line): void {
+    // 실제 백엔드라면 시계열 테이블에 적재될 지점.
+    // 여기서 쌓아 두어야 새로고침 직후에도 그래프가 비어 있지 않다.
+    const history = this.inventoryHistory.get(line.id) ?? [];
+    this.inventoryHistory.set(
+      line.id,
+      [...history, { qty: line.currentQty, at: line.updatedAt }].slice(-MAX_HISTORY_POINTS),
+    );
+
     this.emitter.emit({
       type: 'line.inventory',
       payload: { lineId: line.id, currentQty: line.currentQty, status: line.status, updatedAt: line.updatedAt },

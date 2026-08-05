@@ -1,15 +1,16 @@
 import type { ComponentType } from 'react';
-import { NavLink } from 'react-router-dom';
-import { useFactoryStore } from '../store/useFactoryStore';
+import { Link, NavLink } from 'react-router-dom';
+import { useConnectionStore } from '../store/useConnectionStore';
+import { useShortageEvents } from '../shared/query/useFactoryData';
 import { useUiStore } from '../store/useUiStore';
 import { selectPendingApprovals } from '../store/selectors';
 import { StatusLed } from '../shared/ui';
 import {
   CctvIcon,
-  ChevronLeftIcon,
   DashboardIcon,
   FloorPlanIcon,
   SettingsIcon,
+  SidebarToggleIcon,
 } from '../shared/ui/icons';
 import type { Tone } from '../shared/ui/tone';
 import type { ConnectionStatus } from '../shared/realtime/RealtimeClient';
@@ -43,8 +44,8 @@ const CONNECTION: Record<ConnectionStatus, { label: string; tone: Tone }> = {
 export function SideNav() {
   const navCollapsed = useUiStore((state) => state.navCollapsed);
   const toggleNav = useUiStore((state) => state.toggleNav);
-  const connectionStatus = useFactoryStore((state) => state.connectionStatus);
-  const shortageEvents = useFactoryStore((state) => state.shortageEvents);
+  const connectionStatus = useConnectionStore((state) => state.status);
+  const { shortageEvents } = useShortageEvents();
 
   const pendingCount = selectPendingApprovals(shortageEvents).length;
   const connection = CONNECTION[connectionStatus];
@@ -55,7 +56,7 @@ export function SideNav() {
       data-collapsed={navCollapsed}
       aria-label="주요 화면"
     >
-      <div className={styles.brand}>
+      <Link to="/dashboard" className={styles.brand} title={navCollapsed ? '대시보드로 이동' : undefined}>
         <span className={styles.brandMark} aria-hidden="true">
           SF
         </span>
@@ -63,7 +64,7 @@ export function SideNav() {
           <strong className={styles.brandTitle}>스마트 팩토리</strong>
           <span className={styles.brandSubtitle}>재고 관제</span>
         </span>
-      </div>
+      </Link>
 
       <ul className={styles.list}>
         {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
@@ -103,9 +104,8 @@ export function SideNav() {
           title={navCollapsed ? '펼치기' : '접기'}
         >
           <span className={styles.toggleIcon}>
-            <ChevronLeftIcon size={1.1} />
+            <SidebarToggleIcon size={1.15} />
           </span>
-          <span className={styles.toggleLabel}>접기</span>
         </button>
       </div>
     </nav>

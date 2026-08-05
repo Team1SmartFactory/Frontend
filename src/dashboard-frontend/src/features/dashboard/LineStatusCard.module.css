@@ -1,12 +1,14 @@
+/*
+ * 흰 카드 안에 들어가는 중첩 표면이라 흰 배경 + 그림자로는 구분되지 않는다.
+ * TDS는 이 자리에 옅은 회색 면(background-lower)을 깔고 그림자를 쓰지 않는다.
+ */
 .card {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
   padding: var(--space-4);
-  background: var(--surface-card);
-  border: 1px solid var(--border-hairline);
+  background: var(--surface-sunken);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
 
   /* 상태는 좌측 색 띠로 먼저 읽히게 하고, 세부 수치는 그다음에 읽게 한다. */
   border-left: 3px solid var(--tone);

@@ -1,3 +1,8 @@
+/**
+ * 부족 알림 목록.
+ * 각 행은 옅은 톤 블록(채움 + 라운드)이고,
+ * 부가 설명·시각은 크기와 색으로 낮춘다.
+ */
 .list {
   display: flex;
   flex-direction: column;
@@ -19,19 +24,21 @@
 }
 
 .headline {
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
   color: var(--text-primary);
 }
 
 .detail {
   margin-top: var(--space-1);
   font-size: var(--text-xs);
+  font-weight: var(--weight-regular);
   color: var(--text-secondary);
 }
 
 .time {
   flex-shrink: 0;
-  font-size: var(--text-2xs);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-regular);
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }

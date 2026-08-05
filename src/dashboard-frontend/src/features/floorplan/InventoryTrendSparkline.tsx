@@ -1,4 +1,4 @@
-import type { InventoryPoint } from '../../store/useFactoryStore';
+import type { InventoryPoint } from '../../shared/domain/types';
 import type { Tone } from '../../shared/ui/tone';
 import styles from './InventoryTrendSparkline.module.css';
 

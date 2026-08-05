@@ -1,192 +1,414 @@
 /**
  * 디자인 토큰 — 이 파일이 시각 언어의 단일 소스다.
  *
+ * 시각 언어 출처: 토스 디자인 시스템(TDS).
+ * 토스페이먼츠 아티클 페이지에 실린 TDS 번들에서 원시 팔레트·타이포·라운드·
+ * 그림자 값을 그대로 가져왔다. 대시보드에 필요하지만 원본에 없는 축
+ * (상태 4단계 중 serious)은 원본 색조 사이에서 파생했고, 확장 지점은 주석에 명시한다.
+ *
  * 규칙:
  *  1) 컴포넌트 CSS는 raw 값(#hex, px)을 쓰지 않고 반드시 토큰을 참조한다.
  *  2) 토큰은 "원시(primitive) → 의미(semantic)" 2단계로 나뉜다.
  *     원시 토큰은 여기서만 쓰이고, 컴포넌트는 의미 토큰만 참조한다.
  *  3) 다크 모드는 의미 토큰만 재정의한다. 원시 팔레트는 그대로 둔다.
+ *
+ * 이 시스템의 성격 — 지키지 않으면 TDS처럼 보이지 않는 지점들:
+ *   · 자간을 쓰지 않는다. TDS는 letter-spacing이 전 구간 0이다.
+ *   · 그림자로 경계를 긋지 않는다. 회색 페이지 위 흰 면과 라운드로 층을 만든다.
+ *   · 300 무게를 쓰지 않는다. TDS의 하한은 400이다.
+ *   · 글자가 크고 행간이 넓다. 본문 행간이 1.6이다.
  */
 
 :root {
-  /* ─── 원시: 색상 팔레트 ─────────────────────────────────────── */
-  --c-neutral-0: #ffffff;
-  --c-neutral-50: #f9f9f7;
-  --c-neutral-100: #f2f2ef;
-  --c-neutral-200: #e1e0d9;
-  --c-neutral-300: #c9c8c0;
-  --c-neutral-500: #898781;
-  --c-neutral-600: #6b6a65;
-  --c-neutral-700: #52514e;
-  --c-neutral-850: #1a1a19;
-  --c-neutral-900: #121211;
-  --c-neutral-950: #0d0d0d;
+  /* ─── 원시: 색상 팔레트 (TDS color-base, 라이트) ─────────────── */
+  --c-white: #ffffff;
 
-  --c-blue-400: #5b9ef0;
-  --c-blue-500: #2a78d6;
-  --c-blue-600: #1c5cab;
+  --c-grey-50: #f6f7f9;
+  --c-grey-100: #f2f4f7;
+  --c-grey-200: #e8ebf0;
+  --c-grey-300: #d4d9e1;
+  --c-grey-400: #b8bdc5;
+  --c-grey-500: #8f959e;
+  --c-grey-600: #727780;
+  --c-grey-700: #4e535c;
+  --c-grey-800: #333840;
+  --c-grey-900: #1c1f25;
 
-  --c-green-500: #12a150;
-  --c-amber-600: #c47f00;
-  --c-amber-400: #fab219;
-  --c-orange-500: #e06a3a;
-  --c-orange-400: #f59366;
-  --c-red-500: #e0393a;
-  --c-red-600: #c02a2b;
+  /**
+   * TDS는 회색을 불투명 색이 아니라 "잉크 투명도"로도 쓴다.
+   * 어느 표면 위에 얹혀도 같은 농도로 보이게 하려는 장치이고,
+   * 텍스트 계층과 hover/active 채움이 전부 이 축을 쓴다.
+   */
+  --c-ink-a50: rgba(13, 25, 74, 0.04);
+  --c-ink-a100: rgba(7, 25, 76, 0.05);
+  --c-ink-a200: rgba(3, 31, 63, 0.09);
+  --c-ink-a300: rgba(2, 32, 59, 0.17);
+  --c-ink-a400: rgba(19, 30, 54, 0.3);
+  --c-ink-a500: rgba(18, 31, 51, 0.47);
+  --c-ink-a600: rgba(22, 31, 46, 0.61);
+  --c-ink-a700: rgba(24, 31, 43, 0.77);
+  --c-ink-a800: rgba(26, 31, 41, 0.89);
+  --c-ink-a900: rgba(28, 31, 37, 0.96);
 
-  /* ─── 원시: 간격 스케일 (4px 기준) ──────────────────────────── */
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-  --space-5: 1.25rem;
-  --space-6: 1.5rem;
-  --space-8: 2rem;
-  --space-10: 2.5rem;
+  --c-blue-50: #f2f8ff;
+  --c-blue-100: #ebf4ff;
+  --c-blue-200: #dcecfe;
+  --c-blue-500: #4396fb;
+  --c-blue-600: #3182f6; /* 토스 브랜드 블루 */
+  --c-blue-700: #2272eb;
+  --c-blue-800: #1b59c5;
+
+  --c-red-50: #fff5f5;
+  --c-red-100: #ffefef;
+  --c-red-500: #f86366;
+  --c-red-600: #ef3341;
+  --c-red-700: #de2b39;
+  --c-red-800: #b12831;
+
+  --c-green-50: #f0faf5;
+  --c-green-100: #e7f8f0;
+  --c-green-500: #00b67c;
+  --c-green-600: #1f9d6f;
+  --c-green-700: #009467;
+  --c-green-800: #207450;
+
+  --c-yellow-50: #fef7e4;
+  --c-yellow-100: #fff3ce;
+  --c-yellow-500: #fa8a12;
+  --c-yellow-600: #e26d00;
+  --c-yellow-700: #c95c00;
+  --c-yellow-800: #9b480d;
+
+  /**
+   * 확장 — TDS에 없는 색.
+   * 원본의 상태색은 green/yellow/red 3단이라 대시보드의 4단(정상·주의·심각·위험)을
+   * 만들 수 없다. yellow-600(#e26d00)과 red-600(#ef3341) 사이에서 'serious'용
+   * 주황을 파생했고, 대비 기준(마크 3:1 / 흰 글자 4.5:1)을 계산해 확정했다.
+   */
+  --c-orange-600: #e0561f;
+  --c-orange-800: #b03d10;
+  --c-orange-900: #8a3210;
+
+  /* 다크 모드 전용 (TDS 다크 팔레트) */
+  --c-grey-d50: #202025;
+  --c-grey-d100: #2a2b31;
+  --c-grey-d200: #32343d;
+  --c-grey-d300: #3e3f49;
+  --c-grey-d500: #676c77;
+  --c-grey-d600: #888d97;
+  --c-grey-d700: #b3b8c2;
+  --c-grey-d800: #dadfe9;
+
+  --c-ink-d-a50: rgba(218, 223, 233, 0.04);
+  --c-ink-d-a100: rgba(214, 224, 239, 0.09);
+  --c-ink-d-a200: rgba(213, 223, 244, 0.13);
+  --c-ink-d-a300: rgba(212, 223, 248, 0.19);
+  --c-ink-d-a600: rgba(216, 223, 237, 0.59);
+  --c-ink-d-a700: rgba(217, 223, 235, 0.8);
+  --c-ink-d-a800: rgba(242, 246, 255, 0.9);
+
+  --c-blue-d700: #4896ff;
+  --c-blue-d800: #64adff;
+  --c-red-d700: #f5445a;
+  --c-red-d800: #ff7187;
+  --c-green-d700: #07a978;
+  --c-green-d800: #57c28d;
+  --c-yellow-d700: #fcb50c;
+  --c-yellow-d800: #ffca53;
+  --c-orange-d700: #ff7a43;
+  --c-orange-d800: #ff9a6e;
+
+  --c-ink-900: #17171c; /* TDS 다크 기본 배경 */
+  --c-ink-950: #101013; /* TDS 다크 회색 배경 */
+
+  /* ─── 원시: 간격 스케일 (TDS spacing-base와 동일한 4px 리듬) ── */
+  --space-1: 0.25rem; /*  4px */
+  --space-2: 0.5rem; /*   8px */
+  --space-3: 0.75rem; /* 12px */
+  --space-4: 1rem; /*    16px */
+  --space-5: 1.25rem; /* 20px */
+  --space-6: 1.5rem; /*  24px */
+  --space-8: 2rem; /*    32px */
+  --space-10: 2.5rem; /* 40px */
+
+  /* TDS의 page-padding(20px). 셸·헤더·본문이 같은 값을 참조한다. */
+  --gutter: var(--space-5);
 
   /* ─── 원시: 타이포그래피 ────────────────────────────────────── */
-  --font-sans: 'Pretendard', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /**
+   * TDS 본문 서체는 'Toss Product Sans'다. 토스 소유 서체라 외부 제품에
+   * 번들할 수 없어, 한글 화면에서 가장 가까운 오픈 서체인 Pretendard로 대체한다.
+   * 폰트 파일은 global.css가 npm 패키지에서 불러와 번들에 포함한다.
+   */
+  --font-sans: 'Pretendard Variable', 'Pretendard', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono: 'SF Mono', 'Cascadia Code', Consolas, monospace;
 
-  /* 가독성 최우선: 본문 하한을 13px로 두고 그 아래는 라벨 전용으로만 쓴다. */
-  --text-2xs: 0.6875rem; /* 11px — 뱃지/캡션 전용 */
-  --text-xs: 0.75rem; /*    12px — 보조 라벨 */
-  --text-sm: 0.8125rem; /*  13px — 본문 하한 */
-  --text-base: 0.875rem; /* 14px — 기본 본문 */
-  --text-md: 1rem; /*        16px — 카드 제목 */
-  --text-lg: 1.25rem; /*     20px — 섹션 제목 */
-  --text-xl: 1.75rem; /*     28px — 지표 수치 */
-  --text-2xl: 2.25rem; /*    36px — 대표 수치 */
+  /**
+   * TDS 실측 스케일. 원본에는 14/16/18px이 없다 —
+   * 12 → 13 → 15 → 17 → 19 → 22 → 28 → 30으로 건너뛴다.
+   * 이전 시스템(10~14px 중심)보다 전반적으로 두 단계 크다.
+   */
+  --text-2xs: 0.75rem; /*     12px — supporting-text-small */
+  --text-xs: 0.8125rem; /*    13px — label-xsmall */
+  --text-sm: 0.9375rem; /*    15px — label-small / body-small */
+  --text-base: 1.0625rem; /*  17px — body-medium (TDS 기본 본문) */
+  --text-md: 1.1875rem; /*    19px — body-large / label-large */
+  --text-lg: 1.375rem; /*     22px — title-medium */
+  --text-xl: 1.75rem; /*      28px — display-medium */
+  --text-2xl: 1.875rem; /*    30px — display-large */
 
+  /* TDS의 하한은 400이다. 300은 쓰지 않는다. */
   --weight-regular: 400;
   --weight-medium: 500;
   --weight-semibold: 600;
   --weight-bold: 700;
 
-  --leading-tight: 1.25;
-  --leading-normal: 1.5;
-  --tracking-wide: 0.04em;
+  /* TDS i18n line-height. 본문이 1.6으로 이전(1.5)보다 넓다. */
+  --leading-tight: 1.4; /*  라벨 */
+  --leading-title: 1.5; /*  제목 */
+  --leading-normal: 1.6; /* 본문 */
 
-  /* ─── 원시: 모서리 / 그림자 / 모션 ──────────────────────────── */
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
-  --radius-full: 999px;
+  /*
+   * 자간 토큰은 두지 않는다. TDS는 실측 전 구간이 letter-spacing: normal 이라
+   * 값이 0인 토큰을 남기면 "자간을 조정하고 있다"는 오해만 남는다.
+   */
 
-  --duration-fast: 120ms;
-  --duration-base: 200ms;
-  --duration-slow: 320ms;
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  /* ─── 원시: 모서리 (TDS radius 6/8/10/12/16/20/999) ─────────── */
+  --radius-xs: 0.375rem; /* 6px  — 작은 태그 */
+  --radius-sm: 0.5rem; /*   8px  — 버튼, 썸네일 */
+  --radius-md: 0.625rem; /* 10px — 인풋, 네비 항목 (TDS 실측) */
+  --radius-lg: 1rem; /*     16px — 카드, 콜아웃 (TDS 실측) */
+  --radius-full: 62.4375rem; /* 999px */
+
+  /* ─── 원시: 그림자 ─────────────────────────────────────────── */
+  /**
+   * TDS는 그림자를 거의 쓰지 않는다. 카드는 회색 페이지 위 흰 면과
+   * 16px 라운드만으로 층을 만든다(실측: box-shadow none).
+   * 아래 값은 드롭다운·모달처럼 정말 떠 있어야 하는 표면 전용이다.
+   */
+  --shadow-sm: 0 1px 3px var(--c-ink-a200);
+  --shadow-md: 0 2px 4px var(--c-ink-a200);
+  --shadow-ambient: 0 18px 80px 4px var(--c-ink-a300);
+
+  /* ─── 원시: 모션 ───────────────────────────────────────────── */
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 400ms;
+  --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-linear: linear;
 
   /* ─── 의미: 표면 / 텍스트 / 경계 ────────────────────────────── */
-  --surface-page: var(--c-neutral-50);
-  --surface-card: var(--c-neutral-0);
-  --surface-raised: var(--c-neutral-0);
-  --surface-sunken: var(--c-neutral-100);
-  --surface-nav: var(--c-neutral-0);
-  --surface-overlay: rgba(11, 11, 11, 0.55);
-  --surface-hover: rgba(11, 11, 11, 0.04);
-  --surface-active: rgba(42, 120, 214, 0.1);
+  /* TDS의 서명: 회색 페이지(#f2f4f6) 위에 흰 카드. */
+  --surface-page: #f2f4f6;
+  --surface-card: var(--c-white);
+  --surface-sunken: var(--c-grey-100);
+  --surface-nav: var(--c-white);
+  --surface-overlay: rgba(0, 0, 0, 0.2);
+  --surface-hover: var(--c-ink-a50);
+  --surface-active: var(--c-ink-a100);
+  --surface-tag: var(--c-grey-100);
 
-  --text-primary: #0b0b0b;
-  --text-secondary: var(--c-neutral-700);
-  --text-muted: var(--c-neutral-500);
-  --text-on-accent: var(--c-neutral-0);
+  /* TDS 텍스트 계층은 전부 잉크 투명도 축이다. */
+  --text-primary: var(--c-ink-a800);
+  --text-secondary: var(--c-ink-a700);
+  --text-muted: var(--c-ink-a600);
+  --text-on-accent: var(--c-white);
 
-  --border-hairline: rgba(11, 11, 11, 0.1);
-  --border-strong: rgba(11, 11, 11, 0.18);
-  --gridline: var(--c-neutral-200);
+  --border-hairline: var(--c-ink-a200);
+  --border-default: var(--c-grey-200);
+  --border-strong: var(--c-grey-400);
+  --scrollbar-thumb: var(--c-ink-a300);
 
-  --shadow-sm: 0 1px 2px rgba(11, 11, 11, 0.06);
-  --shadow-md: 0 4px 12px rgba(11, 11, 11, 0.08);
-  --shadow-lg: 0 12px 32px rgba(11, 11, 11, 0.14);
+  /* 비활성 컨트롤. 투명도가 아니라 채움으로 표현하므로 표면·글자를 짝으로 잡는다. */
+  --surface-disabled: var(--c-grey-200);
+  --text-disabled: var(--c-ink-a500);
 
-  /* ─── 의미: 액센트 / 상태 ──────────────────────────────────── */
-  --accent: var(--c-blue-500);
-  --accent-strong: var(--c-blue-600);
-  --accent-soft: rgba(42, 120, 214, 0.12);
+  /* 토글 노브. 파랑·회색 어느 트랙 위에서도 흰 원이라 테마와 무관하다. */
+  --switch-knob: var(--c-white);
+
+  /* 로딩 스피너의 진한 쪽 호(弧). 상태색이 아니므로 중립 축에서 가져온다. */
+  --spinner-track: var(--border-hairline);
+  --spinner-head: var(--c-grey-500);
 
   /**
-   * 상태색은 용도에 따라 3벌로 나눈다. 하나로 쓰면 어느 한쪽이 반드시 깨진다.
-   *  - 기본(--status-*)      : LED·막대·테두리 등 '마크'용. 표면 대비 3:1 이상.
-   *  - -text                 : 글자용. 표면 대비 4.5:1 이상.
-   *  - -soft                 : 배경 채움용.
-   * 라이트 모드 amber/orange는 원색 그대로 쓰면 각각 1.99:1, 2.57:1로
-   * 마크 기준에도 못 미쳐, 마크용만 한 단계 어둡게 잡았다.
+   * 영상 뷰포트처럼 테마와 무관하게 항상 어두운 표면.
+   * 여기 얹히는 글자는 라이트/다크 어느 쪽이든 밝은 쪽이어야 하므로
+   * --text-* 계열을 쓰지 않고 별도로 잡는다.
    */
-  --status-good: var(--c-green-500);
-  --status-warning: var(--c-amber-600);
-  --status-serious: var(--c-orange-500);
-  --status-critical: var(--c-red-500);
-  --status-idle: var(--c-neutral-500);
+  --surface-media: var(--c-ink-900);
+  --text-on-media: var(--c-white);
+  --text-on-media-muted: var(--c-grey-400);
+  --scrim-media: rgba(0, 0, 0, 0.55);
+  --scrim-media-weak: rgba(0, 0, 0, 0.4);
 
-  --status-good-text: #0f7a3d;
-  --status-warning-text: #8a5a00;
-  --status-serious-text: #b3441a;
-  --status-critical-text: var(--c-red-600);
-  --status-idle-text: var(--c-neutral-700);
-  --accent-text: var(--c-blue-600);
+  /**
+   * 도면 선화 색. 채도를 쓰지 않고 색은 상태(구역 톤 · LED)에만 남긴다.
+   * 컴포넌트가 아니라 여기서 정의해야 테마 전환을 따라간다.
+   */
+  --floorplan-ink: var(--c-grey-600);
+  --floorplan-wall: var(--c-grey-400);
+  --floorplan-zone-line: var(--c-grey-300);
 
-  --status-good-soft: rgba(18, 161, 80, 0.12);
-  --status-warning-soft: rgba(196, 127, 0, 0.14);
-  --status-serious-soft: rgba(224, 106, 58, 0.14);
-  --status-critical-soft: rgba(224, 57, 58, 0.12);
-  --status-idle-soft: rgba(137, 135, 129, 0.12);
+  /* ─── 의미: 액센트 / 상태 ──────────────────────────────────── */
+  /**
+   * TDS 브랜드 블루는 #3182f6이지만, 흰 글자를 얹으면 대비가 3.7:1로
+   * 본문 기준(4.5:1)에 못 미친다. 색조는 유지하되 채움·글자용은
+   * 한 단계 진한 blue-700(4.5:1)을 쓴다. 마크(LED·테두리)만 원본 값 그대로.
+   */
+  --accent: var(--c-blue-600);
+  --accent-strong: var(--c-blue-800);
+  --accent-soft: var(--c-blue-100);
+
+  /**
+   * 상태색은 용도에 따라 4벌로 나눈다. 하나로 쓰면 어느 한쪽이 반드시 깨진다.
+   *  - 기본(--status-*)  : LED·막대·테두리 등 '마크'용. 표면 대비 3:1 이상.
+   *  - -text             : 글자용. 표면 대비 4.5:1 이상.
+   *  - -fill             : 흰 글자를 얹는 solid 배경용. 대비 4.5:1 이상.
+   *  - -soft             : 옅은 배경 채움용. TDS의 50/100 틴트를 쓴다.
+   */
+  --status-good: var(--c-green-600);
+  --status-warning: var(--c-yellow-600);
+  --status-serious: var(--c-orange-600);
+  --status-critical: var(--c-red-600);
+  --status-idle: var(--c-grey-500);
+
+  --status-good-text: var(--c-green-800);
+  --status-warning-text: var(--c-yellow-800);
+  --status-serious-text: var(--c-orange-900);
+  --status-critical-text: var(--c-red-700);
+  --status-idle-text: var(--c-ink-a600);
+  --accent-text: var(--c-blue-700);
+
+  --status-good-fill: var(--c-green-800);
+  --status-warning-fill: var(--c-yellow-800);
+  --status-serious-fill: var(--c-orange-800);
+  --status-critical-fill: var(--c-red-700);
+  --status-idle-fill: var(--c-grey-600);
+  --accent-fill: var(--c-blue-700);
+  --text-on-fill: var(--c-white);
+
+  --status-good-soft: var(--c-green-100);
+  --status-warning-soft: var(--c-yellow-100);
+  --status-serious-soft: #ffece4;
+  --status-critical-soft: var(--c-red-100);
+  --status-idle-soft: var(--c-grey-100);
 
   /* ─── 의미: 레이아웃 ────────────────────────────────────────── */
-  --nav-width: 15rem;
-  --nav-width-collapsed: 3.75rem;
+  /* TDS 사이드바 실측 폭 244px. */
+  --nav-width: 15.25rem;
+  --nav-width-collapsed: 4rem;
   --panel-width: 22rem;
 
-  /* ─── 의미: z-index (한 곳에서 층위를 통제한다) ─────────────── */
-  --z-nav: 20;
-  --z-panel: 30;
-  --z-overlay: 40;
-  --z-modal: 50;
-  --z-toast: 60;
+  /**
+   * 인라인 컨트롤(버튼·인풋·네비 항목·세그먼트)의 높이.
+   * 공장 현장 태블릿에서는 아래 @media 블록이 이 값만 44px로 올리므로,
+   * 컨트롤마다 터치 분기를 따로 쓰지 않는다. 새 컨트롤은 이 토큰만 참조하면
+   * 터치 대응이 자동으로 따라온다.
+   */
+  --control-height: 2.25rem; /*    36px */
+  --control-height-lg: 2.625rem; /* 42px — TDS 사이드바 항목 실측 */
+  --control-height-sm: 1.5rem; /*  24px */
+
+  /* ─── 의미: z-index ─────────────────────────────────────────── */
+  --z-nav: 90;
+  --z-panel: 100;
+  --z-overlay: 998;
+  --z-modal: 999;
 }
 
-@media (prefers-color-scheme: dark) {
+/**
+ * 공장 현장 태블릿(터치) 대응.
+ * 44px은 iOS/Android 공통 최소 탭 타깃 권장값이다. 화면 폭이 아니라
+ * pointer로 판별해, 같은 태블릿이라도 마우스가 물린 상태에서는
+ * 원래 밀도를 유지한다. 컨트롤 높이를 여기서 한 번만 올리면
+ * --control-height를 참조하는 모든 컴포넌트가 함께 커진다.
+ */
+@media (pointer: coarse) {
   :root {
-    color-scheme: dark;
-
-    --surface-page: var(--c-neutral-950);
-    --surface-card: var(--c-neutral-850);
-    --surface-raised: #222221;
-    --surface-sunken: var(--c-neutral-900);
-    --surface-nav: var(--c-neutral-900);
-    --surface-overlay: rgba(0, 0, 0, 0.65);
-    --surface-hover: rgba(255, 255, 255, 0.06);
-    --surface-active: rgba(57, 135, 229, 0.16);
-
-    --text-primary: var(--c-neutral-0);
-    --text-secondary: #c3c2b7;
-    --text-muted: var(--c-neutral-500);
-
-    --border-hairline: rgba(255, 255, 255, 0.1);
-    --border-strong: rgba(255, 255, 255, 0.2);
-    --gridline: #2c2c2a;
-
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
-    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.55);
-
-    --accent: #3987e5;
-    --accent-strong: var(--c-blue-400);
-    --accent-soft: rgba(57, 135, 229, 0.18);
-
-    /* 어두운 배경에서는 밝은 쪽이 대비가 나오므로 마크·텍스트 모두 밝게 잡는다. */
-    --status-good: #22c55e;
-    --status-warning: var(--c-amber-400);
-    --status-serious: var(--c-orange-400);
-    --status-critical: #f4514f;
-
-    --status-good-text: #4ade80;
-    --status-warning-text: #fbbf24;
-    --status-serious-text: #fb9a6d;
-    --status-critical-text: #f87171;
-    --status-idle-text: #c3c2b7;
-    --accent-text: var(--c-blue-400);
+    --control-height: 2.75rem;
+    --control-height-lg: 2.75rem;
+    --control-height-sm: 2rem;
   }
+}
+
+/**
+ * 다크 모드 — TDS 다크 팔레트를 그대로 옮겼다.
+ * 24시간 가동되는 공장 관제 화면이라 야간 시인성을 포기할 수 없다.
+ * 원시 팔레트는 건드리지 않고 의미 토큰만 재정의한다.
+ *
+ * OS의 prefers-color-scheme을 CSS에서 직접 보지 않는다 — 설정 탭에서
+ * 라이트/다크/시스템을 고르면 useUiStore가 <html data-theme>을 씌우고,
+ * '시스템'을 골랐을 때만 그 값이 OS 설정을 따라간다(index.html의 인라인
+ * 스크립트가 첫 페인트 전에 한 번 먼저 계산해 깜빡임을 막는다).
+ */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --surface-page: var(--c-ink-950);
+  --surface-card: var(--c-ink-900);
+  --surface-sunken: var(--c-ink-950);
+  --surface-nav: var(--c-ink-900);
+  --surface-overlay: rgba(0, 0, 0, 0.56);
+  --surface-hover: var(--c-ink-d-a50);
+  --surface-active: var(--c-ink-d-a100);
+  --surface-tag: var(--c-grey-d100);
+
+  --text-primary: var(--c-ink-d-a800);
+  --text-secondary: var(--c-ink-d-a700);
+  --text-muted: var(--c-ink-d-a600);
+
+  --border-hairline: var(--c-ink-d-a200);
+  --border-default: var(--c-grey-d300);
+  --border-strong: var(--c-grey-d500);
+  --scrollbar-thumb: var(--c-ink-d-a300);
+
+  --surface-disabled: var(--c-grey-d200);
+  --text-disabled: var(--c-grey-d500);
+
+  --spinner-head: var(--c-grey-d600);
+
+  /* 영상 표면은 테마와 무관하게 어둡다 — 라이트 값 그대로 둔다. */
+  --text-on-media-muted: var(--c-grey-d600);
+
+  /* 어두운 배경 위에서는 선화를 밝은 쪽으로 뒤집어야 읽힌다. */
+  --floorplan-ink: var(--c-grey-d600);
+  --floorplan-wall: var(--c-grey-d500);
+  --floorplan-zone-line: var(--c-ink-d-a300);
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.5);
+  --shadow-ambient: 0 18px 80px 4px rgba(0, 0, 0, 0.6);
+
+  --accent: var(--c-blue-600);
+  --accent-strong: var(--c-blue-d800);
+  --accent-soft: rgba(49, 130, 246, 0.16);
+  --accent-text: var(--c-blue-d700);
+  --accent-fill: var(--c-blue-600);
+
+  --status-good: var(--c-green-d700);
+  --status-warning: var(--c-yellow-d700);
+  --status-serious: var(--c-orange-d700);
+  --status-critical: var(--c-red-d700);
+
+  --status-good-text: var(--c-green-d800);
+  --status-warning-text: var(--c-yellow-d800);
+  --status-serious-text: var(--c-orange-d800);
+  --status-critical-text: var(--c-red-d800);
+  --status-idle-text: var(--c-ink-d-a600);
+
+  /* 밝은 채움 위에는 흰 글자가 아니라 어두운 글자를 얹어야 대비가 산다. */
+  --status-good-fill: var(--c-green-d700);
+  --status-warning-fill: var(--c-yellow-d700);
+  --status-serious-fill: var(--c-orange-d700);
+  --status-critical-fill: var(--c-red-d700);
+  --status-idle-fill: var(--c-grey-d600);
+  --text-on-fill: var(--c-ink-900);
+  --text-on-accent: var(--c-white);
+
+  /* TDS 다크의 상태 틴트는 16% 투명도다. */
+  --status-good-soft: rgba(7, 169, 120, 0.16);
+  --status-warning-soft: rgba(252, 181, 12, 0.16);
+  --status-serious-soft: rgba(255, 122, 67, 0.16);
+  --status-critical-soft: rgba(245, 68, 90, 0.16);
+  --status-idle-soft: var(--c-ink-d-a100);
 }

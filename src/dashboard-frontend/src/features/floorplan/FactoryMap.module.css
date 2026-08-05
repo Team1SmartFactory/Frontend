@@ -1,26 +1,15 @@
 /*
- * 도면 전용 색. 원본이 흑백 선화이므로 채도를 쓰지 않고,
- * 색은 상태(구역 톤 · LED)에만 남겨 둔다.
+ * 도면 선화 색(--floorplan-*)은 tokens.css가 소유한다.
+ * 여기서 @media (prefers-color-scheme)로 갈랐더니, 설정 탭에서 고른 테마와
+ * OS 설정이 다를 때 셸만 어둡고 도면은 밝은 채로 남는 문제가 있었다.
  */
 .stage {
-  --floorplan-ink: #6b6a65;
-  --floorplan-wall: #9b9a94;
-  --floorplan-zone-line: #b6b5ae;
-
   flex: 1;
   min-width: 0;
   min-height: 0;
   display: flex;
   padding: var(--space-4);
   background: var(--surface-sunken);
-}
-
-@media (prefers-color-scheme: dark) {
-  .stage {
-    --floorplan-ink: #8b8a83;
-    --floorplan-wall: #55544f;
-    --floorplan-zone-line: #4a4944;
-  }
 }
 
 .map {
@@ -93,6 +82,10 @@
   vector-effect: non-scaling-stroke;
 }
 
+/*
+ * 도면 안의 글자는 viewBox 사용자 좌표계 단위라 지도와 함께 확대·축소된다.
+ * 여기만은 rem 토큰이 아니라 원시 단위를 쓰는 것이 맞다.
+ */
 .labelText {
   font-size: 19px;
   font-weight: var(--weight-semibold);

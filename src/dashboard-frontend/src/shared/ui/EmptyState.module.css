@@ -9,11 +9,13 @@
 }
 
 .message {
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
   color: var(--text-secondary);
 }
 
+/* 보조 문구는 무게가 아니라 크기와 색으로 뒤로 물린다. */
 .hint {
   font-size: var(--text-xs);
+  font-weight: var(--weight-regular);
   color: var(--text-muted);
 }

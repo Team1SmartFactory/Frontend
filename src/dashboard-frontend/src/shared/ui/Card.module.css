@@ -1,11 +1,15 @@
+/**
+ * TDS 카드 문법.
+ * 실측 결과 토스의 카드는 box-shadow가 none이다. 회색 페이지(#f2f4f6) 위에
+ * 흰 면을 얹고 16px 라운드만 주는 것으로 층이 다 표현된다.
+ * 그림자를 걷어낸 자리는 여백이 대신 메운다 — 이게 TDS의 인상을 만드는 핵심이다.
+ */
 .card {
   display: flex;
   flex-direction: column;
   min-width: 0;
   background: var(--surface-card);
-  border: 1px solid var(--border-hairline);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
   overflow: hidden;
 }
 
@@ -13,27 +17,33 @@
   height: 100%;
 }
 
+/*
+ * TDS는 제목과 본문을 구분선으로 나누지 않는다. 헤더 아래 여백이 그 일을 한다.
+ * 구분선을 지우면 카드 안이 한 덩어리로 읽히고, 그게 토스 화면의 인상이다.
+ */
 .header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-3);
-  padding: var(--space-4) var(--space-5);
-  border-bottom: 1px solid var(--border-hairline);
+  padding: var(--space-5) var(--gutter) var(--space-3);
 }
 
 .heading {
   min-width: 0;
 }
 
+/* TDS title 조판: 19px / 700 / 자간 없음 / 행간 1.5. */
 .title {
   font-size: var(--text-md);
-  font-weight: var(--weight-semibold);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-title);
 }
 
 .subtitle {
   margin-top: var(--space-1);
   font-size: var(--text-xs);
+  font-weight: var(--weight-regular);
   color: var(--text-muted);
 }
 
@@ -44,8 +54,17 @@
 .body {
   flex: 1;
   min-height: 0;
-  padding: var(--space-5);
+  padding: 0 var(--gutter) var(--space-5);
   overflow: auto;
+}
+
+/* 제목 없이 본문만 있는 카드는 위쪽 여백을 스스로 확보한다. */
+.header + .body {
+  padding-top: 0;
+}
+
+.card > .body:first-child {
+  padding-top: var(--space-5);
 }
 
 .bodyFlush {

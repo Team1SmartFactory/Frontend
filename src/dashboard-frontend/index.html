@@ -6,6 +6,26 @@
     <title>Smart Factory Stock Control Dashboard</title>
   </head>
   <body>
+    <!--
+      화면 표시 모드(라이트/다크/시스템) 초기 적용.
+      React가 뜨기도 전에 첫 페인트가 일어나므로, useUiStore와 별개로
+      여기서 한 번 더 같은 로직(localStorage → 없으면 OS 설정)을 동기 실행해
+      "잠깐 밝았다가 어두워지는" 깜빡임을 막는다. 로직이 바뀌면 useUiStore.ts도 같이 고칠 것.
+    -->
+    <script>
+      (function () {
+        try {
+          var stored = JSON.parse(localStorage.getItem('sfsc.ui.theme') || '"system"');
+          var resolved =
+            stored === 'system'
+              ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+              : stored;
+          document.documentElement.dataset.theme = resolved;
+        } catch (e) {
+          // 스토리지 접근이 막힌 환경에서는 tokens.css의 라이트 기본값을 그대로 쓴다.
+        }
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

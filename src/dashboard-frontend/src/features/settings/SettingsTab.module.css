@@ -5,18 +5,21 @@
   min-height: 0;
 }
 
+/*
+ * 좌우 여백은 헤더와 같은 거터를 쓴다. 원본의 화면 거터가 전 화면 공통 축이다.
+ * 설정 카드가 여러 장 쌓이므로(화면 표시, 승인 권한, …) flex column + gap으로 간격을 준다.
+ */
 .scroll {
   flex: 1;
   min-height: 0;
   overflow: auto;
-  padding: var(--space-5) var(--space-6) var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--gutter) var(--space-8);
 }
 
-/* 설정은 읽는 폭이 넓어지면 가독성이 떨어지므로 최대 폭을 제한한다. */
-.columns {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
-  gap: var(--space-4);
-  max-width: 56rem;
-  align-items: start;
+/* 설정 카드는 읽는 폭이 넓어지면 가독성이 떨어지므로 최대 폭을 제한한다. */
+.scroll > * {
+  max-width: 32rem;
 }

@@ -55,3 +55,20 @@ export const SHORTAGE_STATUS_LABEL: Record<ShortageEventStatus, string> = {
   completed: '완료',
   rejected: '반려됨',
 };
+
+/**
+ * "아직 끝나지 않은 부족 건" — 평면도 LED와 사이드 패널이 같은 기준을 봐야 하는 집합.
+ *
+ * 두 화면이 각자 리터럴을 들고 있으면, 상태가 하나 늘었을 때 한쪽만 고쳐도
+ * 타입 검사를 통과한다. 그러면 LED는 "조치 필요"로 깜박이는데 그 LED를 눌러
+ * 연 패널은 같은 건을 '지난 이력'으로 분류하는 모순이 조용히 생긴다.
+ */
+export const OPEN_SHORTAGE_STATUSES = new Set<ShortageEventStatus>([
+  'pending_approval',
+  'dispatched',
+  'in_transit',
+]);
+
+export function isOpenShortage(status: ShortageEventStatus): boolean {
+  return OPEN_SHORTAGE_STATUSES.has(status);
+}

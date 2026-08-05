@@ -67,10 +67,16 @@ export function SettingsIcon(props: IconProps) {
   );
 }
 
-export function ChevronLeftIcon(props: IconProps) {
+/**
+ * 사이드바 접기/펼치기 아이콘 — 패널 프레임 안에 세로선 하나로 "사이드바"를
+ * 표현하는, Notion을 비롯해 대부분의 에디터형 앱이 쓰는 관용적인 형태다.
+ * 상태에 따라 회전·반전하지 않고 항상 같은 모양을 쓴다.
+ */
+export function SidebarToggleIcon(props: IconProps) {
   return (
     <Svg {...props}>
-      <path d="M15 5 8 12l7 7" />
+      <rect x="3" y="4" width="18" height="16" rx="3" />
+      <path d="M9 4v16" />
     </Svg>
   );
 }
@@ -79,6 +85,35 @@ export function CloseIcon(props: IconProps) {
   return (
     <Svg {...props}>
       <path d="M6 6 18 18M18 6 6 18" />
+    </Svg>
+  );
+}
+
+/* ─── 테마 선택 (설정 탭 화면 표시) ────────────────────────────── */
+
+export function SunIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <circle cx="12" cy="12" r="4.5" />
+      <path d="M12 2.5v2.5M12 19v2.5M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M2.5 12H5M19 12h2.5M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" />
+    </Svg>
+  );
+}
+
+export function MoonIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z" />
+    </Svg>
+  );
+}
+
+/** 시스템 설정 따라가기 — 모니터 화면 형태로 'OS 값을 그대로 따른다'는 뜻을 전달한다. */
+export function SystemIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <rect x="3" y="4.5" width="18" height="12" rx="2" />
+      <path d="M8.5 20.5h7M12 16.5v4" />
     </Svg>
   );
 }

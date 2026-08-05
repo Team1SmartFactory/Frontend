@@ -1,7 +1,7 @@
-import { useFactoryStore } from '../../store/useFactoryStore';
+import { useLines, useRobots, useShortageEvents } from '../../shared/query/useFactoryData';
 import { useUiStore } from '../../store/useUiStore';
 import { selectActiveShortageLineIds } from '../../store/selectors';
-import { Badge, PageHeader } from '../../shared/ui';
+import { Badge, PageHeader, QueryState } from '../../shared/ui';
 import { FactoryMap } from './FactoryMap';
 import { MapLegend } from './MapLegend';
 import { ShortageSidePanel } from './ShortageSidePanel';
@@ -12,10 +12,9 @@ import styles from './FloorPlanTab.module.css';
  * 라인을 선택하면 우측 패널에 부족 상세와 카메라 뷰를 보여준다.
  */
 export function FloorPlanTab() {
-  const lines = useFactoryStore((state) => state.lines);
-  const robots = useFactoryStore((state) => state.robots);
-  const shortageEvents = useFactoryStore((state) => state.shortageEvents);
-  const inventoryHistory = useFactoryStore((state) => state.inventoryHistory);
+  const { lines, isPending, isError, error, refetch } = useLines();
+  const { robots } = useRobots();
+  const { shortageEvents } = useShortageEvents();
   const selectedLineId = useUiStore((state) => state.selectedLineId);
   const selectLine = useUiStore((state) => state.selectLine);
 
@@ -41,25 +40,36 @@ export function FloorPlanTab() {
       />
 
       <div className={styles.body}>
-        <div className={styles.mapArea}>
-          <FactoryMap
-            lines={Object.values(lines)}
-            robots={Object.values(robots)}
-            shortageLineIds={shortageLineIds}
-            selectedLineId={selectedLineId}
-            onSelectLine={selectLine}
-          />
-          <MapLegend />
-        </div>
+        <QueryState
+          isPending={isPending}
+          isError={isError}
+          error={error}
+          onRetry={() => void refetch()}
+          loadingMessage="평면도를 불러오는 중…"
+        >
+          <div className={styles.mapArea}>
+            <FactoryMap
+              lines={Object.values(lines)}
+              robots={Object.values(robots)}
+              shortageLineIds={shortageLineIds}
+              selectedLineId={selectedLineId}
+              onSelectLine={selectLine}
+            />
+            <MapLegend />
+          </div>
 
-        {selectedLineId && (
-          <ShortageSidePanel
-            line={selectedLine}
-            shortageEvents={Object.values(shortageEvents).filter((event) => event.lineId === selectedLineId)}
-            history={inventoryHistory[selectedLineId] ?? []}
-            onClose={() => selectLine(null)}
-          />
-        )}
+          {/* 라인이 실제로 존재할 때만 연다. 패널이 자체적으로 재고 이력을 조회하므로
+              line이 없는 상태로 마운트되면 빈 쿼리가 나간다. */}
+          {selectedLine && (
+            <ShortageSidePanel
+              line={selectedLine}
+              shortageEvents={Object.values(shortageEvents).filter(
+                (event) => event.lineId === selectedLine.id,
+              )}
+              onClose={() => selectLine(null)}
+            />
+          )}
+        </QueryState>
       </div>
     </div>
   );

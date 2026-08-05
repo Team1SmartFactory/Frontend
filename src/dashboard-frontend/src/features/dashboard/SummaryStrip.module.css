@@ -4,15 +4,14 @@
   gap: var(--space-3);
 }
 
+/* 회색 페이지 위에 바로 놓이는 카드라 흰 면 + 라운드만으로 층이 선다. */
 .tile {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  padding: var(--space-4);
+  padding: var(--space-5);
   background: var(--surface-card);
-  border: 1px solid var(--border-hairline);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
 }
 
 .labelRow {

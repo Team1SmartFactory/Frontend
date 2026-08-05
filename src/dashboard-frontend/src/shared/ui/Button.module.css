@@ -1,46 +1,70 @@
+/**
+ * 버튼.
+ * 배경과 같은 색의 1px 테두리를 깔아, 채운 버튼과 외곽선 버튼이
+ * 같은 박스 크기를 갖게 한다. 높이는 --control-height가 소유하므로
+ * 터치 기기 대응이 자동으로 따라온다.
+ */
 .button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  padding: var(--space-2) var(--space-4);
+  height: var(--control-height);
+  padding: 0 var(--space-4);
   border: 1px solid transparent;
   border-radius: var(--radius-md);
-  font-size: var(--text-sm);
+  font-size: var(--text-md);
   font-weight: var(--weight-semibold);
+  white-space: nowrap;
   transition:
     background var(--duration-fast) var(--ease-out),
     border-color var(--duration-fast) var(--ease-out),
-    opacity var(--duration-fast) var(--ease-out);
+    color var(--duration-fast) var(--ease-out);
 }
 
+/* 작은 변형 — 목록 행 안에 들어가는 인라인 액션용. */
 .button[data-size='sm'] {
-  padding: var(--space-1) var(--space-3);
-  font-size: var(--text-xs);
+  height: var(--control-height-sm);
+  padding: 0 var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
 }
 
+/* 비활성은 투명도가 아니라 회색 채움으로 표현한다. 테마를 따라가도록 의미 토큰을 쓴다. */
 .button:disabled {
-  opacity: 0.45;
+  background: var(--surface-disabled);
+  border-color: var(--surface-disabled);
+  color: var(--text-disabled);
   cursor: not-allowed;
 }
 
+.ghost:disabled {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text-disabled);
+}
+
+/* 파랑은 주 행동색이다. */
 .primary {
   background: var(--accent);
+  border-color: var(--accent);
   color: var(--text-on-accent);
 }
 
 .primary:hover:not(:disabled) {
   background: var(--accent-strong);
+  border-color: var(--accent-strong);
 }
+
 
 .secondary {
   background: var(--surface-card);
-  border-color: var(--border-strong);
+  border-color: var(--border-default);
   color: var(--text-primary);
 }
 
 .secondary:hover:not(:disabled) {
-  background: var(--surface-hover);
+  border-color: var(--border-strong);
 }
 
 .ghost {
@@ -54,10 +78,12 @@
 }
 
 .danger {
-  background: var(--status-critical);
-  color: var(--c-neutral-0);
+  background: var(--status-critical-fill);
+  border-color: var(--status-critical-fill);
+  color: var(--text-on-fill);
 }
 
 .danger:hover:not(:disabled) {
-  filter: brightness(0.92);
+  background: var(--status-critical-text);
+  border-color: var(--status-critical-text);
 }

@@ -3,17 +3,12 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
+  gap: var(--space-4);
   height: 100%;
-  padding: 3rem 1.5rem;
+  padding: var(--space-10) var(--space-6);
   text-align: center;
+  font-size: var(--text-base);
   color: var(--text-secondary);
 }
 
-.fallback button {
-  padding: 0.5rem 1.25rem;
-  border-radius: 0.5rem;
-  border: 1px solid var(--border-hairline);
-  background: var(--surface-card);
-  color: var(--text-primary);
-}
+/* 재시도 버튼은 shared/ui의 Button(secondary)을 쓴다. 여기서 다시 그리지 않는다. */

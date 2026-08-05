@@ -1,12 +1,6 @@
 import type { Line, ShortageEvent } from '../shared/domain/types';
-import { toneForLine } from '../shared/domain/statusTone';
+import { isOpenShortage, toneForLine } from '../shared/domain/statusTone';
 import type { Tone } from '../shared/ui/tone';
-
-const ACTIVE_SHORTAGE_STATUSES = new Set<ShortageEvent['status']>([
-  'pending_approval',
-  'dispatched',
-  'in_transit',
-]);
 
 /**
  * 조치 시급도 순서.
@@ -41,7 +35,7 @@ export function selectPendingApprovals(events: Record<string, ShortageEvent>): S
 export function selectActiveShortageLineIds(events: Record<string, ShortageEvent>): Set<string> {
   const ids = new Set<string>();
   Object.values(events).forEach((event) => {
-    if (ACTIVE_SHORTAGE_STATUSES.has(event.status)) ids.add(event.lineId);
+    if (isOpenShortage(event.status)) ids.add(event.lineId);
   });
   return ids;
 }
