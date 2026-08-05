@@ -1,11 +1,15 @@
+/**
+ * TDS 페이지 헤더.
+ * 구분선을 긋지 않고 회색 본문 위에 헤더 여백만으로 층을 나눈다.
+ * 제목 조판은 TDS title-medium (22px / 700 / 자간 0 / 행간 1.5).
+ */
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
   flex-shrink: 0;
-  padding: var(--space-5) var(--space-6);
-  border-bottom: 1px solid var(--border-hairline);
+  padding: var(--space-6) var(--gutter) var(--space-4);
   background: var(--surface-page);
 }
 
@@ -16,11 +20,13 @@
 .title {
   font-size: var(--text-lg);
   font-weight: var(--weight-bold);
+  line-height: var(--leading-title);
 }
 
 .description {
   margin-top: var(--space-1);
-  font-size: var(--text-xs);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-regular);
   color: var(--text-muted);
 }
 

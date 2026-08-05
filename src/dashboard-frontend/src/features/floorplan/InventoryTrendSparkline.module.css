@@ -47,19 +47,23 @@
   margin-top: var(--space-2);
 }
 
+/* 수치 조판은 원본의 가격 표기와 같이 굵게 + 음수 자간으로 조인다. */
 .value {
   font-size: var(--text-md);
   font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-tight);
   font-variant-numeric: tabular-nums;
   color: var(--tone-text);
 }
 
 .thresholdLabel {
-  font-size: var(--text-2xs);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-regular);
   color: var(--text-muted);
 }
 
 .empty {
   font-size: var(--text-xs);
+  font-weight: var(--weight-regular);
   color: var(--text-muted);
 }

@@ -7,10 +7,10 @@ import { selectPendingApprovals } from '../store/selectors';
 import { StatusLed } from '../shared/ui';
 import {
   CctvIcon,
-  ChevronLeftIcon,
   DashboardIcon,
   FloorPlanIcon,
   SettingsIcon,
+  SidebarToggleIcon,
 } from '../shared/ui/icons';
 import type { Tone } from '../shared/ui/tone';
 import type { ConnectionStatus } from '../shared/realtime/RealtimeClient';
@@ -104,9 +104,8 @@ export function SideNav() {
           title={navCollapsed ? '펼치기' : '접기'}
         >
           <span className={styles.toggleIcon}>
-            <ChevronLeftIcon size={1.1} />
+            <SidebarToggleIcon size={1.15} />
           </span>
-          <span className={styles.toggleLabel}>접기</span>
         </button>
       </div>
     </nav>

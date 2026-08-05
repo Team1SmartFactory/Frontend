@@ -1,3 +1,9 @@
+/**
+ * 다비치 토글.
+ * 원본은 체크박스를 숨기고 형제 요소를 스타일링하는 문법을 쓴다
+ * (.btn-wish input:checked + .label). 여기서도 같은 구조로,
+ * 켜짐 색은 원본의 주 행동색인 파랑, 꺼짐은 원본 기본 보더색(#ddd)이다.
+ */
 .row {
   display: flex;
   align-items: center;
@@ -10,7 +16,7 @@
 }
 
 .label {
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
   font-weight: var(--weight-medium);
   cursor: pointer;
 }
@@ -18,6 +24,7 @@
 .description {
   margin-top: var(--space-1);
   font-size: var(--text-xs);
+  font-weight: var(--weight-regular);
   color: var(--text-muted);
 }
 
@@ -28,7 +35,10 @@
   height: 1.5rem;
 }
 
-/* 네이티브 입력은 투명하게 덮어 두고 히트 영역·키보드 동작을 그대로 쓴다. */
+/*
+ * 네이티브 입력은 투명하게 덮어 두고 히트 영역·키보드 동작을 그대로 쓴다.
+ * 태블릿에서는 inset을 음수로 벌려 손가락 탭 영역을 넓힌다(시각적 트랙 크기는 그대로).
+ */
 .input {
   position: absolute;
   inset: 0;
@@ -40,23 +50,33 @@
   z-index: 1;
 }
 
+/*
+ * overflow: hidden이 핵심이다 — 이게 없으면 노브의 box-shadow가 트랙의
+ * 둥근 모서리 밖(흰 배경 위)으로 번져 나가 초승달 모양의 얼룩으로 보인다.
+ * 노브는 margin이 아니라 절대 위치로 잡아, 트랙 폭이 바뀌어도 계산식이
+ * 깨지지 않게 한다.
+ */
 .track {
+  position: relative;
   display: block;
   width: 100%;
   height: 100%;
   border-radius: var(--radius-full);
-  background: var(--border-strong);
+  background: var(--border-default);
+  overflow: hidden;
   transition: background var(--duration-base) var(--ease-out);
 }
 
 .knob {
-  display: block;
+  position: absolute;
+  top: 50%;
+  left: 0.1875rem;
   width: 1.125rem;
   height: 1.125rem;
-  margin: 0.1875rem;
   border-radius: var(--radius-full);
-  background: var(--c-neutral-0);
-  box-shadow: var(--shadow-sm);
+  background: var(--c-white);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-50%);
   transition: transform var(--duration-base) var(--ease-out);
 }
 
@@ -65,12 +85,23 @@
 }
 
 .input:checked + .track .knob {
-  transform: translateX(1rem);
+  transform: translateY(-50%) translateX(1rem);
 }
 
+/*
+ * outline은 요소 자신의 overflow에 영향받지 않는다(스펙상 클리핑 대상이
+ * 아니다) — 그래서 트랙에 overflow: hidden을 줘도 포커스 링은 그대로 보인다.
+ */
 .input:focus-visible + .track {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+@media (pointer: coarse) {
+  /* 터치 탭 오차를 감안해 보이지 않는 히트 영역만 넓힌다. */
+  .input {
+    inset: -0.625rem;
+  }
 }
 
 /* 저장 중에는 조작이 막혔음을 색으로 알린다. */

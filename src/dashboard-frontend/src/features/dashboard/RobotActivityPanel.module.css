@@ -4,13 +4,15 @@
   gap: var(--space-5);
 }
 
+/*
+ * 구역 소제목. TDS는 대문자 변형과 자간 벌리기를 쓰지 않고,
+ * 크기·무게·색만으로 계층을 만든다.
+ */
 .groupTitle {
   margin-bottom: var(--space-2);
-  font-size: var(--text-2xs);
-  font-weight: var(--weight-bold);
-  letter-spacing: var(--tracking-wide);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
   color: var(--text-muted);
-  text-transform: uppercase;
 }
 
 .list {
@@ -26,7 +28,7 @@
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-md);
   background: var(--tone-soft);
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
 }
 
 .robotId {
@@ -46,9 +48,11 @@
   font-size: var(--text-xs);
 }
 
+/* 보조 안내문은 원본 메타 조판(300)으로 뒤로 물린다. */
 .allIdle,
 .idleNote {
   font-size: var(--text-xs);
+  font-weight: var(--weight-regular);
   color: var(--text-muted);
 }
 

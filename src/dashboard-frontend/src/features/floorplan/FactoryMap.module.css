@@ -3,9 +3,9 @@
  * 색은 상태(구역 톤 · LED)에만 남겨 둔다.
  */
 .stage {
-  --floorplan-ink: #6b6a65;
-  --floorplan-wall: #9b9a94;
-  --floorplan-zone-line: #b6b5ae;
+  --floorplan-ink: var(--c-grey-600);
+  --floorplan-wall: var(--c-grey-400);
+  --floorplan-zone-line: var(--c-grey-300);
 
   flex: 1;
   min-width: 0;
@@ -17,9 +17,9 @@
 
 @media (prefers-color-scheme: dark) {
   .stage {
-    --floorplan-ink: #8b8a83;
-    --floorplan-wall: #55544f;
-    --floorplan-zone-line: #4a4944;
+    --floorplan-ink: var(--c-grey-d600);
+    --floorplan-wall: var(--c-grey-d500);
+    --floorplan-zone-line: var(--c-ink-d-a300);
   }
 }
 
@@ -93,6 +93,10 @@
   vector-effect: non-scaling-stroke;
 }
 
+/*
+ * 도면 안의 글자는 viewBox 사용자 좌표계 단위라 지도와 함께 확대·축소된다.
+ * 여기만은 rem 토큰이 아니라 원시 단위를 쓰는 것이 맞다.
+ */
 .labelText {
   font-size: 19px;
   font-weight: var(--weight-semibold);

@@ -10,16 +10,18 @@
   backdrop-filter: blur(2px);
 }
 
+/*
+ * 원본의 기획전 토스트 문법을 그대로 가져왔다 — 흰 표면에 상태색 2px 테두리를
+ * 사방으로 두르고, 같은 색 계열의 옅은 그림자를 깐다.
+ * 상단 3px 띠보다 이쪽이 "조치가 필요한 알림"이라는 신호를 더 강하게 준다.
+ */
 .dialog {
   width: min(26rem, 100%);
   padding: var(--space-6);
-  border: 1px solid var(--border-hairline);
-  border-radius: var(--radius-xl);
+  border: 2px solid var(--status-critical);
+  border-radius: var(--radius-lg);
   background: var(--surface-card);
-  box-shadow: var(--shadow-lg);
-
-  /* 승인 팝업은 조치가 필요한 상태이므로 상단에 상태색 띠를 얹는다. */
-  border-top: 3px solid var(--status-critical);
+  box-shadow: var(--shadow-ambient);
 }
 
 .header {

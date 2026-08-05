@@ -1,3 +1,10 @@
+/**
+ * 부족 현황 사이드 패널.
+ * 도면과 맞닿는 경계는 테두리가 아니라 1px 그림자로 긋는다 (원본 #header.sub를
+ * 세로로 세운 것 — SideNav의 오른쪽 경계와 같은 문법이다).
+ * 그림자는 박스 밖으로 나가므로, 층위를 올리지 않으면 position:relative인
+ * 지도 영역이 그 위를 덮어 경계선이 사라진다. SideNav와 같은 처리다.
+ */
 .panel {
   display: flex;
   flex-direction: column;
@@ -5,17 +12,18 @@
   width: var(--panel-width);
   min-height: 0;
   background: var(--surface-card);
-  border-left: 1px solid var(--border-hairline);
+  box-shadow: -1px 0 var(--border-hairline);
+  z-index: var(--z-panel);
 }
 
+/* TDS는 제목과 본문을 선으로 나누지 않는다. 여백이 그 일을 한다. */
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-2);
   flex-shrink: 0;
-  padding: var(--space-4) var(--space-3) var(--space-4) var(--space-5);
-  border-bottom: 1px solid var(--border-hairline);
+  padding: var(--space-5) var(--space-3) var(--space-3) var(--gutter);
 }
 
 .titleRow {
@@ -25,9 +33,12 @@
   min-width: 0;
 }
 
+/* 원본 카드 제목 조판(14px / 700 / -0.02em / 1.2). */
 .title {
   font-size: var(--text-md);
-  font-weight: var(--weight-semibold);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--leading-title);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -37,19 +48,21 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: var(--space-5);
+  padding: var(--space-5) var(--gutter);
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
 }
 
+/*
+ * 구역 소제목. TDS는 대문자 변형과 자간 벌리기를 쓰지 않고,
+ * 크기·무게·색만으로 계층을 만든다.
+ */
 .sectionTitle {
   margin-bottom: var(--space-3);
-  font-size: var(--text-2xs);
-  font-weight: var(--weight-bold);
-  letter-spacing: var(--tracking-wide);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
   color: var(--text-muted);
-  text-transform: uppercase;
 }
 
 /* ─── 가져올 부품 ───────────────────────────────────────────── */
@@ -74,20 +87,23 @@
 }
 
 .partName {
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
   font-weight: var(--weight-semibold);
 }
 
 .partMeta {
   margin-top: var(--space-1);
-  font-size: var(--text-2xs);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-regular);
   color: var(--text-muted);
 }
 
+/* 수치 조판은 원본의 가격 표기와 같이 굵게 + 음수 자간으로 조인다. */
 .partQty {
   flex-shrink: 0;
   font-size: var(--text-md);
   font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-tight);
   font-variant-numeric: tabular-nums;
 }
 
@@ -97,14 +113,15 @@
   flex-direction: column;
 }
 
+/* 목록 행 사이는 원본의 실제 1px 보더(#dddddd)로 끊는다. */
 .historyItem {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-2);
   padding: var(--space-2) 0;
-  border-bottom: 1px solid var(--border-hairline);
-  font-size: var(--text-sm);
+  border-bottom: 1px solid var(--border-default);
+  font-size: var(--text-base);
 }
 
 .historyItem:last-child {

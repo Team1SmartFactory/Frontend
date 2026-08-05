@@ -14,10 +14,14 @@
   opacity: 0.4;
 }
 
-/* 실제 광원. 흰빛을 살짝 섞어 "발광 중"으로 읽히게 한다. */
+/*
+ * 코어. 다비치 시스템은 발광을 쓰지 않는 평면 언어라, 흰빛 혼합과
+ * drop-shadow 번짐을 걷어내고 단색 점으로 바꿨다. 위치 식별에 필요한
+ * 존재감은 위의 halo·bloom(옅은 톤 채움)이 대신한다 —
+ * 이는 원본의 --tone-soft 어휘와 같은 계열이다.
+ */
 .core {
-  fill: color-mix(in srgb, var(--tone) 78%, white);
-  filter: drop-shadow(0 0 0.6px var(--tone)) drop-shadow(0 0 1.6px var(--tone));
+  fill: var(--tone);
 }
 
 .ledPulse {

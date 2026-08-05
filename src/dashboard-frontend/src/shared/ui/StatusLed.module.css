@@ -1,5 +1,12 @@
+/**
+ * 다비치 상태 점.
+ * 원본은 발광 효과를 일절 쓰지 않는 평면 시스템이라, 상태 표시는
+ * 7px 원형 단색 점 하나로 끝낸다 (.hd-utils li.on .link:after).
+ * 기존의 3중 발광 레이어를 걷어내고 그 문법으로 바꾸되, 관제 화면에서
+ * 점을 놓치지 않도록 원본의 '옅은 톤 채움' 어휘를 빌려 후광 링만 남겼다.
+ */
 .led {
-  --led-size: 0.5rem;
+  --led-size: 0.4375rem; /* 7px — 원본 값 */
 
   display: inline-block;
   flex-shrink: 0;
@@ -7,37 +14,27 @@
   height: var(--led-size);
   border-radius: var(--radius-full);
   background: var(--tone);
-
-  /* 발광 3중 레이어: 밀착 테두리 → 근거리 광원 → 원거리 확산 */
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--tone) 30%, transparent),
-    0 0 4px var(--tone),
-    0 0 10px color-mix(in srgb, var(--tone) 55%, transparent);
+  box-shadow: 0 0 0 3px var(--tone-soft);
 }
 
 .led[data-size='sm'] {
   --led-size: 0.375rem;
+
+  box-shadow: 0 0 0 2px var(--tone-soft);
 }
 
+/* 원본의 유일한 점멸 문법은 불투명도 왕복이다 (.liveDot: 1 → 0.35). */
 .ledPulse {
   composes: led;
-  animation: ledBreathe 1.6s var(--ease-out) infinite;
+  animation: ledBlink 1.8s var(--ease-out) infinite;
 }
 
-@keyframes ledBreathe {
+@keyframes ledBlink {
   0%,
   100% {
     opacity: 1;
-    box-shadow:
-      0 0 0 1px color-mix(in srgb, var(--tone) 30%, transparent),
-      0 0 4px var(--tone),
-      0 0 10px color-mix(in srgb, var(--tone) 55%, transparent);
   }
   50% {
-    opacity: 0.72;
-    box-shadow:
-      0 0 0 1px color-mix(in srgb, var(--tone) 20%, transparent),
-      0 0 2px var(--tone),
-      0 0 5px color-mix(in srgb, var(--tone) 30%, transparent);
+    opacity: 0.35;
   }
 }

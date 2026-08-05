@@ -1,8 +1,15 @@
 /**
  * 전역 리셋 + 기본 타이포그래피.
  * 시각 값은 전부 tokens.css의 의미 토큰을 참조한다.
+ * 리셋 항목은 다비치마켓 시스템의 리셋을 따랐다.
+ *
+ * 폰트: tokens.css는 'Pretendard'를 지정하지만 이 프로젝트 어디에도 실제
+ * 폰트 파일을 불러오는 곳이 없었다 — 즉 지금까지 모든 화면이 시스템 기본
+ * 서체(Windows는 Segoe UI)로 그려지고 있었다. 공장 LAN이 인터넷과 끊겨
+ * 있을 수 있어 외부 CDN 대신 npm 패키지(self-host)로 가변 폰트 파일을
+ * 번들에 포함시킨다.
  */
-
+@import 'pretendard/dist/web/variable/pretendardvariable.css';
 @import './tokens.css';
 
 *,
@@ -25,8 +32,14 @@ body {
   background: var(--surface-page);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
+  /* 원본 리셋: 모바일 사파리에서 가로 회전 시 글자가 커지는 것을 막는다. */
+  -webkit-text-size-adjust: 100%;
 }
 
+/**
+ * 원본은 제목 태그의 기본 크기를 죽이고 필요한 곳에서만 크기를 준다.
+ * 브라우저 기본 스케일이 시스템 스케일을 덮어쓰는 것을 막는 장치다.
+ */
 h1,
 h2,
 h3,
@@ -34,8 +47,9 @@ h4,
 h5,
 h6 {
   margin: 0;
-  line-height: var(--leading-tight);
+  font-size: 100%;
   font-weight: var(--weight-semibold);
+  line-height: var(--leading-title);
 }
 
 p {
@@ -43,17 +57,59 @@ p {
 }
 
 ul,
-ol {
+ol,
+nav {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-button {
+img {
+  max-width: 100%;
+  vertical-align: top;
+}
+
+/* 원본 리셋: 폼 요소는 폰트를 상속받지 않으므로 명시적으로 물려준다. */
+button,
+input,
+select,
+textarea {
+  margin: 0;
   font-family: inherit;
-  font-size: inherit;
+  font-size: 100%;
+  vertical-align: top;
+  box-sizing: border-box;
+}
+
+button {
+  padding: 0;
+  border: 0;
+  background: transparent;
   color: inherit;
+  font-size: inherit;
   cursor: pointer;
+}
+
+input,
+select,
+textarea {
+  border-radius: 0;
+  outline: none;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--c-grey-400);
+}
+
+/* 원본 리셋: 비활성·읽기전용 입력은 텍스트 커서를 주지 않는다. */
+input[disabled],
+input[readonly],
+select[disabled],
+select[readonly],
+textarea[disabled],
+textarea[readonly] {
+  cursor: default;
 }
 
 a {
@@ -61,50 +117,61 @@ a {
   text-decoration: none;
 }
 
+strong {
+  font-weight: var(--weight-bold);
+}
+
 /**
  * Tone 해석 레이어.
- * `data-tone`이 붙은 요소는 --tone / --tone-text / --tone-soft 를 갖게 되고,
- * 하위 컴포넌트 CSS는 상태별 분기 없이 이 세 변수만 참조하면 된다.
+ * `data-tone`이 붙은 요소는 --tone / --tone-text / --tone-fill / --tone-soft 를 갖게 되고,
+ * 하위 컴포넌트 CSS는 상태별 분기 없이 이 네 변수만 참조하면 된다.
  * 상태 색상 분기가 컴포넌트마다 중복되는 것을 막기 위한 장치다.
  *
  * 용도 구분을 반드시 지킬 것:
  *   --tone       LED·막대·테두리 등 마크
  *   --tone-text  글자 (마크 색을 글자에 쓰면 대비가 무너진다)
- *   --tone-soft  배경 채움
+ *   --tone-fill  흰 글자를 얹는 solid 배경 (마크 색을 쓰면 글자가 안 읽힌다)
+ *   --tone-soft  옅은 배경 채움
  */
 [data-tone] {
   --tone: var(--status-idle);
   --tone-text: var(--status-idle-text);
+  --tone-fill: var(--status-idle-fill);
   --tone-soft: var(--status-idle-soft);
 }
 
 [data-tone='accent'] {
   --tone: var(--accent);
   --tone-text: var(--accent-text);
+  --tone-fill: var(--accent-fill);
   --tone-soft: var(--accent-soft);
 }
 
 [data-tone='good'] {
   --tone: var(--status-good);
   --tone-text: var(--status-good-text);
+  --tone-fill: var(--status-good-fill);
   --tone-soft: var(--status-good-soft);
 }
 
 [data-tone='warning'] {
   --tone: var(--status-warning);
   --tone-text: var(--status-warning-text);
+  --tone-fill: var(--status-warning-fill);
   --tone-soft: var(--status-warning-soft);
 }
 
 [data-tone='serious'] {
   --tone: var(--status-serious);
   --tone-text: var(--status-serious-text);
+  --tone-fill: var(--status-serious-fill);
   --tone-soft: var(--status-serious-soft);
 }
 
 [data-tone='critical'] {
   --tone: var(--status-critical);
   --tone-text: var(--status-critical-text);
+  --tone-fill: var(--status-critical-fill);
   --tone-soft: var(--status-critical-soft);
 }
 
@@ -112,22 +179,27 @@ a {
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
 }
 
-/* 스크롤바가 레이아웃 폭을 흔들지 않도록 얇게 고정한다. */
+/**
+ * 스크롤바.
+ * 원본은 오버레이·드롭다운에서 4px 반투명 thumb에 트랙을 비운다.
+ * 대시보드는 긴 목록이 많아 폭만 8px로 키우고 나머지는 원본 문법을 따른다.
+ */
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--border-strong) transparent;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
 }
 
 *::-webkit-scrollbar {
   width: 8px;
   height: 8px;
+  background: transparent;
 }
 
 *::-webkit-scrollbar-thumb {
-  background: var(--border-strong);
+  background: var(--scrollbar-thumb);
   border-radius: var(--radius-full);
 }
 

@@ -1,16 +1,18 @@
+/**
+ * 카메라 타일 — 클릭 가능한 래퍼.
+ * 라운드는 안에 들어가는 CameraFeed(원본 썸네일 5px)와 맞춘다.
+ * 호버는 원본 문법대로 위치를 옮기지 않고 그림자로만 들어올린다.
+ */
 .tile {
   display: block;
   width: 100%;
-  padding: 0;
-  border: none;
-  background: none;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   text-align: left;
-  transition: transform var(--duration-fast) var(--ease-out);
+  transition: box-shadow var(--duration-fast) var(--ease-out);
 }
 
 .tile:hover {
-  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .tile > * {

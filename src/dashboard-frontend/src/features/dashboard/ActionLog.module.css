@@ -1,11 +1,28 @@
+/**
+ * 액션 로그.
+ * TDS 목록 문법: 행 사이는 잉크 투명도 기반의 옅은 1px 선으로 끊고,
+ * 시각·행위자 같은 메타는 크기와 색으로만 뒤로 물린다(무게는 400 유지).
+ *
+ * 로그는 최대 20건까지 쌓이므로(ActionLog.tsx의 MAX_VISIBLE) 카드 높이가
+ * 내용을 따라 계속 늘어나면 옆의 로봇 현황 카드와 나란히 맞지 않는다.
+ * 행 높이를 고정값으로 못박고 6줄 높이에서 잘라 내부 스크롤로 넘긴다.
+ * 값(76px)은 TDS 조판 기준으로 다시 계산했다 —
+ * 본문 17px×1.6 + 메타 13px×1.6 + 상하 패딩 24px.
+ */
 .log {
+  --row: 4.75rem;
+
   display: flex;
   flex-direction: column;
+  max-height: calc(var(--row) * 6);
+  overflow-y: auto;
 }
 
 .entry {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
+  min-height: var(--row);
   gap: var(--space-3);
   padding: var(--space-3) 0;
   border-bottom: 1px solid var(--border-hairline);
@@ -18,7 +35,7 @@
 .time {
   flex-shrink: 0;
   font-family: var(--font-mono);
-  font-size: var(--text-2xs);
+  font-size: var(--text-xs);
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
@@ -29,7 +46,7 @@
 }
 
 .headline {
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
   color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
@@ -38,6 +55,7 @@
 
 .actor {
   margin-top: var(--space-1);
-  font-size: var(--text-2xs);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-regular);
   color: var(--text-muted);
 }
