@@ -40,9 +40,11 @@ export function useShortageActions() {
   return {
     approve,
     reject,
-    /** 요청이 진행 중인 이벤트 id. 버튼 비활성화에 쓴다. */
+    /**
+     * 요청이 진행 중인 이벤트 id. 버튼 비활성화에 쓴다.
+     * "무언가 진행 중"이 아니라 "어느 건이 진행 중"이어야 팝업이 큐로 넘어갈 때
+     * 다음 건의 버튼까지 잠기지 않는다.
+     */
     pendingId: approveMutation.variables?.id ?? rejectMutation.variables?.id ?? null,
-    isBusy: approveMutation.isPending || rejectMutation.isPending,
-    error: approveMutation.error ?? rejectMutation.error,
   };
 }

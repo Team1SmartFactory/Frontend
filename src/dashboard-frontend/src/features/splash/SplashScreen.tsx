@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useConnectionStore } from '../../store/useConnectionStore';
+import { Spinner } from '../../shared/ui';
 import styles from './SplashScreen.module.css';
 
 const FALLBACK_DELAY_MS = 2500;
@@ -41,7 +42,7 @@ export function SplashScreen() {
       <p className={styles.subtitle}>Beagle + OMX-F 기반 재고 관제 대시보드</p>
 
       <p className={styles.status} role="status">
-        <span className={styles.spinner} aria-hidden="true" />
+        <Spinner size="sm" />
         {STATUS_MESSAGE[connectionStatus] ?? '준비 중…'}
       </p>
     </div>

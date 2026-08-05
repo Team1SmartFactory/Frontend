@@ -5,6 +5,7 @@ import {
   ShortageEventSchema,
   SnapshotSchema,
 } from '../domain/schemas';
+import { DEFAULT_PERMISSIONS } from '../domain/types';
 import type { FactoryApi } from './FactoryApi';
 import { ENDPOINTS, isImplemented } from './endpoints';
 import { request } from './httpClient';
@@ -37,7 +38,7 @@ export const httpFactoryApi: FactoryApi = {
 
   fetchPermissions: (signal) => {
     if (!isImplemented('permissions')) {
-      return Promise.resolve({ approvalRequired: true, authorizedApprovers: ['admin'] });
+      return Promise.resolve(DEFAULT_PERMISSIONS);
     }
     return request(ENDPOINTS.permissions(), PermissionsSchema, { signal });
   },

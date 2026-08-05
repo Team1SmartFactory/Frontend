@@ -15,7 +15,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  height: 2.25rem;
+  height: var(--control-height);
   padding: 0 var(--space-4);
   border-radius: var(--radius-sm);
   color: var(--text-secondary);
@@ -43,11 +43,4 @@
   display: grid;
   place-items: center;
   flex-shrink: 0;
-}
-
-/* 공장 현장 태블릿(터치) 대응 — 44px 최소 탭 타깃. */
-@media (pointer: coarse) {
-  .segment {
-    height: 2.75rem;
-  }
 }

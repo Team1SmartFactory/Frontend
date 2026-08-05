@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { ApiError } from '../api/ApiError';
 import { Button } from './Button';
+import { Spinner } from './Spinner';
 import styles from './QueryState.module.css';
 
 /**
@@ -13,7 +14,7 @@ import styles from './QueryState.module.css';
 export function LoadingState({ message = '불러오는 중…' }: { message?: string }) {
   return (
     <div className={styles.state} role="status">
-      <span className={styles.spinner} aria-hidden="true" />
+      <Spinner />
       <p className={styles.message}>{message}</p>
     </div>
   );

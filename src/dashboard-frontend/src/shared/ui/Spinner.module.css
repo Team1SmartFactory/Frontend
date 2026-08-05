@@ -1,0 +1,36 @@
+/**
+ * 회전 로딩 인디케이터.
+ * 2px 링에 위쪽 호(弧)만 진한 색을 주고 1초 linear로 돌린다.
+ * 359deg는 오타가 아니다 — 360deg면 시작·끝 변환이 같아 일부 엔진이
+ * 회전을 no-op으로 최적화해 버린다.
+ */
+.spinner {
+  width: var(--spinner-size, 1.5rem);
+  height: var(--spinner-size, 1.5rem);
+  flex-shrink: 0;
+  border: 2px solid var(--spinner-track);
+  border-top-color: var(--spinner-head);
+  border-radius: var(--radius-full);
+  animation: spCircRot 1s var(--ease-linear) infinite;
+}
+
+.spinner[data-size='sm'] {
+  --spinner-size: 1rem;
+}
+
+@keyframes spCircRot {
+  0% {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(359deg);
+  }
+}
+
+/* 회전 애니메이션은 전정기관 장애가 있는 사용자에게 불편할 수 있어 존중한다. */
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+    border-top-color: var(--spinner-track);
+  }
+}

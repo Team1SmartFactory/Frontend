@@ -12,7 +12,7 @@
  *     원시 토큰은 여기서만 쓰이고, 컴포넌트는 의미 토큰만 참조한다.
  *  3) 다크 모드는 의미 토큰만 재정의한다. 원시 팔레트는 그대로 둔다.
  *
- * TDS를 옮기며 이 시스템이 갖게 된 성격 — 이전(다비치)과 정반대인 지점들:
+ * 이 시스템의 성격 — 지키지 않으면 TDS처럼 보이지 않는 지점들:
  *   · 자간을 쓰지 않는다. TDS는 letter-spacing이 전 구간 0이다.
  *   · 그림자로 경계를 긋지 않는다. 회색 페이지 위 흰 면과 라운드로 층을 만든다.
  *   · 300 무게를 쓰지 않는다. TDS의 하한은 400이다.
@@ -162,28 +162,22 @@
   --weight-medium: 500;
   --weight-semibold: 600;
   --weight-bold: 700;
-  --weight-extrabold: 800;
 
   /* TDS i18n line-height. 본문이 1.6으로 이전(1.5)보다 넓다. */
   --leading-tight: 1.4; /*  라벨 */
   --leading-title: 1.5; /*  제목 */
   --leading-normal: 1.6; /* 본문 */
 
-  /**
-   * TDS는 자간을 쓰지 않는다. 실측 결과 제목·본문·라벨·버튼 전 구간이
-   * letter-spacing: normal 이다. 토큰은 이전 시스템과의 호환을 위해
-   * 남겨 두되 값은 0으로 고정한다.
+  /*
+   * 자간 토큰은 두지 않는다. TDS는 실측 전 구간이 letter-spacing: normal 이라
+   * 값이 0인 토큰을 남기면 "자간을 조정하고 있다"는 오해만 남는다.
    */
-  --tracking-title: 0;
-  --tracking-tight: 0;
-  --tracking-wide: 0;
 
   /* ─── 원시: 모서리 (TDS radius 6/8/10/12/16/20/999) ─────────── */
   --radius-xs: 0.375rem; /* 6px  — 작은 태그 */
   --radius-sm: 0.5rem; /*   8px  — 버튼, 썸네일 */
   --radius-md: 0.625rem; /* 10px — 인풋, 네비 항목 (TDS 실측) */
   --radius-lg: 1rem; /*     16px — 카드, 콜아웃 (TDS 실측) */
-  --radius-xl: 1.25rem; /*  20px — 큰 표면 */
   --radius-full: 62.4375rem; /* 999px */
 
   /* ─── 원시: 그림자 ─────────────────────────────────────────── */
@@ -192,10 +186,8 @@
    * 16px 라운드만으로 층을 만든다(실측: box-shadow none).
    * 아래 값은 드롭다운·모달처럼 정말 떠 있어야 하는 표면 전용이다.
    */
-  --shadow-hairline: 0 1px var(--c-ink-a200);
   --shadow-sm: 0 1px 3px var(--c-ink-a200);
   --shadow-md: 0 2px 4px var(--c-ink-a200);
-  --shadow-lg: 0 12px 40px 4px var(--c-ink-a200);
   --shadow-ambient: 0 18px 80px 4px var(--c-ink-a300);
 
   /* ─── 원시: 모션 ───────────────────────────────────────────── */
@@ -203,22 +195,18 @@
   --duration-base: 250ms;
   --duration-slow: 400ms;
   --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  --ease-in-out: ease-in-out;
   --ease-linear: linear;
 
   /* ─── 의미: 표면 / 텍스트 / 경계 ────────────────────────────── */
   /* TDS의 서명: 회색 페이지(#f2f4f6) 위에 흰 카드. */
   --surface-page: #f2f4f6;
   --surface-card: var(--c-white);
-  --surface-raised: var(--c-white);
   --surface-sunken: var(--c-grey-100);
   --surface-nav: var(--c-white);
   --surface-overlay: rgba(0, 0, 0, 0.2);
   --surface-hover: var(--c-ink-a50);
   --surface-active: var(--c-ink-a100);
-  --surface-chip: var(--c-grey-100);
   --surface-tag: var(--c-grey-100);
-  --surface-skeleton: var(--c-grey-200);
 
   /* TDS 텍스트 계층은 전부 잉크 투명도 축이다. */
   --text-primary: var(--c-ink-a800);
@@ -229,8 +217,37 @@
   --border-hairline: var(--c-ink-a200);
   --border-default: var(--c-grey-200);
   --border-strong: var(--c-grey-400);
-  --gridline: var(--c-grey-200);
   --scrollbar-thumb: var(--c-ink-a300);
+
+  /* 비활성 컨트롤. 투명도가 아니라 채움으로 표현하므로 표면·글자를 짝으로 잡는다. */
+  --surface-disabled: var(--c-grey-200);
+  --text-disabled: var(--c-ink-a500);
+
+  /* 토글 노브. 파랑·회색 어느 트랙 위에서도 흰 원이라 테마와 무관하다. */
+  --switch-knob: var(--c-white);
+
+  /* 로딩 스피너의 진한 쪽 호(弧). 상태색이 아니므로 중립 축에서 가져온다. */
+  --spinner-track: var(--border-hairline);
+  --spinner-head: var(--c-grey-500);
+
+  /**
+   * 영상 뷰포트처럼 테마와 무관하게 항상 어두운 표면.
+   * 여기 얹히는 글자는 라이트/다크 어느 쪽이든 밝은 쪽이어야 하므로
+   * --text-* 계열을 쓰지 않고 별도로 잡는다.
+   */
+  --surface-media: var(--c-ink-900);
+  --text-on-media: var(--c-white);
+  --text-on-media-muted: var(--c-grey-400);
+  --scrim-media: rgba(0, 0, 0, 0.55);
+  --scrim-media-weak: rgba(0, 0, 0, 0.4);
+
+  /**
+   * 도면 선화 색. 채도를 쓰지 않고 색은 상태(구역 톤 · LED)에만 남긴다.
+   * 컴포넌트가 아니라 여기서 정의해야 테마 전환을 따라간다.
+   */
+  --floorplan-ink: var(--c-grey-600);
+  --floorplan-wall: var(--c-grey-400);
+  --floorplan-zone-line: var(--c-grey-300);
 
   /* ─── 의미: 액센트 / 상태 ──────────────────────────────────── */
   /**
@@ -282,13 +299,36 @@
   --nav-width-collapsed: 4rem;
   --panel-width: 22rem;
 
+  /**
+   * 인라인 컨트롤(버튼·인풋·네비 항목·세그먼트)의 높이.
+   * 공장 현장 태블릿에서는 아래 @media 블록이 이 값만 44px로 올리므로,
+   * 컨트롤마다 터치 분기를 따로 쓰지 않는다. 새 컨트롤은 이 토큰만 참조하면
+   * 터치 대응이 자동으로 따라온다.
+   */
+  --control-height: 2.25rem; /*    36px */
+  --control-height-lg: 2.625rem; /* 42px — TDS 사이드바 항목 실측 */
+  --control-height-sm: 1.5rem; /*  24px */
+
   /* ─── 의미: z-index ─────────────────────────────────────────── */
-  --z-sticky: 10;
   --z-nav: 90;
   --z-panel: 100;
   --z-overlay: 998;
   --z-modal: 999;
-  --z-toast: 1000;
+}
+
+/**
+ * 공장 현장 태블릿(터치) 대응.
+ * 44px은 iOS/Android 공통 최소 탭 타깃 권장값이다. 화면 폭이 아니라
+ * pointer로 판별해, 같은 태블릿이라도 마우스가 물린 상태에서는
+ * 원래 밀도를 유지한다. 컨트롤 높이를 여기서 한 번만 올리면
+ * --control-height를 참조하는 모든 컴포넌트가 함께 커진다.
+ */
+@media (pointer: coarse) {
+  :root {
+    --control-height: 2.75rem;
+    --control-height-lg: 2.75rem;
+    --control-height-sm: 2rem;
+  }
 }
 
 /**
@@ -306,15 +346,12 @@
 
   --surface-page: var(--c-ink-950);
   --surface-card: var(--c-ink-900);
-  --surface-raised: var(--c-grey-d50);
   --surface-sunken: var(--c-ink-950);
   --surface-nav: var(--c-ink-900);
   --surface-overlay: rgba(0, 0, 0, 0.56);
   --surface-hover: var(--c-ink-d-a50);
   --surface-active: var(--c-ink-d-a100);
-  --surface-chip: var(--c-grey-d100);
   --surface-tag: var(--c-grey-d100);
-  --surface-skeleton: var(--c-grey-d200);
 
   --text-primary: var(--c-ink-d-a800);
   --text-secondary: var(--c-ink-d-a700);
@@ -323,13 +360,23 @@
   --border-hairline: var(--c-ink-d-a200);
   --border-default: var(--c-grey-d300);
   --border-strong: var(--c-grey-d500);
-  --gridline: var(--c-ink-d-a200);
   --scrollbar-thumb: var(--c-ink-d-a300);
 
-  --shadow-hairline: 0 1px var(--c-ink-d-a200);
+  --surface-disabled: var(--c-grey-d200);
+  --text-disabled: var(--c-grey-d500);
+
+  --spinner-head: var(--c-grey-d600);
+
+  /* 영상 표면은 테마와 무관하게 어둡다 — 라이트 값 그대로 둔다. */
+  --text-on-media-muted: var(--c-grey-d600);
+
+  /* 어두운 배경 위에서는 선화를 밝은 쪽으로 뒤집어야 읽힌다. */
+  --floorplan-ink: var(--c-grey-d600);
+  --floorplan-wall: var(--c-grey-d500);
+  --floorplan-zone-line: var(--c-ink-d-a300);
+
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
   --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 12px 40px 4px rgba(0, 0, 0, 0.5);
   --shadow-ambient: 0 18px 80px 4px rgba(0, 0, 0, 0.6);
 
   --accent: var(--c-blue-600);

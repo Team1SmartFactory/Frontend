@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import { usePermissions, useUpdatePermissions } from '../../shared/query/useSettings';
 import { Button, Card, Switch, TextField } from '../../shared/ui';
 import styles from './PermissionSettings.module.css';
@@ -10,12 +10,24 @@ export function PermissionSettings() {
 
   const savedApprovers = permissions.authorizedApprovers.join(', ');
   const [approverInput, setApproverInput] = useState(savedApprovers);
+  const [syncedFrom, setSyncedFrom] = useState(savedApprovers);
 
-  // 서버 값이 늦게 도착하거나 다른 창에서 바뀌면 입력란을 따라가게 한다.
-  // 사용자가 편집 중일 때는 덮어쓰지 않도록 저장된 값과 같을 때만 동기화한다.
-  useEffect(() => {
-    setApproverInput((current) => (current === '' ? savedApprovers : current));
-  }, [savedApprovers]);
+  /*
+   * 서버 값이 늦게 도착하거나 다른 창에서 바뀌면 입력란을 따라가게 한다.
+   * 단, 사용자가 편집 중이면 덮어쓰지 않는다.
+   *
+   * "직전에 반영한 서버 값"을 따로 들고 비교해야 그 둘을 구분할 수 있다.
+   * 입력값이 비었는지로 판단하면(이전 구현) 첫 렌더에서 이미 폴백 값이
+   * 채워져 있어 조건이 영영 성립하지 않고, 실제로 동작하는 경우는
+   * 사용자가 입력란을 지웠을 때 멋대로 되채우는 것뿐이었다.
+   *
+   * prop 변화에 따른 state 조정은 effect가 아니라 렌더 중에 하는 것이
+   * React 공식 권장이다 — 여분의 리렌더가 없다.
+   */
+  if (savedApprovers !== syncedFrom) {
+    setSyncedFrom(savedApprovers);
+    if (approverInput === syncedFrom) setApproverInput(savedApprovers);
+  }
 
   const isDirty = approverInput.trim() !== savedApprovers;
   const isSaving = updatePermissions.isPending;

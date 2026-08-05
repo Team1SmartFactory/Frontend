@@ -1,13 +1,14 @@
 import { Emitter } from '../utils/emitter';
 import type { RealtimeMessage } from '../domain/schemas';
-import type {
-  Camera,
-  InventoryPoint,
-  Line,
-  Permissions,
-  Position,
-  RobotStatus,
-  ShortageEvent,
+import {
+  DEFAULT_PERMISSIONS,
+  type Camera,
+  type InventoryPoint,
+  type Line,
+  type Permissions,
+  type Position,
+  type RobotStatus,
+  type ShortageEvent,
 } from '../domain/types';
 import type { Snapshot } from '../domain/schemas';
 
@@ -27,11 +28,6 @@ const REJECT_COOLDOWN_TICKS = 3;
 const MAX_HISTORY_POINTS = 30;
 
 const PERMISSIONS_STORAGE_KEY = 'sfsc.settings.permissions';
-
-const DEFAULT_PERMISSIONS: Permissions = {
-  approvalRequired: true,
-  authorizedApprovers: ['admin'],
-};
 
 type TaskStep = 'dispatch_storage' | 'beagle_to_line' | 'unload' | 'done';
 

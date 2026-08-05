@@ -1,15 +1,19 @@
 /**
  * 전역 리셋 + 기본 타이포그래피.
  * 시각 값은 전부 tokens.css의 의미 토큰을 참조한다.
- * 리셋 항목은 다비치마켓 시스템의 리셋을 따랐다.
  *
  * 폰트: tokens.css는 'Pretendard'를 지정하지만 이 프로젝트 어디에도 실제
  * 폰트 파일을 불러오는 곳이 없었다 — 즉 지금까지 모든 화면이 시스템 기본
  * 서체(Windows는 Segoe UI)로 그려지고 있었다. 공장 LAN이 인터넷과 끊겨
- * 있을 수 있어 외부 CDN 대신 npm 패키지(self-host)로 가변 폰트 파일을
- * 번들에 포함시킨다.
+ * 있을 수 있어 외부 CDN 대신 npm 패키지(self-host)로 번들에 포함시킨다.
+ *
+ * 통짜 파일(pretendardvariable.css)이 아니라 dynamic-subset을 쓴다.
+ * 통짜는 2MB짜리 woff2 하나를 무조건 받는데, 이는 앱의 JS+CSS를 전부
+ * 합친 것의 6배다. 서브셋은 같은 가변 폰트를 unicode-range로 92조각
+ * 낸 것이라, 브라우저가 화면에 실제로 나온 글자가 속한 조각만 받는다.
+ * 한글 관제 화면 기준으로 수백 KB 수준으로 떨어진다.
  */
-@import 'pretendard/dist/web/variable/pretendardvariable.css';
+@import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
 @import './tokens.css';
 
 *,
@@ -32,13 +36,13 @@ body {
   background: var(--surface-page);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
-  /* 원본 리셋: 모바일 사파리에서 가로 회전 시 글자가 커지는 것을 막는다. */
+  /* 모바일 사파리에서 가로 회전 시 글자가 커지는 것을 막는다. */
   -webkit-text-size-adjust: 100%;
 }
 
 /**
- * 원본은 제목 태그의 기본 크기를 죽이고 필요한 곳에서만 크기를 준다.
- * 브라우저 기본 스케일이 시스템 스케일을 덮어쓰는 것을 막는 장치다.
+ * 제목 태그의 브라우저 기본 크기를 죽이고 필요한 곳에서만 크기를 준다.
+ * 브라우저 기본 스케일이 이 시스템의 타입 스케일을 덮어쓰는 것을 막는 장치다.
  */
 h1,
 h2,
@@ -69,7 +73,7 @@ img {
   vertical-align: top;
 }
 
-/* 원본 리셋: 폼 요소는 폰트를 상속받지 않으므로 명시적으로 물려준다. */
+/* 폼 요소는 폰트를 상속받지 않으므로 명시적으로 물려준다. */
 button,
 input,
 select,
@@ -99,10 +103,10 @@ textarea {
 
 input::placeholder,
 textarea::placeholder {
-  color: var(--c-grey-400);
+  color: var(--text-muted);
 }
 
-/* 원본 리셋: 비활성·읽기전용 입력은 텍스트 커서를 주지 않는다. */
+/* 비활성·읽기전용 입력은 텍스트 커서를 주지 않는다. */
 input[disabled],
 input[readonly],
 select[disabled],
@@ -184,8 +188,8 @@ strong {
 
 /**
  * 스크롤바.
- * 원본은 오버레이·드롭다운에서 4px 반투명 thumb에 트랙을 비운다.
- * 대시보드는 긴 목록이 많아 폭만 8px로 키우고 나머지는 원본 문법을 따른다.
+ * 반투명 thumb에 트랙은 비운다.
+ * 대시보드는 긴 목록이 많아 폭을 8px로 잡았다.
  */
 * {
   scrollbar-width: thin;

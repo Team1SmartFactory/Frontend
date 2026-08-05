@@ -1,22 +1,20 @@
 /**
- * 다비치 버튼 문법.
- * 원본 .btn: border-radius 6px, 배경과 같은 색의 1px 테두리를 깔아
- * 채운 버튼과 외곽선 버튼이 같은 박스 크기를 갖게 한다. 자간은 -0.02em.
- * 높이는 원본의 인라인 컨트롤 치수를 따랐다 (36px = 원본 셀렉트·필터 버튼,
- * 24px = 원본 .btn-s). 원본의 48px은 모바일 전폭 CTA 전용이라 쓰지 않는다.
+ * 버튼.
+ * 배경과 같은 색의 1px 테두리를 깔아, 채운 버튼과 외곽선 버튼이
+ * 같은 박스 크기를 갖게 한다. 높이는 --control-height가 소유하므로
+ * 터치 기기 대응이 자동으로 따라온다.
  */
 .button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  height: 2.25rem;
+  height: var(--control-height);
   padding: 0 var(--space-4);
   border: 1px solid transparent;
   border-radius: var(--radius-md);
   font-size: var(--text-md);
   font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-tight);
   white-space: nowrap;
   transition:
     background var(--duration-fast) var(--ease-out),
@@ -24,29 +22,29 @@
     color var(--duration-fast) var(--ease-out);
 }
 
-/* 원본 .btn-s */
+/* 작은 변형 — 목록 행 안에 들어가는 인라인 액션용. */
 .button[data-size='sm'] {
-  height: 1.5rem;
+  height: var(--control-height-sm);
   padding: 0 var(--space-2);
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
 }
 
-/* 원본 .is-disabled: 투명도가 아니라 회색 채움으로 비활성을 표현한다. */
+/* 비활성은 투명도가 아니라 회색 채움으로 표현한다. 테마를 따라가도록 의미 토큰을 쓴다. */
 .button:disabled {
-  background: var(--c-grey-400);
-  border-color: var(--c-grey-400);
-  color: var(--c-white);
+  background: var(--surface-disabled);
+  border-color: var(--surface-disabled);
+  color: var(--text-disabled);
   cursor: not-allowed;
 }
 
 .ghost:disabled {
   background: transparent;
   border-color: transparent;
-  color: var(--c-grey-400);
+  color: var(--text-disabled);
 }
 
-/* 원본 .btn.secondary — 이 시스템에서 파랑이 주 행동색이다. */
+/* 파랑은 주 행동색이다. */
 .primary {
   background: var(--accent);
   border-color: var(--accent);
@@ -58,7 +56,7 @@
   border-color: var(--accent-strong);
 }
 
-/* 원본 .btn.color2 */
+
 .secondary {
   background: var(--surface-card);
   border-color: var(--border-default);
@@ -88,20 +86,4 @@
 .danger:hover:not(:disabled) {
   background: var(--status-critical-text);
   border-color: var(--status-critical-text);
-}
-
-/*
- * 공장 현장의 10인치급 산업용 태블릿(터치) 대응.
- * 44px은 iOS/Android 공통 최소 탭 타깃 권장값이라 이 기준으로 맞춘다.
- * width가 아니라 pointer로 판별해, 같은 태블릿이라도 마우스가 물린
- * 상태에서는 원래 밀도를 유지한다.
- */
-@media (pointer: coarse) {
-  .button {
-    height: 2.75rem;
-  }
-
-  .button[data-size='sm'] {
-    height: 2rem;
-  }
 }

@@ -1,14 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { factoryApi } from '../api';
 import type { ApiError } from '../api/ApiError';
-import type { Permissions } from '../domain/types';
+import { DEFAULT_PERMISSIONS, type Permissions } from '../domain/types';
 import { queryKeys } from './queryKeys';
-
-/** 백엔드가 아직 권한 API를 열지 않았을 때 화면이 비지 않도록 쓰는 값. */
-const FALLBACK_PERMISSIONS: Permissions = {
-  approvalRequired: true,
-  authorizedApprovers: ['admin'],
-};
 
 /**
  * 승인 권한 설정.
@@ -23,7 +17,7 @@ export function usePermissions() {
     queryFn: ({ signal }) => factoryApi.fetchPermissions(signal),
   });
 
-  return { permissions: data ?? FALLBACK_PERMISSIONS, isPending, isError, error };
+  return { permissions: data ?? DEFAULT_PERMISSIONS, isPending, isError, error };
 }
 
 export function useUpdatePermissions() {

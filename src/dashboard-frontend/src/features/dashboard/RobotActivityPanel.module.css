@@ -48,7 +48,7 @@
   font-size: var(--text-xs);
 }
 
-/* 보조 안내문은 원본 메타 조판(300)으로 뒤로 물린다. */
+/* 보조 안내문은 크기와 색으로 뒤로 물린다. */
 .allIdle,
 .idleNote {
   font-size: var(--text-xs);

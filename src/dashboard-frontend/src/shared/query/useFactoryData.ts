@@ -83,13 +83,3 @@ export function useShortageEvents() {
     error,
   };
 }
-
-/**
- * 부팅 상태만 알고 싶은 곳(스플래시)에서 쓴다.
- * select를 주지 않으면 캐시 전체가 바뀔 때마다 리렌더되므로,
- * 데이터를 쓰지 않는 화면에서만 사용한다.
- */
-export function useFactoryDataStatus() {
-  const { isPending, isError, error, refetch } = useFactoryQuery({ select: selectLines });
-  return { isPending, isError, error, refetch };
-}

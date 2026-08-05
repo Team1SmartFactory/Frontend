@@ -33,11 +33,10 @@
   min-width: 0;
 }
 
-/* 원본 카드 제목 조판(14px / 700 / -0.02em / 1.2). */
+/* 카드 제목 조판 — 크기·무게·행간은 토큰이 소유한다. */
 .title {
   font-size: var(--text-md);
   font-weight: var(--weight-bold);
-  letter-spacing: var(--tracking-tight);
   line-height: var(--leading-title);
   white-space: nowrap;
   overflow: hidden;
@@ -98,12 +97,11 @@
   color: var(--text-muted);
 }
 
-/* 수치 조판은 원본의 가격 표기와 같이 굵게 + 음수 자간으로 조인다. */
+/* 수치는 굵게 잡고 고정폭 숫자로 자릿수 흔들림을 막는다. */
 .partQty {
   flex-shrink: 0;
   font-size: var(--text-md);
   font-weight: var(--weight-bold);
-  letter-spacing: var(--tracking-tight);
   font-variant-numeric: tabular-nums;
 }
 
@@ -113,7 +111,7 @@
   flex-direction: column;
 }
 
-/* 목록 행 사이는 원본의 실제 1px 보더(#dddddd)로 끊는다. */
+/* 목록 행 사이는 1px 선으로 끊는다. */
 .historyItem {
   display: flex;
   align-items: center;

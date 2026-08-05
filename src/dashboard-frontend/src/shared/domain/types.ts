@@ -75,6 +75,19 @@ export interface Permissions {
   authorizedApprovers: string[];
 }
 
+/**
+ * 서버 값이 아직 없을 때 쓰는 기본값.
+ *
+ * "승인 필요"가 기본이어야 안전한 쪽으로 실패한다 — 설정을 못 읽었다고
+ * 로봇이 승인 없이 움직이면 안 된다. 목 백엔드·HTTP 폴백·쿼리 폴백이
+ * 각자 리터럴을 들고 있으면 셋 중 하나만 바뀌었을 때 조회 전후로 값이
+ * 달라지므로, 한 곳에서만 정의한다.
+ */
+export const DEFAULT_PERMISSIONS: Permissions = {
+  approvalRequired: true,
+  authorizedApprovers: ['admin'],
+};
+
 /** 재고 추이 그래프의 한 점. */
 export interface InventoryPoint {
   qty: number;

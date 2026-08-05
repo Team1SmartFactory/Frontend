@@ -1,9 +1,4 @@
-/**
- * 로딩/오류 상태.
- * 스피너는 원본 .sp-circle을 그대로 옮겼다 — 24px, 2px 회색 링에 위쪽만
- * 진한 색, 1초 linear 무한 회전. 359deg는 오타가 아니라 원본 값으로,
- * 360deg일 때 일부 엔진이 회전을 no-op으로 최적화해 버리는 것을 피하는 관용구다.
- */
+/* 로딩/오류 상태. 스피너 자체는 shared/ui의 Spinner가 담당한다. */
 .state {
   display: flex;
   flex-direction: column;
@@ -23,31 +18,5 @@
   font-size: var(--text-xs);
   font-weight: var(--weight-regular);
   color: var(--text-muted);
-  font-family: var(--font-mono, monospace);
-}
-
-.spinner {
-  width: 1.5rem;
-  height: 1.5rem;
-  border: 2px solid var(--border-hairline);
-  border-top-color: var(--c-grey-500);
-  border-radius: var(--radius-full);
-  animation: spCircRot 1s var(--ease-linear) infinite;
-}
-
-@keyframes spCircRot {
-  0% {
-    transform: rotate(0);
-  }
-  to {
-    transform: rotate(359deg);
-  }
-}
-
-/* 회전 애니메이션은 전정기관 장애가 있는 사용자에게 불편할 수 있어 존중한다. */
-@media (prefers-reduced-motion: reduce) {
-  .spinner {
-    animation: none;
-    border-top-color: var(--border-hairline);
-  }
+  font-family: var(--font-mono);
 }

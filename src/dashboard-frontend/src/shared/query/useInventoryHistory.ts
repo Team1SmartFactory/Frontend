@@ -13,11 +13,10 @@ const EMPTY: readonly InventoryPoint[] = Object.freeze([]);
  * 같은 캐시 키에 이어 붙인다. (useRealtimeSync 참고)
  * 이렇게 해야 새로고침 직후에도 그래프가 비어 있지 않다.
  */
-export function useInventoryHistory(lineId: string | null) {
+export function useInventoryHistory(lineId: string) {
   const { data, isPending, isError, error } = useQuery<InventoryPoint[], ApiError>({
-    queryKey: queryKeys.inventory.history(lineId ?? ''),
-    queryFn: ({ signal }) => factoryApi.fetchInventoryHistory({ lineId: lineId as string }, signal),
-    enabled: Boolean(lineId),
+    queryKey: queryKeys.inventory.history(lineId),
+    queryFn: ({ signal }) => factoryApi.fetchInventoryHistory({ lineId }, signal),
   });
 
   return { history: data ?? (EMPTY as InventoryPoint[]), isPending, isError, error };

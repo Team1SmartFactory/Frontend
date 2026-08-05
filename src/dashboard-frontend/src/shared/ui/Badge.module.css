@@ -1,9 +1,7 @@
 /**
- * 다비치 태그 문법.
- * 원본 .tag는 알약이 아니라 3px 라운드의 작은 사각 라벨이고 기본은 중립 회색이다
- * (background:#f7f7f7; color:#818181; padding:3px 5px; border-radius:3px).
- * 크기·무게는 원본에서 '의미를 담는' 뱃지인 필터 카운트(11px/500)를 따랐다.
- * 장식용 스펙 태그(10px/300)를 그대로 쓰면 상태 라벨이 읽히지 않는다.
+ * 상태 뱃지.
+ * 알약이 아니라 작은 사각 라벨이고, 톤이 없으면 중립 회색으로 떨어진다.
+ * 상태를 담는 라벨이므로 장식 태그보다 한 단계 크고 굵게 잡는다.
  */
 .badge {
   display: inline-flex;
@@ -19,7 +17,7 @@
   white-space: nowrap;
 }
 
-/* 톤이 없는 기본 뱃지는 원본의 중립 태그 그대로. */
+/* 톤이 없는 기본 뱃지는 중립 회색. */
 .badge[data-tone='idle'] {
   background: var(--surface-tag);
   color: var(--text-muted);

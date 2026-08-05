@@ -1,7 +1,7 @@
 /**
- * 다비치 입력 필드.
- * 원본의 폼 입력은 1px #ddd 테두리 + 6px 라운드이고, 높이는 검색 입력과 같은 40px이다.
- * 라벨은 원본의 브랜드명 조판(11px/600)을, 힌트는 메타 조판(10px/300)을 따랐다.
+ * 입력 필드.
+ * 1px 테두리 + 라운드, 높이는 --control-height-lg가 소유해
+ * 터치 기기에서 탭 타깃이 자동으로 커진다.
  */
 .field {
   display: flex;
@@ -16,7 +16,7 @@
 }
 
 .input {
-  height: 2.5rem;
+  height: var(--control-height-lg);
   padding: 0 var(--space-3);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
@@ -35,11 +35,4 @@
   font-size: var(--text-2xs);
   font-weight: var(--weight-regular);
   color: var(--text-muted);
-}
-
-/* 공장 현장 태블릿(터치) 대응 — 44px 최소 탭 타깃. */
-@media (pointer: coarse) {
-  .input {
-    height: 2.75rem;
-  }
 }

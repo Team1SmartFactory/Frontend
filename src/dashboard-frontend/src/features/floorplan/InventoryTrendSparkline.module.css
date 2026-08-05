@@ -47,11 +47,10 @@
   margin-top: var(--space-2);
 }
 
-/* 수치 조판은 원본의 가격 표기와 같이 굵게 + 음수 자간으로 조인다. */
+/* 수치는 굵게 잡고 고정폭 숫자로 자릿수 흔들림을 막는다. */
 .value {
   font-size: var(--text-md);
   font-weight: var(--weight-bold);
-  letter-spacing: var(--tracking-tight);
   font-variant-numeric: tabular-nums;
   color: var(--tone-text);
 }

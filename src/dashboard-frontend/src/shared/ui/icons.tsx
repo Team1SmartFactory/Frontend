@@ -67,14 +67,6 @@ export function SettingsIcon(props: IconProps) {
   );
 }
 
-export function ChevronLeftIcon(props: IconProps) {
-  return (
-    <Svg {...props}>
-      <path d="M15 5 8 12l7 7" />
-    </Svg>
-  );
-}
-
 /**
  * 사이드바 접기/펼치기 아이콘 — 패널 프레임 안에 세로선 하나로 "사이드바"를
  * 표현하는, Notion을 비롯해 대부분의 에디터형 앱이 쓰는 관용적인 형태다.

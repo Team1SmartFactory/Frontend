@@ -1,8 +1,8 @@
 /**
- * 다비치 토글.
- * 원본은 체크박스를 숨기고 형제 요소를 스타일링하는 문법을 쓴다
- * (.btn-wish input:checked + .label). 여기서도 같은 구조로,
- * 켜짐 색은 원본의 주 행동색인 파랑, 꺼짐은 원본 기본 보더색(#ddd)이다.
+ * 켬/끔 토글.
+ * 네이티브 체크박스를 투명하게 덮고 형제 요소를 스타일링해,
+ * 포커스·키보드 동작을 브라우저에 맡긴다.
+ * 켜짐은 주 행동색인 파랑, 꺼짐은 기본 보더색이다.
  */
 .row {
   display: flex;
@@ -74,7 +74,7 @@
   width: 1.125rem;
   height: 1.125rem;
   border-radius: var(--radius-full);
-  background: var(--c-white);
+  background: var(--switch-knob);
   box-shadow: var(--shadow-md);
   transform: translateY(-50%);
   transition: transform var(--duration-base) var(--ease-out);
