@@ -21,13 +21,19 @@
   width: var(--nav-width-collapsed);
 }
 
-/* ─── 브랜드 ────────────────────────────────────────────────── */
+/* ─── 브랜드 (클릭하면 대시보드로 이동) ─────────────────────── */
 .brand {
   display: flex;
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-2);
   margin-bottom: var(--space-6);
+  border-radius: var(--radius-md);
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+.brand:hover {
+  background: var(--surface-hover);
 }
 
 .brandMark {

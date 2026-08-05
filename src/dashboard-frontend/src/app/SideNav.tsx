@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react';
-import { NavLink } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { useConnectionStore } from '../store/useConnectionStore';
 import { useShortageEvents } from '../shared/query/useFactoryData';
 import { useUiStore } from '../store/useUiStore';
@@ -56,7 +56,7 @@ export function SideNav() {
       data-collapsed={navCollapsed}
       aria-label="주요 화면"
     >
-      <div className={styles.brand}>
+      <Link to="/dashboard" className={styles.brand} title={navCollapsed ? '대시보드로 이동' : undefined}>
         <span className={styles.brandMark} aria-hidden="true">
           SF
         </span>
@@ -64,7 +64,7 @@ export function SideNav() {
           <strong className={styles.brandTitle}>스마트 팩토리</strong>
           <span className={styles.brandSubtitle}>재고 관제</span>
         </span>
-      </div>
+      </Link>
 
       <ul className={styles.list}>
         {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
