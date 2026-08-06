@@ -32,6 +32,8 @@ export function CctvTab() {
           ? shortageLineIds.size > 0
           : Boolean(camera.lineId && shortageLineIds.has(camera.lineId)),
       alertLabel: camera.scope === 'overview' ? '부족 라인 있음' : '부품 부족',
+      // 부족 경보와 뜻이 겹치지 않게, 특정 라인이 아닌 카메라에만 붙는 별도 태그.
+      scopeTag: camera.scope === 'overview' ? '전체' : undefined,
     }))
     .sort((a, b) => {
       if (a.scope !== b.scope) return a.scope === 'overview' ? -1 : 1;
@@ -78,6 +80,7 @@ export function CctvTab() {
                   hasShortage={camera.hasShortage}
                   streamUrl={camera.streamUrl}
                   alertLabel={camera.alertLabel}
+                  scopeTag={camera.scopeTag}
                   onZoom={() => zoomCamera(camera.id)}
                 />
               ))}
@@ -93,6 +96,7 @@ export function CctvTab() {
           hasShortage={zoomed.hasShortage}
           streamUrl={zoomed.streamUrl}
           alertLabel={zoomed.alertLabel}
+          scopeTag={zoomed.scopeTag}
           onClose={() => zoomCamera(null)}
         />
       )}

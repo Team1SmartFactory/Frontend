@@ -10,6 +10,7 @@ interface CameraZoomModalProps {
   hasShortage: boolean;
   streamUrl?: string;
   alertLabel: string;
+  scopeTag?: string;
   onClose: () => void;
 }
 
@@ -20,6 +21,7 @@ export function CameraZoomModal({
   hasShortage,
   streamUrl,
   alertLabel,
+  scopeTag,
   onClose,
 }: CameraZoomModalProps) {
   useEscapeKey(onClose);
@@ -56,6 +58,7 @@ export function CameraZoomModal({
             tone={hasShortage ? 'critical' : undefined}
             alertLabel={alertLabel}
             streamUrl={streamUrl}
+            scopeTag={scopeTag}
           />
         </div>
       </div>

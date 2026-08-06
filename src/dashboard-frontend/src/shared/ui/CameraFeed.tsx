@@ -14,6 +14,13 @@ interface CameraFeedProps {
    * Camera.streamUrl과 같은 형식을 기대한다 — 자세한 제약은 그쪽 문서를 본다.
    */
   streamUrl?: string;
+  /**
+   * 이 카메라가 무엇을 비추는지 짧게 알리는 태그(예: '전체').
+   * 특정 라인이 아니라 공장 전체처럼 성격이 다른 카메라를 구분할 때 쓴다.
+   * 부족 경보(tone/alertLabel)와 뜻이 겹치면 안 되므로 상태색 팔레트를 쓰지 않고
+   * 항상 같은 액센트 파랑으로 고정한다 — 경보가 함께 떠도 어느 쪽이 우선인지 헷갈리지 않는다.
+   */
+  scopeTag?: string;
 }
 
 /**
@@ -25,7 +32,7 @@ interface CameraFeedProps {
  *
  * 평면도 사이드 패널·CCTV 탭·부족 승인 팝업이 같은 모양을 쓰도록 공용 컴포넌트로 둔다.
  */
-export function CameraFeed({ cameraId, label, tone, alertLabel, streamUrl }: CameraFeedProps) {
+export function CameraFeed({ cameraId, label, tone, alertLabel, streamUrl, scopeTag }: CameraFeedProps) {
   // 주소가 바뀌면 이전 실패 기록을 지운다. 재생 불가 판정이 다음 카메라까지 따라가면 안 된다.
   const [streamFailed, setStreamFailed] = useState(false);
   useEffect(() => setStreamFailed(false), [streamUrl]);
@@ -33,7 +40,12 @@ export function CameraFeed({ cameraId, label, tone, alertLabel, streamUrl }: Cam
   const showStream = Boolean(streamUrl) && !streamFailed;
 
   return (
-    <div className={styles.feed} data-tone={tone} data-alert={Boolean(tone)}>
+    <div
+      className={styles.feed}
+      data-tone={tone}
+      data-alert={Boolean(tone)}
+      data-scope-tag={Boolean(scopeTag)}
+    >
       {showStream ? (
         // 재생 불가(잘못된 주소·지원하지 않는 코덱·연결 끊김)면 빈 검은 화면 대신
         // 자리표시자로 돌아간다. 그래야 "카메라가 있다"는 사실 자체는 계속 읽힌다.
@@ -53,9 +65,12 @@ export function CameraFeed({ cameraId, label, tone, alertLabel, streamUrl }: Cam
       )}
 
       <div className={styles.overlay}>
-        <span className={styles.live}>
-          <span className={styles.liveDot} />
-          LIVE
+        <span className={styles.leftGroup}>
+          <span className={styles.live}>
+            <span className={styles.liveDot} />
+            LIVE
+          </span>
+          {scopeTag && <span className={styles.scopeTag}>{scopeTag}</span>}
         </span>
         {alertLabel && tone && <span className={styles.alert}>{alertLabel}</span>}
       </div>
