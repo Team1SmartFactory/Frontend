@@ -48,7 +48,7 @@ export function LineStockConfirmDialog({ line, onClose }: LineStockConfirmDialog
     >
       {camera && (
         <div className={styles.camera}>
-          <CameraFeed cameraId={camera.id} label={camera.label} />
+          <CameraFeed cameraId={camera.id} label={camera.label} streamUrl={camera.streamUrl} />
         </div>
       )}
 

@@ -52,6 +52,29 @@ describe('overrideLineStock', () => {
   });
 });
 
+/**
+ * CCTV 탭이 "전체 뷰 카메라가 맨 앞"을 보장할 수 있으려면, 백엔드가 내려주는
+ * 목록 자체에 scope: 'overview' 카메라가 하나, lineId 없이 존재해야 한다.
+ * 정렬은 화면 쪽 책임이지만, 그 전제가 되는 데이터 모양은 여기서 고정해 둔다.
+ */
+describe('getCameras', () => {
+  it('공장 전체 뷰 카메라가 라인에 속하지 않은 채로 포함된다', () => {
+    const cameras = mockFactoryBackend.getCameras();
+    const overview = cameras.filter((camera) => camera.scope === 'overview');
+
+    expect(overview).toHaveLength(1);
+    expect(overview[0]?.lineId).toBeUndefined();
+  });
+
+  it('나머지 카메라는 모두 특정 라인에 속한다', () => {
+    const cameras = mockFactoryBackend.getCameras();
+    const lineCameras = cameras.filter((camera) => camera.scope === 'line');
+
+    expect(lineCameras.length).toBeGreaterThan(0);
+    expect(lineCameras.every((camera) => typeof camera.lineId === 'string')).toBe(true);
+  });
+});
+
 describe('rejectShortage', () => {
   it('반려하면 부족이었던 라인이 정상으로 바뀐다', async () => {
     await mockFactoryBackend.overrideLineStock('line-b', 'shortage', '관리자');

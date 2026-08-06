@@ -63,6 +63,7 @@ export function ShortageApprovalModal() {
               label={camera.label}
               tone="critical"
               alertLabel="부품 부족"
+              streamUrl={camera.streamUrl}
             />
           ) : (
             <EmptyState

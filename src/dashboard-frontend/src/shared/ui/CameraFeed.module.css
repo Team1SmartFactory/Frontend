@@ -29,6 +29,15 @@
   );
 }
 
+/* 실제 스트림. 자리표시자와 같은 자리를 차지하되, 원본 화면비를 지키며 채운다. */
+.video {
+  flex: 1;
+  min-height: 6rem;
+  width: 100%;
+  object-fit: cover;
+  background: var(--surface-media);
+}
+
 .overlay {
   position: absolute;
   inset: var(--space-2) var(--space-2) auto;

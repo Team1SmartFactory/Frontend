@@ -96,15 +96,29 @@ export interface RobotStatus {
 }
 
 /**
+ * 카메라가 무엇을 비추는가.
+ *   overview — 공장 천장 전체 뷰. 특정 라인에 속하지 않는다.
+ *   line     — 특정 라인 하나를 비추는 카메라.
+ */
+export type CameraScope = 'overview' | 'line';
+
+/**
  * 설치된 카메라.
  * 라인당 1대를 가정하지 않는다. 실제로는 한 라인에 여러 대가 붙을 수 있어
- * lineId를 필드로 두고 화면에서 묶는다.
+ * lineId를 필드로 두고 화면에서 묶는다. 전체 뷰 카메라는 어느 라인에도 속하지
+ * 않으므로 scope로 구분하고, 그때는 lineId가 없다.
  */
 export interface Camera {
   id: string;
-  lineId: string;
+  scope: CameraScope;
+  /** scope가 'line'일 때만 있다. */
+  lineId?: string;
   label: string;
-  /** RTSP/HLS/WebRTC 주소. 아직 스트림이 없으면 비어 있다. */
+  /**
+   * 실제 영상 주소. 브라우저 <video>가 직접 재생할 수 있는 형태(HLS .m3u8, mp4/webm 등)를 기대한다.
+   * RTSP는 브라우저가 직접 재생하지 못하므로, 백엔드가 HLS나 WebRTC로 변환해 내려줘야 한다.
+   * 비어 있으면 화면은 연결 전 자리표시자를 보여준다.
+   */
   streamUrl?: string;
   online: boolean;
 }

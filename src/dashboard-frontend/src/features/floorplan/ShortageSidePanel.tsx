@@ -89,6 +89,7 @@ export function ShortageSidePanel({ line, shortageEvents, onClose }: ShortageSid
               label={camera.label}
               tone={tone === 'critical' ? 'critical' : undefined}
               alertLabel="부품 부족"
+              streamUrl={camera.streamUrl}
             />
           ) : (
             <EmptyState message="이 라인에 연결된 카메라가 없습니다." />

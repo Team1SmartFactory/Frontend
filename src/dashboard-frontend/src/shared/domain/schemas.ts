@@ -104,9 +104,12 @@ export const SnapshotSchema = z.object({
 });
 export type Snapshot = z.infer<typeof SnapshotSchema>;
 
+export const CameraScopeSchema = z.enum(['overview', 'line']);
+
 export const CameraSchema = z.object({
   id: z.string(),
-  lineId: z.string(),
+  scope: CameraScopeSchema,
+  lineId: z.string().optional(),
   label: z.string(),
   streamUrl: z.string().optional(),
   online: z.boolean(),

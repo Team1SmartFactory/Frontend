@@ -137,13 +137,25 @@ const ACTIVE_SHORTAGE_STATUSES = new Set<ShortageEvent['status']>([
   'in_transit',
 ]);
 
-/** 라인당 천장 카메라 1대. 실제 백엔드에서는 카메라 테이블이 대신한다. */
-const INITIAL_CAMERAS: Camera[] = INITIAL_LINES.map((line) => ({
-  id: `cam-${line.id}`,
-  lineId: line.id,
-  label: `${line.name} 천장 카메라`,
+/** 공장 전체를 비추는 천장 카메라. 특정 라인에 속하지 않으므로 목록 맨 앞에 고정으로 둔다. */
+const OVERVIEW_CAMERA: Camera = {
+  id: 'cam-overview',
+  scope: 'overview',
+  label: '공장 전체 천장 카메라',
   online: true,
-}));
+};
+
+/** 전체 뷰 1대 + 라인당 천장 카메라 1대. 실제 백엔드에서는 카메라 테이블이 대신한다. */
+const INITIAL_CAMERAS: Camera[] = [
+  OVERVIEW_CAMERA,
+  ...INITIAL_LINES.map((line) => ({
+    id: `cam-${line.id}`,
+    scope: 'line' as const,
+    lineId: line.id,
+    label: `${line.name} 천장 카메라`,
+    online: true,
+  })),
+];
 
 function readStoredPermissions(): Permissions {
   try {
