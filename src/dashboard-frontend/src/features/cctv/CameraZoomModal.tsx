@@ -8,11 +8,22 @@ interface CameraZoomModalProps {
   cameraId: string;
   label: string;
   hasShortage: boolean;
+  streamUrl?: string;
+  alertLabel: string;
+  scopeTag?: string;
   onClose: () => void;
 }
 
 /** 카메라 뷰 클릭 시 열리는 확대 팝업. 배경 클릭과 Esc로도 닫힌다. */
-export function CameraZoomModal({ cameraId, label, hasShortage, onClose }: CameraZoomModalProps) {
+export function CameraZoomModal({
+  cameraId,
+  label,
+  hasShortage,
+  streamUrl,
+  alertLabel,
+  scopeTag,
+  onClose,
+}: CameraZoomModalProps) {
   useEscapeKey(onClose);
 
   /** 다이얼로그 내부 클릭이 배경까지 올라가 창을 닫아 버리는 것을 막는다. */
@@ -31,7 +42,7 @@ export function CameraZoomModal({ cameraId, label, hasShortage, onClose }: Camer
           <div className={styles.headerActions}>
             {hasShortage && (
               <Badge tone="critical" led pulse>
-                부품 부족
+                {alertLabel}
               </Badge>
             )}
             <Button variant="ghost" size="sm" onClick={onClose} aria-label="닫기">
@@ -45,7 +56,9 @@ export function CameraZoomModal({ cameraId, label, hasShortage, onClose }: Camer
             cameraId={cameraId}
             label={label}
             tone={hasShortage ? 'critical' : undefined}
-            alertLabel="부품 부족"
+            alertLabel={alertLabel}
+            streamUrl={streamUrl}
+            scopeTag={scopeTag}
           />
         </div>
       </div>

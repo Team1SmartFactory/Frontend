@@ -1,6 +1,8 @@
+import { z } from 'zod';
 import {
   CameraListSchema,
   InventoryHistorySchema,
+  LineSchema,
   PermissionsSchema,
   ShortageEventSchema,
   SnapshotSchema,
@@ -30,6 +32,22 @@ export const httpFactoryApi: FactoryApi = {
 
   rejectShortage: ({ id }) =>
     request(ENDPOINTS.rejectShortage(id), ShortageEventSchema, { method: 'POST' }),
+
+  overrideLineStock: ({ lineId, verdict, by }) =>
+    request(ENDPOINTS.lineStock(lineId), LineSchema, {
+      method: 'PUT',
+      body: { verdict, by },
+    }),
+
+  submitDetectionFeedback: async (input) => {
+    // 라벨은 모으지 못해도 현장 동작은 계속되어야 하므로, 라우터가 열리기 전에는
+    // 경고만 남기고 넘어간다. 조용히 버리면 "학습이 되고 있다"는 착각을 준다.
+    if (!isImplemented('detectionFeedback')) {
+      console.warn('[detection-feedback] 백엔드 라우터가 아직 없어 라벨을 보내지 못했습니다:', input);
+      return;
+    }
+    await request(ENDPOINTS.detectionFeedback(), z.unknown(), { method: 'POST', body: input });
+  },
 
   fetchCameras: (signal) => {
     if (!isImplemented('cameras')) return Promise.resolve([]);

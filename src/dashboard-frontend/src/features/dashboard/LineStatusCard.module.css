@@ -30,6 +30,31 @@
   text-overflow: ellipsis;
 }
 
+/*
+ * 배지를 누를 수 있게 감싼 버튼.
+ * 배지 자체의 모양은 그대로 두고 버튼은 자리만 내어 준다 —
+ * 눌리는 곳이 배지 테두리와 정확히 겹쳐야 무엇을 누르는지 헷갈리지 않는다.
+ */
+.badgeButton {
+  display: inline-flex;
+  padding: 0;
+  border: none;
+  background: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+}
+
+/* 전역 :focus-visible이 씌우는 반경 대신 배지의 알약 모양을 지킨다. 테두리는 전역 규칙이 그린다. */
+.badgeButton:focus-visible {
+  border-radius: var(--radius-full);
+}
+
+@media (hover: hover) {
+  .badgeButton:hover {
+    opacity: 0.7;
+  }
+}
+
 .readout {
   display: flex;
   align-items: baseline;

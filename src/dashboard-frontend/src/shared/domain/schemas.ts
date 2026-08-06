@@ -49,6 +49,20 @@ export const ShortageEventSchema = z.object({
   approvedAt: z.string().optional(),
 });
 
+export const StockVerdictSchema = z.enum(['shortage', 'sufficient']);
+export const FeedbackSourceSchema = z.enum(['approve', 'reject', 'manual_toggle']);
+
+export const DetectionFeedbackSchema = z.object({
+  id: z.string(),
+  lineId: z.string(),
+  detected: StockVerdictSchema,
+  corrected: StockVerdictSchema,
+  source: FeedbackSourceSchema,
+  by: z.string(),
+  at: z.string(),
+  shortageEventId: z.string().optional(),
+});
+
 export const RobotTypeSchema = z.enum(['beagle', 'omxf_storage', 'omxf_line']);
 export const RobotStateSchema = z.enum(['idle', 'moving', 'working', 'error', 'offline']);
 
@@ -90,9 +104,12 @@ export const SnapshotSchema = z.object({
 });
 export type Snapshot = z.infer<typeof SnapshotSchema>;
 
+export const CameraScopeSchema = z.enum(['overview', 'line']);
+
 export const CameraSchema = z.object({
   id: z.string(),
-  lineId: z.string(),
+  scope: CameraScopeSchema,
+  lineId: z.string().optional(),
   label: z.string(),
   streamUrl: z.string().optional(),
   online: z.boolean(),

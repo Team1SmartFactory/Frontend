@@ -3,6 +3,7 @@ export { Badge } from './Badge';
 export { Button } from './Button';
 export { CameraFeed } from './CameraFeed';
 export { Card } from './Card';
+export { ConfirmDialog } from './ConfirmDialog';
 export { EmptyState } from './EmptyState';
 export { Meter } from './Meter';
 export { PageHeader } from './PageHeader';

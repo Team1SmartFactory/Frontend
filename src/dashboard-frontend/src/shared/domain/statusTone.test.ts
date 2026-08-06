@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { toneForLine, toneForRobotState, toneForShortageStatus } from './statusTone';
+import {
+  detectedVerdict,
+  isTreatedAsShortage,
+  oppositeVerdict,
+  toneForLine,
+  toneForRobotState,
+  toneForShortageStatus,
+} from './statusTone';
 import type { Line } from './types';
 
 function makeLine(overrides: Partial<Line> = {}): Line {
@@ -35,6 +42,40 @@ describe('toneForLine', () => {
 
   it('보충 중이면 재고량과 무관하게 accent', () => {
     expect(toneForLine(makeLine({ currentQty: 3, status: 'restocking' }))).toBe('accent');
+  });
+});
+
+describe('isTreatedAsShortage', () => {
+  it('임계치 이하면 부족으로 취급한다', () => {
+    expect(isTreatedAsShortage(makeLine({ currentQty: 20 }))).toBe(true);
+    expect(isTreatedAsShortage(makeLine({ currentQty: 21 }))).toBe(false);
+  });
+
+  it('보충 중이면 재고량이 회복돼도 아직 부족 처리 중으로 본다', () => {
+    // 색은 accent(파랑)지만 "부족해서 로봇이 가는 중"이므로,
+    // 관리자가 지금 누를 수 있는 버튼은 정상 되돌리기(=작업 취소)여야 한다.
+    expect(isTreatedAsShortage(makeLine({ currentQty: 90, status: 'restocking' }))).toBe(true);
+  });
+});
+
+describe('oppositeVerdict / detectedVerdict', () => {
+  it('부족 취급 중이면 관리자 판정은 정상 쪽으로 넘어간다', () => {
+    const line = makeLine({ currentQty: 10 });
+    expect(detectedVerdict(line)).toBe('shortage');
+    expect(oppositeVerdict(line)).toBe('sufficient');
+  });
+
+  it('정상이면 관리자 판정은 부족 쪽으로 넘어간다', () => {
+    const line = makeLine({ currentQty: 80 });
+    expect(detectedVerdict(line)).toBe('sufficient');
+    expect(oppositeVerdict(line)).toBe('shortage');
+  });
+
+  it('두 판정은 항상 서로 반대다', () => {
+    for (const qty of [0, 20, 21, 50, 100]) {
+      const line = makeLine({ currentQty: qty });
+      expect(detectedVerdict(line)).not.toBe(oppositeVerdict(line));
+    }
   });
 });
 

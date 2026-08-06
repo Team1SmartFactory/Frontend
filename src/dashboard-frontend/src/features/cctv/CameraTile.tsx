@@ -5,18 +5,31 @@ interface CameraTileProps {
   cameraId: string;
   label: string;
   hasShortage: boolean;
+  streamUrl?: string;
+  alertLabel: string;
+  scopeTag?: string;
   onZoom: () => void;
 }
 
 /** CCTV 오버뷰의 카메라 한 칸. 클릭하면 확대 팝업이 열린다. */
-export function CameraTile({ cameraId, label, hasShortage, onZoom }: CameraTileProps) {
+export function CameraTile({
+  cameraId,
+  label,
+  hasShortage,
+  streamUrl,
+  alertLabel,
+  scopeTag,
+  onZoom,
+}: CameraTileProps) {
   return (
     <button type="button" className={styles.tile} onClick={onZoom} aria-label={`${label} 확대`}>
       <CameraFeed
         cameraId={cameraId}
         label={label}
         tone={hasShortage ? 'critical' : undefined}
-        alertLabel="부품 부족"
+        alertLabel={alertLabel}
+        streamUrl={streamUrl}
+        scopeTag={scopeTag}
       />
     </button>
   );

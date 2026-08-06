@@ -1,0 +1,30 @@
+/* 판단 근거가 먼저 오고 그 아래에 바뀔 값을 둔다 — 보고 나서 정하는 순서. */
+.camera {
+  margin-bottom: var(--space-4);
+}
+
+/* 바뀌기 전과 후를 나란히 놓아, 어느 방향으로 가는지 문장 없이도 읽히게 한다. */
+.transition {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.arrow {
+  color: var(--text-muted);
+}
+
+.note {
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--surface-sunken);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+
+.error {
+  margin-top: var(--space-3);
+  font-size: var(--text-xs);
+  color: var(--status-critical-text);
+}

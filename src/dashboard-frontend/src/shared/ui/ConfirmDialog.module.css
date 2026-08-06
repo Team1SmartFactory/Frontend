@@ -1,0 +1,52 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  background: var(--surface-overlay);
+  backdrop-filter: blur(2px);
+}
+
+/*
+ * 승인 요청 팝업과 같은 문법(흰 표면 + 2px 상태색 테두리)을 쓰되,
+ * 색은 고정하지 않고 톤을 받는다. 무엇에 대한 확인인지 색으로도 읽히게 하기 위함이다.
+ */
+.dialog {
+  width: min(24rem, 100%);
+  padding: var(--space-6);
+  border: 2px solid var(--tone);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+  box-shadow: var(--shadow-ambient);
+}
+
+/* 초점은 받되 테두리를 두 겹으로 그리지 않는다 (이미 톤 테두리가 있다). */
+.dialog:focus {
+  outline: none;
+}
+
+.title {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-title);
+}
+
+.description {
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.body {
+  margin-top: var(--space-5);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: flex-end;
+  margin-top: var(--space-6);
+}

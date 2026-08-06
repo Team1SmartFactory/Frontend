@@ -31,13 +31,14 @@
 
 ## 2. REST API — 현재 프론트가 호출 중
 
-`httpApiClient.ts`에 이미 구현되어 있어, 백엔드가 아래 3개만 제공하면 `VITE_USE_MOCK=false`로 바로 연동됩니다.
+`httpApiClient.ts`에 이미 구현되어 있어, 백엔드가 아래 4개만 제공하면 `VITE_USE_MOCK=false`로 바로 연동됩니다.
 
 | # | 기능 | Method | Path | 요청 Body | 응답 | 호출 시점 |
 |---|---|---|---|---|---|---|
 | 1 | 초기 스냅샷 조회 | `GET` | `/snapshot` | — | [`Snapshot`](#41-snapshot) | 앱 부팅 시 1회 |
 | 2 | 보충 승인 | `POST` | `/shortage-events/{id}/approve` | `{ "approvedBy": string }` | [`ShortageEvent`](#43-shortageevent) | 승인 팝업 · 보충 승인 |
 | 3 | 보충 반려 | `POST` | `/shortage-events/{id}/reject` | — | [`ShortageEvent`](#43-shortageevent) | 승인 팝업 · 반려 |
+| 4 | 현황 직접 지정 | `PUT` | `/lines/{id}/stock` | `{ "verdict": "shortage" \| "sufficient", "by": string }` | [`Line`](#42-lineupdate) | 대시보드 배지 · 평면도 사이드바 토글 |
 
 ### 동작 요구사항
 
@@ -45,10 +46,19 @@
 |---|---|
 | `GET /snapshot` | 현재 전체 라인·로봇·부족 이벤트를 한 번에 반환. 화면 첫 진입 시 이 응답만으로 전 탭이 채워져야 함 |
 | `POST .../approve` | 상태를 `dispatched`로 전이, `approvedBy`/`approvedAt` 기록, 보관소 OMX-F에 보충 지시 발행 |
-| `POST .../reject` | 상태를 `rejected`로 전이. 재감지 쿨다운을 두어 즉시 재알람이 뜨지 않게 할 것 |
+| `POST .../reject` | 상태를 `rejected`로 전이하고 **라인을 정상으로 되돌릴 것**. 반려는 "감지가 틀렸다"는 판정이므로 라인이 부족 색으로 남아 있으면 안 됨. 재감지 쿨다운도 함께 둘 것 |
+| `PUT /lines/{id}/stock` | `verdict: "shortage"` → 부족 이벤트를 `dispatched`로 바로 만들고 보충 지시 발행(승인 절차 생략 — 지시한 사람이 곧 승인권자). `verdict: "sufficient"` → 진행 중인 부족 건을 `rejected`로 닫고 로봇 작업을 중단·복귀시킨 뒤 라인을 정상으로 되돌림 |
 
-> 승인/반려 결과는 **응답 Body로도 돌려주고, WebSocket `line.shortage`로도 브로드캐스트**해야 합니다.
+> 승인/반려/현황 지정 결과는 **응답 Body로도 돌려주고, WebSocket으로도 브로드캐스트**해야 합니다.
 > 응답은 요청한 관리자 화면용, 브로드캐스트는 다른 관리자 화면 동기화용입니다.
+> (`line.shortage` + 라인 값이 바뀌었으면 `line.inventory`, 로봇이 멈췄으면 `robot.status`)
+
+#### 관리자 판정과 측정값의 관계
+
+관리자 판정은 "비전 측정이 틀렸다"는 뜻이므로, 별도 플래그를 세우지 말고 **측정값 자체를 보정**해야 합니다.
+플래그 방식은 "정상으로 표시되는데 측정값은 계속 임계치 이하"인 상태를 만들고, 그 플래그를 언제 푸는지에
+대한 규칙이 따로 필요해집니다. 목 시뮬레이터는 `sufficient` 판정 시 `currentQty`를 임계치의 3배
+(= `statusTone`의 '정상' 구간)로 올리는 방식을 씁니다.
 
 ---
 
@@ -169,7 +179,9 @@
 | 2 | `dispatched` | `POST .../approve` | 보관소 OMX-F가 Beagle에 적재 |
 | 3 | `in_transit` | 적재 완료 | Beagle이 해당 라인으로 이동 |
 | 4 | `completed` | 라인 OMX-F 하역 완료 | 라인 `status`를 `normal`로 복귀 |
-| — | `rejected` | `POST .../reject` | 없음 (쿨다운 후 재감지) |
+| — | `rejected` | `POST .../reject` | 없음. 라인 측정값을 정상으로 보정 후 쿨다운 |
+| — | `dispatched` | `PUT /lines/{id}/stock` `verdict=shortage` | 1번을 건너뛰고 바로 2번부터 시작 |
+| — | `rejected` | `PUT /lines/{id}/stock` `verdict=sufficient` | 진행 중이던 작업 중단, 로봇 대기 위치로 복귀 |
 
 > **자동 동작 모드**: 설정에서 "관리자 승인 필수"를 끄면 프론트가 `pending_approval` 건을
 > 즉시 `approve`로 호출합니다(`useAutoApproval`). 백엔드는 별도 분기가 필요 없습니다.
@@ -202,17 +214,29 @@
 > 로봇 자동 동작 여부를 결정하는 값이므로 **서버 보관이 맞습니다.**
 > 현재 구조로는 관리자 A가 자동 모드를 켜도 관리자 B 화면에는 반영되지 않습니다.
 
-### 7.3 카메라 (CCTV 탭 · 평면도 사이드 패널)
+### 7.3 카메라 (CCTV 탭 · 평면도 사이드 패널 · 승인 팝업 · 현황 변경 팝업)
 
-현재: 라인 목록에서 `cam-{lineId}`를 파생 생성, 화면은 자리표시자.
+현재: 목 백엔드가 라인당 1대 + 공장 전체 뷰 1대를 고정 생성, `streamUrl` 없이 화면은 자리표시자.
 
 | 기능 | Method | Path (제안) | 응답 |
 |---|---|---|---|
-| 카메라 목록 | `GET` | `/cameras` | `[{ id, lineId, label, streamUrl, online }]` |
-| 스트림 | — | RTSP / WebRTC / HLS | 실시간 영상 |
+| 카메라 목록 | `GET` | `/cameras` | `[{ id, scope, lineId?, label, streamUrl?, online }]` |
+
+| 필드 | 값 | 의미 |
+|---|---|---|
+| `scope` | `"overview"` \| `"line"` | `overview`는 공장 천장 전체 뷰. 특정 라인에 속하지 않으며 `lineId`가 없다 |
+| `lineId` | `string` (scope가 `"line"`일 때만) | 이 카메라가 비추는 라인 |
+| `streamUrl` | `string?` | 브라우저 `<video>`가 직접 재생 가능한 주소(HLS `.m3u8`, mp4/webm 등). 없으면 프론트가 자리표시자를 보여줌 |
 
 > 카메라와 라인은 실제로 1:1이 아닐 수 있습니다(라인당 여러 대). 목록 API가 생기면
 > `lineId` 기준으로 묶어 부족 라인 카메라를 강조하는 현재 로직을 그대로 쓸 수 있습니다.
+>
+> **실제 영상 연결**: `streamUrl`을 채워 응답하면, 프론트는 별도 배포 없이 그 주소를
+> `<video>`로 즉시 재생합니다(`CameraFeed` 컴포넌트 하나가 CCTV 탭·평면도 사이드바·
+> 승인 팝업·현황 변경 팝업에 모두 쓰이므로). 단, **RTSP는 브라우저가 직접 재생하지
+> 못합니다** — 백엔드/미디어 서버가 RTSP를 HLS 또는 WebRTC로 변환해 `streamUrl`에
+> 그 변환된 주소를 내려줘야 합니다. 주소가 재생 불가하면 프론트는 조용히 자리표시자로
+> 되돌아갑니다(빈 화면 대신).
 
 ### 7.4 재고 추이 이력
 
@@ -222,7 +246,30 @@
 |---|---|---|---|---|
 | 라인 재고 이력 | `GET` | `/lines/{id}/inventory-history` | `?from=&to=` | `[{ qty, at }]` |
 
-### 7.5 액션 로그 조회
+### 7.5 객체 인식 학습 피드백
+
+현재: 프론트가 라벨을 만들어 `POST`를 시도하지만, 라우터가 없어 콘솔 경고만 남기고 넘어갑니다
+(`endpoints.ts`의 `NOT_YET_IMPLEMENTED`에서 `detectionFeedback`을 빼면 실제 호출로 전환).
+
+| 기능 | Method | Path (제안) | 요청 |
+|---|---|---|---|
+| 판정 대조 기록 | `POST` | `/detection-feedback` | `{ lineId, detected, corrected, source, by, shortageEventId? }` |
+
+| 필드 | 값 | 의미 |
+|---|---|---|
+| `detected` | `"shortage"` \| `"sufficient"` | 비전이 내렸던 판정 |
+| `corrected` | `"shortage"` \| `"sufficient"` | 관리자가 카메라로 확인한 실제 값 |
+| `source` | `"approve"` \| `"reject"` \| `"manual_toggle"` | 판정이 나온 경로 |
+
+- `detected === corrected` → 감지가 맞았다는 **양성 라벨** (승인)
+- `detected="shortage", corrected="sufficient"` → **오탐 라벨** (반려, 또는 부족→정상 토글)
+- `detected="sufficient", corrected="shortage"` → **미탐 라벨** (정상→부족 토글)
+
+> **자동 승인 건은 보내지 않습니다.** "관리자 승인 필수"를 끈 상태의 승인은 사람이 카메라를
+> 확인하지 않은 것이라, 라벨로 쌓으면 모델이 자기 판정을 자기가 되먹이게 됩니다.
+> 학습 파이프라인 자체(라벨 적재 후 재학습 트리거)는 백엔드/ML 몫이며 프론트는 라벨 생성까지만 합니다.
+
+### 7.6 액션 로그 조회
 
 현재: `shortageEvents` 스냅샷에서 파생. 오래된 이력은 조회 불가.
 

@@ -46,6 +46,11 @@
   font-weight: var(--weight-bold);
 }
 
+/* 라인명 바로 아래 — 수치를 읽기 전에 눈으로 먼저 확인하게 하는 자리. */
+.camera {
+  margin-top: var(--space-4);
+}
+
 .details {
   margin: var(--space-5) 0;
   display: flex;

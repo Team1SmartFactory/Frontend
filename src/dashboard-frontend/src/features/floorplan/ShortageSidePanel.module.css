@@ -54,6 +54,18 @@
 }
 
 /*
+ * 현황 판정 스위치 자리. 스크롤 영역 밖에 두어 이력이 길어져도 항상 보인다.
+ * 스크롤과 맞닿는 경계라 여기서는 1px 선을 긋는다 — 내용이 잘린 게 아니라
+ * 다른 층이라는 표시가 필요한 유일한 자리다.
+ */
+.footer {
+  flex-shrink: 0;
+  padding: var(--space-4) var(--gutter);
+  border-top: 1px solid var(--border-hairline);
+  background: var(--surface-card);
+}
+
+/*
  * 구역 소제목. TDS는 대문자 변형과 자간 벌리기를 쓰지 않고,
  * 크기·무게·색만으로 계층을 만든다.
  */
