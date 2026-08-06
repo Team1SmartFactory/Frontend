@@ -3,15 +3,53 @@
  * TDS는 이 자리에 옅은 회색 면(background-lower)을 깔고 그림자를 쓰지 않는다.
  */
 .card {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
   padding: var(--space-4);
   background: var(--surface-sunken);
   border-radius: var(--radius-lg);
+  transition: box-shadow var(--duration-fast) var(--ease-out);
 
   /* 상태는 좌측 색 띠로 먼저 읽히게 하고, 세부 수치는 그다음에 읽게 한다. */
   border-left: 3px solid var(--tone);
+}
+
+/*
+ * 카드를 덮는 투명 버튼. 카드 안의 제목·수치는 그대로 두고 누를 자리만 얹는다.
+ * 카드 자체를 버튼으로 만들면 안의 <h3>가 제목으로 읽히지 않는다.
+ */
+.hitArea {
+  position: absolute;
+  inset: 0;
+  border: none;
+  background: none;
+  /* 카드와 정확히 겹치므로, 여기 그린 그림자·초점 테두리가 곧 카드의 것으로 보인다. */
+  border-radius: inherit;
+  cursor: pointer;
+  transition: box-shadow var(--duration-fast) var(--ease-out);
+}
+
+/* 전역 :focus-visible의 반경 대신 카드의 반경을 지킨다. 테두리 자체는 전역 규칙이 그린다. */
+.hitArea:focus-visible {
+  border-radius: inherit;
+}
+
+/* 호버는 위치를 옮기지 않고 그림자로만 들어올린다 — CameraTile과 같은 문법. */
+@media (hover: hover) {
+  .hitArea:hover {
+    box-shadow: var(--shadow-md);
+  }
+}
+
+/*
+ * 우측 패널에 열려 있는 라인. 어느 카드의 상세를 보고 있는지 표시한다.
+ * 상태 색(좌측 띠)을 건드리면 부족·정상을 잘못 읽게 되므로, 선택은 상태 팔레트가
+ * 아닌 액센트 링으로 따로 말한다.
+ */
+.card[data-selected='true'] {
+  box-shadow: 0 0 0 2px var(--accent);
 }
 
 .header {
@@ -28,31 +66,6 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-/*
- * 배지를 누를 수 있게 감싼 버튼.
- * 배지 자체의 모양은 그대로 두고 버튼은 자리만 내어 준다 —
- * 눌리는 곳이 배지 테두리와 정확히 겹쳐야 무엇을 누르는지 헷갈리지 않는다.
- */
-.badgeButton {
-  display: inline-flex;
-  padding: 0;
-  border: none;
-  background: none;
-  border-radius: var(--radius-full);
-  cursor: pointer;
-}
-
-/* 전역 :focus-visible이 씌우는 반경 대신 배지의 알약 모양을 지킨다. 테두리는 전역 규칙이 그린다. */
-.badgeButton:focus-visible {
-  border-radius: var(--radius-full);
-}
-
-@media (hover: hover) {
-  .badgeButton:hover {
-    opacity: 0.7;
-  }
 }
 
 .readout {

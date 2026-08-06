@@ -23,54 +23,57 @@ export function FloorPlanTab() {
 
   return (
     <div className={styles.page}>
-      <PageHeader
-        title="평면도"
-        description="라인을 선택하면 부족 상세와 카메라 뷰가 열립니다."
-        actions={
-          shortageLineIds.size > 0 ? (
-            <Badge tone="critical" led pulse>
-              부족 {shortageLineIds.size}개 라인
-            </Badge>
-          ) : (
-            <Badge tone="good" led>
-              전 라인 정상
-            </Badge>
-          )
-        }
-      />
+      <div className={styles.content}>
+        <PageHeader
+          title="평면도"
+          description="라인을 선택하면 부족 상세와 카메라 뷰가 열립니다."
+          actions={
+            shortageLineIds.size > 0 ? (
+              <Badge tone="critical" led pulse>
+                부족 {shortageLineIds.size}개 라인
+              </Badge>
+            ) : (
+              <Badge tone="good" led>
+                전 라인 정상
+              </Badge>
+            )
+          }
+        />
 
-      <div className={styles.body}>
-        <QueryState
-          isPending={isPending}
-          isError={isError}
-          error={error}
-          onRetry={() => void refetch()}
-          loadingMessage="평면도를 불러오는 중…"
-        >
-          <div className={styles.mapArea}>
-            <FactoryMap
-              lines={Object.values(lines)}
-              robots={Object.values(robots)}
-              shortageLineIds={shortageLineIds}
-              selectedLineId={selectedLineId}
-              onSelectLine={selectLine}
-            />
-            <MapLegend />
-          </div>
-
-          {/* 라인이 실제로 존재할 때만 연다. 패널이 자체적으로 재고 이력을 조회하므로
-              line이 없는 상태로 마운트되면 빈 쿼리가 나간다. */}
-          {selectedLine && (
-            <ShortageSidePanel
-              line={selectedLine}
-              shortageEvents={Object.values(shortageEvents).filter(
-                (event) => event.lineId === selectedLine.id,
-              )}
-              onClose={() => selectLine(null)}
-            />
-          )}
-        </QueryState>
+        <div className={styles.body}>
+          <QueryState
+            isPending={isPending}
+            isError={isError}
+            error={error}
+            onRetry={() => void refetch()}
+            loadingMessage="평면도를 불러오는 중…"
+          >
+            <div className={styles.mapArea}>
+              <FactoryMap
+                lines={Object.values(lines)}
+                robots={Object.values(robots)}
+                shortageLineIds={shortageLineIds}
+                selectedLineId={selectedLineId}
+                onSelectLine={selectLine}
+              />
+              <MapLegend />
+            </div>
+          </QueryState>
+        </div>
       </div>
+
+      {/* 헤더와 나란히 두어 화면 높이를 끝까지 채운다. 라인이 실제로 존재할 때만
+          연다 — 패널이 자체적으로 재고 이력을 조회하므로 line이 없는 상태로
+          마운트되면 빈 쿼리가 나간다. */}
+      {selectedLine && (
+        <ShortageSidePanel
+          line={selectedLine}
+          shortageEvents={Object.values(shortageEvents).filter(
+            (event) => event.lineId === selectedLine.id,
+          )}
+          onClose={() => selectLine(null)}
+        />
+      )}
     </div>
   );
 }

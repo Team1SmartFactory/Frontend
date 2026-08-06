@@ -1,12 +1,13 @@
-import { useState } from 'react';
 import type { Line } from '../../shared/domain/types';
-import { isTreatedAsShortage, toneForLine } from '../../shared/domain/statusTone';
+import { toneForLine } from '../../shared/domain/statusTone';
 import { Badge, Meter } from '../../shared/ui';
-import { LineStockConfirmDialog } from '../line-stock/LineStockConfirmDialog';
 import styles from './LineStatusCard.module.css';
 
 interface LineStatusCardProps {
   line: Line;
+  /** 배지를 누르면 이 라인의 상세 패널을 연다. */
+  onSelect: (line: Line) => void;
+  selected: boolean;
 }
 
 const TONE_LABEL: Record<string, string> = {
@@ -20,31 +21,28 @@ const TONE_LABEL: Record<string, string> = {
 /**
  * 라인별 실시간 재고 현황 카드. 상태 색은 항상 텍스트 배지와 함께 표시한다(색만으로 의미 전달 금지).
  *
- * 배지는 누를 수 있다. 카메라로 확인해 보니 감지가 틀렸을 때, 관리자가 여기서
- * 바로 현황을 바로잡는다. 잘못 누르면 로봇이 움직이므로 확인 팝업을 한 단계 둔다.
+ * 카드 전체가 누를 수 있는 영역이고, 누르면 우측 상세 패널이 열린다. 예전에는 여기서
+ * 곧바로 현황 변경 확인 팝업이 떴는데, 판단 근거(카메라·재고 추이)를 못 본 채 바꿀지
+ * 말지부터 묻는 순서였다. 지금은 평면도와 같은 패널을 열어 근거를 먼저 보여주고,
+ * 변경은 그 패널 맨 아래 스위치가 맡는다 — 두 탭에서 라인을 다루는 방법이 하나로 모인다.
+ *
+ * 누르는 영역은 <article>에 onClick을 다는 대신 카드를 덮는 투명 버튼으로 만든다.
+ * 카드째로 <button>을 만들면 안에 든 <h3>가 버튼 라벨로 흡수되어 제목으로 읽히지
+ * 않고, div에 role만 붙이면 키보드 조작을 직접 구현해야 한다. 실제 버튼을 하나 두면
+ * 초점·엔터·스페이스가 전부 공짜로 따라온다.
  */
-export function LineStatusCard({ line }: LineStatusCardProps) {
-  const [confirming, setConfirming] = useState(false);
-
+export function LineStatusCard({ line, onSelect, selected }: LineStatusCardProps) {
   const tone = toneForLine(line);
   const needsAction = tone === 'critical';
   const label = TONE_LABEL[tone] ?? '정상';
-  const nextLabel = isTreatedAsShortage(line) ? '정상' : '부족';
 
   return (
-    <article className={styles.card} data-tone={tone}>
+    <article className={styles.card} data-tone={tone} data-selected={selected}>
       <header className={styles.header}>
         <h3 className={styles.name}>{line.name}</h3>
-        <button
-          type="button"
-          className={styles.badgeButton}
-          onClick={() => setConfirming(true)}
-          aria-label={`${line.name} 현황 ${label} — 눌러서 ${nextLabel}으로 변경`}
-        >
-          <Badge tone={tone} led pulse={needsAction}>
-            {label}
-          </Badge>
-        </button>
+        <Badge tone={tone} led pulse={needsAction}>
+          {label}
+        </Badge>
       </header>
 
       <div className={styles.readout}>
@@ -63,7 +61,13 @@ export function LineStatusCard({ line }: LineStatusCardProps) {
         임계치 {line.threshold}% · 부품 적재 면적 기준
       </p>
 
-      {confirming && <LineStockConfirmDialog line={line} onClose={() => setConfirming(false)} />}
+      <button
+        type="button"
+        className={styles.hitArea}
+        onClick={() => onSelect(line)}
+        aria-pressed={selected}
+        aria-label={`${line.name} 현황 ${label} — 눌러서 상세 보기`}
+      />
     </article>
   );
 }

@@ -1,8 +1,22 @@
+/*
+ * 페이지 전체를 가로로 나눈다 — 왼쪽이 헤더+도면, 오른쪽이 상세 패널.
+ * 패널을 헤더 아래가 아니라 헤더와 나란히 두는 이유는 두 가지다.
+ * 하나는 패널이 화면 높이를 끝까지 채우기 위해서고, 다른 하나는 패널이 열릴 때
+ * 헤더 폭이 함께 줄어 우측의 '부족 라인 개수' 뱃지가 왼쪽으로 밀리게 하기 위해서다.
+ * 헤더가 패널 밑으로 깔리면 뱃지가 패널에 가려 사라진다.
+ */
 .page {
   display: flex;
-  flex-direction: column;
   height: 100%;
   min-height: 0;
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .body {
