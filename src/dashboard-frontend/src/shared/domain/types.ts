@@ -43,6 +43,46 @@ export interface ShortageEvent {
   approvedAt?: string;
 }
 
+/**
+ * 라인의 부품 현황 판정.
+ *
+ * 비전이 내리는 판정과 관리자가 카메라를 보고 내리는 판정이 같은 어휘를 쓴다.
+ * 둘을 나란히 비교해야 "감지가 틀렸다"를 데이터로 남길 수 있기 때문이다.
+ */
+export type StockVerdict = 'shortage' | 'sufficient';
+
+/**
+ * 관리자 판정이 나온 경로.
+ *
+ * 승인/반려는 감지 결과를 눈앞에 두고 내린 판단이고, 수동 토글은 알림 없이
+ * 관리자가 먼저 발견한 경우다. 학습 라벨의 성격이 다르므로 구분해 보낸다.
+ */
+export type FeedbackSource = 'approve' | 'reject' | 'manual_toggle';
+
+/**
+ * 비전 판정과 관리자 판정을 짝지은 기록. 객체 인식 모델의 재학습 라벨로 쓰인다.
+ *
+ * detected === corrected면 "감지가 맞았다"는 양성 라벨이고,
+ * 어긋나면 오탐(부족이 아닌데 부족) 또는 미탐(부족인데 놓침) 라벨이 된다.
+ * 프론트는 라벨을 만들어 보내기만 하고, 학습 자체는 백엔드가 맡는다.
+ */
+export interface DetectionFeedback {
+  id: string;
+  lineId: string;
+  /** 비전이 판정했던 값 */
+  detected: StockVerdict;
+  /** 관리자가 카메라로 확인한 실제 값 */
+  corrected: StockVerdict;
+  source: FeedbackSource;
+  by: string;
+  at: string;
+  /** 이 판단의 계기가 된 부족 이벤트. 수동 토글이면 없다. */
+  shortageEventId?: string;
+}
+
+/** 서버가 id와 시각을 채우므로, 보낼 때는 판정 내용만 담는다. */
+export type DetectionFeedbackInput = Omit<DetectionFeedback, 'id' | 'at'>;
+
 export type RobotType = 'beagle' | 'omxf_storage' | 'omxf_line';
 export type RobotState = 'idle' | 'moving' | 'working' | 'error' | 'offline';
 

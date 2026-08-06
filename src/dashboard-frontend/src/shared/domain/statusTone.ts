@@ -1,5 +1,5 @@
 import type { Tone } from '../ui/tone';
-import type { Line, RobotState, ShortageEventStatus } from './types';
+import type { Line, RobotState, ShortageEventStatus, StockVerdict } from './types';
 
 /**
  * 도메인 상태 → Tone 매핑을 이 파일 하나로 통제한다.
@@ -14,6 +14,27 @@ export function toneForLine(line: Line): Tone {
   if (line.currentQty <= line.threshold * 1.5) return 'serious';
   if (line.currentQty <= line.threshold * 2.5) return 'warning';
   return 'good';
+}
+
+/**
+ * 시스템이 이 라인을 "부족으로 취급 중"인가.
+ *
+ * 관리자 토글이 어느 방향으로 갈지 정하는 기준이라, 색 계산과 따로 둔다.
+ * 보충 중(restocking)도 포함해야 한다 — 색은 파랑이지만 "부족해서 로봇이 가는 중"이므로,
+ * 관리자가 지금 누를 수 있는 버튼은 '정상으로 되돌리기'(=작업 취소)여야 한다.
+ */
+export function isTreatedAsShortage(line: Line): boolean {
+  return line.status === 'restocking' || line.currentQty <= line.threshold;
+}
+
+/** 관리자가 토글했을 때 넘어갈 반대 판정. */
+export function oppositeVerdict(line: Line): StockVerdict {
+  return isTreatedAsShortage(line) ? 'sufficient' : 'shortage';
+}
+
+/** 비전이 지금 내리고 있는 판정. 관리자 판정과 짝지어 학습 라벨이 된다. */
+export function detectedVerdict(line: Line): StockVerdict {
+  return isTreatedAsShortage(line) ? 'shortage' : 'sufficient';
 }
 
 const ROBOT_STATE_TONE: Record<RobotState, Tone> = {

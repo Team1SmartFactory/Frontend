@@ -1,9 +1,10 @@
 import { useState, type FormEvent } from 'react';
 import { usePermissions, useUpdatePermissions } from '../../shared/query/useSettings';
-import { Button, Card, Switch, TextField } from '../../shared/ui';
+import { Button, Switch, TextField } from '../../shared/ui';
+import { SettingsRow } from './SettingsList';
 import styles from './PermissionSettings.module.css';
 
-/** 설정 탭의 "로봇 제어 승인 권한 설정". */
+/** 설정 목록의 "로봇 제어 승인 권한" 항목들. */
 export function PermissionSettings() {
   const { permissions, isPending } = usePermissions();
   const updatePermissions = useUpdatePermissions();
@@ -42,8 +43,9 @@ export function PermissionSettings() {
   }
 
   return (
-    <Card title="로봇 제어 승인 권한" subtitle="부족 감지 후 로봇을 어떻게 동작시킬지 결정합니다.">
-      <div className={styles.body}>
+    <>
+      {/* Switch가 라벨·설명·컨트롤을 이미 한 줄로 배치하므로 행 이름을 겹쳐 두지 않는다. */}
+      <SettingsRow>
         <Switch
           checked={permissions.approvalRequired}
           disabled={isPending || isSaving}
@@ -57,7 +59,9 @@ export function PermissionSettings() {
               : '승인 없이 로봇이 즉시 보충 작업을 시작합니다.'
           }
         />
+      </SettingsRow>
 
+      <SettingsRow>
         <form className={styles.form} onSubmit={handleApproverSubmit}>
           <TextField
             label="승인 권한 보유자"
@@ -76,7 +80,7 @@ export function PermissionSettings() {
             설정을 저장하지 못했습니다. {updatePermissions.error.message}
           </p>
         )}
-      </div>
-    </Card>
+      </SettingsRow>
+    </>
   );
 }

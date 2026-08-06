@@ -23,6 +23,10 @@ export const mockFactoryApi: FactoryApi = {
   approveShortage: ({ id, approvedBy }) => mockFactoryBackend.approveShortage(id, approvedBy),
   rejectShortage: ({ id }) => mockFactoryBackend.rejectShortage(id),
 
+  overrideLineStock: ({ lineId, verdict, by }) =>
+    mockFactoryBackend.overrideLineStock(lineId, verdict, by),
+  submitDetectionFeedback: (input) => mockFactoryBackend.submitDetectionFeedback(input),
+
   fetchCameras: () => delayed(() => mockFactoryBackend.getCameras()),
 
   fetchPermissions: () => delayed(() => mockFactoryBackend.getPermissions()),

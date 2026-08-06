@@ -11,7 +11,7 @@ import type { ShortageEvent } from '../../shared/domain/types';
 export function useAutoApproval(
   pendingEvents: ShortageEvent[],
   enabled: boolean,
-  approve: (id: string) => Promise<void>,
+  approve: (event: ShortageEvent) => Promise<void>,
 ): void {
   const handledIds = useRef(new Set<string>());
 
@@ -25,7 +25,7 @@ export function useAutoApproval(
     pendingEvents.forEach((event) => {
       if (handledIds.current.has(event.id)) return;
       handledIds.current.add(event.id);
-      void approve(event.id);
+      void approve(event);
     });
   }, [pendingEvents, enabled, approve]);
 }

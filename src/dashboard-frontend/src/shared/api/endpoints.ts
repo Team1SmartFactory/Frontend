@@ -15,6 +15,12 @@ export const ENDPOINTS = {
   approveShortage: (id: string) => `/shortage-events/${encodeURIComponent(id)}/approve`,
   rejectShortage: (id: string) => `/shortage-events/${encodeURIComponent(id)}/reject`,
 
+  /** 관리자가 카메라로 확인한 부품 현황을 직접 지정한다. 로봇 동작까지 이어진다. */
+  lineStock: (lineId: string) => `/lines/${encodeURIComponent(lineId)}/stock`,
+
+  /** 비전 판정 대 관리자 판정 기록. 객체 인식 모델 재학습 라벨로 쌓인다. */
+  detectionFeedback: () => '/detection-feedback',
+
   /** 설치된 카메라 목록. 지금은 라인당 1대지만 실제로는 1:N일 수 있다. */
   cameras: () => '/cameras',
 
@@ -32,11 +38,16 @@ export const ENDPOINTS = {
  * 여기 담긴 키는 http 구현이 호출을 시도하지 않고 즉시 폴백한다.
  * 백엔드에 라우터가 생기면 이 배열에서 이름만 빼면 실제 호출로 전환된다.
  * (연동 순서를 코드 한 줄로 통제하기 위한 장치)
+ *
+ * lineStock은 일부러 넣지 않는다. 폴백할 안전한 기본값이 없는 명령이기 때문이다.
+ * 관리자가 "부족으로 바꿔라"를 눌렀는데 조용히 아무 일도 안 일어나는 것보다,
+ * 404로 실패해 화면에 오류가 뜨는 편이 낫다.
  */
 export const NOT_YET_IMPLEMENTED: ReadonlyArray<keyof typeof ENDPOINTS> = [
   'cameras',
   'permissions',
   'inventoryHistory',
+  'detectionFeedback',
 ];
 
 export function isImplemented(name: keyof typeof ENDPOINTS): boolean {

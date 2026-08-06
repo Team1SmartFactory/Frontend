@@ -3,12 +3,14 @@ import type { RealtimeMessage } from '../domain/schemas';
 import {
   DEFAULT_PERMISSIONS,
   type Camera,
+  type DetectionFeedbackInput,
   type InventoryPoint,
   type Line,
   type Permissions,
   type Position,
   type RobotStatus,
   type ShortageEvent,
+  type StockVerdict,
 } from '../domain/types';
 import type { Snapshot } from '../domain/schemas';
 
@@ -24,8 +26,20 @@ import type { Snapshot } from '../domain/schemas';
 const TICK_MS = 1200;
 const SHORTAGE_THRESHOLD = 20;
 const STEP_TICKS = 3;
-const REJECT_COOLDOWN_TICKS = 3;
 const MAX_HISTORY_POINTS = 30;
+
+/**
+ * 관리자가 "부족 아님"으로 판정했을 때 되돌릴 측정값 — 임계치의 3배.
+ *
+ * 관리자 판정은 비전 측정이 틀렸다는 뜻이므로, 플래그를 덧씌우는 대신
+ * 측정값 자체를 바로잡는다. 그래야 화면(뱃지·LED·게이지)이 저절로 일치하고,
+ * 이후의 감소 → 재감지 흐름도 자연스럽게 이어진다.
+ * 3배로 잡은 것은 statusTone의 '정상' 구간(임계치 2.5배 초과)에 들기 위해서다.
+ */
+const CONFIRMED_NORMAL_MULTIPLIER = 3;
+
+/** 보정 직후 다시 감소해 곧바로 재감지되는 것을 막는 유예 틱. */
+const CORRECTION_COOLDOWN_TICKS = 5;
 
 const PERMISSIONS_STORAGE_KEY = 'sfsc.settings.permissions';
 
@@ -207,17 +221,18 @@ class MockFactoryBackend {
     const updated: ShortageEvent = { ...event, status: 'dispatched', approvedBy, approvedAt: nowIso() };
     this.shortageEvents.set(id, updated);
     this.emitShortage(updated);
-    this.setLineStatus(event.lineId, 'restocking');
-    this.activeTasks.set(event.lineId, {
-      shortageEventId: id,
-      lineId: event.lineId,
-      step: 'dispatch_storage',
-      progress: 0,
-    });
+    this.startReplenishment(updated);
 
     return updated;
   }
 
+  /**
+   * 반려 = "카메라로 봤더니 부족이 아니었다".
+   *
+   * 감지가 틀렸다는 판단이므로 측정값을 정상 구간으로 되돌린다.
+   * (예전에는 +15만 올려 '관찰' 구간에 머물렀는데, 관리자가 정상이라고
+   *  판정한 라인이 계속 주의색으로 남아 판단과 화면이 어긋났다)
+   */
   async rejectShortage(id: string): Promise<ShortageEvent> {
     const event = this.shortageEvents.get(id);
     if (!event) throw new Error(`알 수 없는 부족 이벤트: ${id}`);
@@ -227,10 +242,65 @@ class MockFactoryBackend {
     this.emitShortage(updated);
 
     const line = this.lines.get(event.lineId);
-    if (line) this.bumpLineQty(line, 15);
-    this.cooldownUntilTick.set(event.lineId, this.tick + REJECT_COOLDOWN_TICKS);
+    if (line) this.correctToNormal(line);
 
     return updated;
+  }
+
+  /**
+   * 관리자가 카메라로 확인한 결과를 그대로 반영한다.
+   *
+   * 'sufficient'  → 진행 중인 건을 취소하고 로봇을 되돌린 뒤 측정값을 정상으로 보정
+   * 'shortage'    → 측정값을 임계치까지 내리고 보충 작업을 즉시 착수
+   *
+   * 'shortage'가 승인 대기를 거치지 않는 이유는, 지시한 사람이 곧 승인권자이기 때문이다.
+   * 자기가 누른 버튼에 대해 다시 승인 팝업을 띄우면 같은 판단을 두 번 묻는 꼴이 된다.
+   */
+  async overrideLineStock(lineId: string, verdict: StockVerdict, by: string): Promise<Line> {
+    const line = this.lines.get(lineId);
+    if (!line) throw new Error(`알 수 없는 라인: ${lineId}`);
+
+    if (verdict === 'sufficient') {
+      this.cancelOpenShortages(lineId);
+      this.abortTask(lineId);
+      this.correctToNormal(line);
+      return { ...line };
+    }
+
+    // 이미 처리 중인 건이 있으면 로봇을 두 번 보내지 않는다.
+    if (this.hasActiveShortage(lineId)) return { ...line };
+
+    line.currentQty = Math.min(line.currentQty, line.threshold);
+    line.updatedAt = nowIso();
+    this.cooldownUntilTick.delete(lineId);
+    this.emitInventory(line);
+
+    const event: ShortageEvent = {
+      id: makeId('shortage'),
+      lineId,
+      detectedAt: nowIso(),
+      status: 'dispatched',
+      partName: PART_NAMES[Math.floor(Math.random() * PART_NAMES.length)] ?? '부품',
+      requiredQty: 20 + Math.floor(Math.random() * 30),
+      approvedBy: by,
+      approvedAt: nowIso(),
+    };
+    this.shortageEvents.set(event.id, event);
+    this.emitShortage(event);
+    this.startReplenishment(event);
+
+    return { ...line };
+  }
+
+  /**
+   * 학습 라벨 수집구.
+   *
+   * 실제 백엔드라면 재학습 데이터셋에 적재될 자리다. 여기서는 읽는 쪽이 없으므로
+   * 쌓아 두지 않고 로그만 남긴다. 아무도 보지 않는 배열에 모으면
+   * "저장되고 있다"는 잘못된 인상만 남는다.
+   */
+  async submitDetectionFeedback(input: DetectionFeedbackInput): Promise<void> {
+    console.info('[detection-feedback] 학습 라벨 수집:', input);
   }
 
   private emitShortage(event: ShortageEvent): void {
@@ -264,10 +334,68 @@ class MockFactoryBackend {
     this.emitInventory(line);
   }
 
-  private bumpLineQty(line: Line, amount: number): void {
-    line.currentQty = Math.min(100, line.currentQty + amount);
+  /** 관리자가 "부족 아님"으로 판정한 라인의 측정값을 정상 구간으로 바로잡는다. */
+  private correctToNormal(line: Line): void {
+    line.currentQty = Math.max(line.currentQty, line.threshold * CONFIRMED_NORMAL_MULTIPLIER);
+    line.status = 'normal';
     line.updatedAt = nowIso();
+    // 보정 직후 감소가 겹쳐 같은 알림이 다시 뜨면 판정이 무시된 것처럼 보인다.
+    this.cooldownUntilTick.set(line.id, this.tick + CORRECTION_COOLDOWN_TICKS);
     this.emitInventory(line);
+  }
+
+  private startReplenishment(event: ShortageEvent): void {
+    this.setLineStatus(event.lineId, 'restocking');
+    this.activeTasks.set(event.lineId, {
+      shortageEventId: event.id,
+      lineId: event.lineId,
+      step: 'dispatch_storage',
+      progress: 0,
+    });
+  }
+
+  /** 진행 중인 부족 건을 모두 반려로 닫는다. 완료·반려 건은 그대로 둔다. */
+  private cancelOpenShortages(lineId: string): void {
+    for (const event of this.shortageEvents.values()) {
+      if (event.lineId !== lineId || !ACTIVE_SHORTAGE_STATUSES.has(event.status)) continue;
+      const updated: ShortageEvent = { ...event, status: 'rejected' };
+      this.shortageEvents.set(event.id, updated);
+      this.emitShortage(updated);
+    }
+  }
+
+  /**
+   * 진행 중인 보충 작업을 중단하고 로봇을 대기 상태로 되돌린다.
+   *
+   * 보관소 OMX-F와 Beagle은 전 라인이 공유하므로, 다른 라인의 작업이 남아 있으면
+   * 건드리지 않는다. 취소한 라인의 하역 로봇만 확실히 내려놓는다.
+   */
+  private abortTask(lineId: string): void {
+    if (!this.activeTasks.delete(lineId)) return;
+
+    const lineRobot = this.robots.get(`omxf-${lineId}`);
+    if (lineRobot && lineRobot.state !== 'idle') {
+      lineRobot.state = 'idle';
+      lineRobot.updatedAt = nowIso();
+      this.emitRobot(lineRobot);
+    }
+
+    if (this.activeTasks.size > 0) return;
+
+    const storage = this.robots.get('omxf-storage-1');
+    if (storage && storage.state !== 'idle') {
+      storage.state = 'idle';
+      storage.updatedAt = nowIso();
+      this.emitRobot(storage);
+    }
+
+    const beagle = this.robots.get('beagle-1');
+    if (beagle) {
+      beagle.state = 'idle';
+      beagle.position = { ...STORAGE_POSITION };
+      beagle.updatedAt = nowIso();
+      this.emitRobot(beagle);
+    }
   }
 
   private hasActiveShortage(lineId: string): boolean {

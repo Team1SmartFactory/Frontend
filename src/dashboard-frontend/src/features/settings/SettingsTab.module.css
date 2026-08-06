@@ -7,7 +7,8 @@
 
 /*
  * 좌우 여백은 헤더와 같은 거터를 쓴다. 원본의 화면 거터가 전 화면 공통 축이다.
- * 설정 카드가 여러 장 쌓이므로(화면 표시, 승인 권한, …) flex column + gap으로 간격을 준다.
+ * 묶음이 여러 개 쌓이므로(화면, 로봇 제어, …) flex column + gap으로 간격을 준다.
+ * 묶음 사이는 항목 사이보다 확실히 넓어야 목록의 경계가 읽힌다.
  */
 .scroll {
   flex: 1;
@@ -15,11 +16,11 @@
   overflow: auto;
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-6);
   padding: var(--space-5) var(--gutter) var(--space-8);
 }
 
-/* 설정 카드는 읽는 폭이 넓어지면 가독성이 떨어지므로 최대 폭을 제한한다. */
+/* 설정 항목은 읽는 폭이 넓어지면 가독성이 떨어지므로 최대 폭을 제한한다. */
 .scroll > * {
   max-width: 32rem;
 }
