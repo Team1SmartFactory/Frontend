@@ -1,7 +1,9 @@
 /**
  * 좌측 네비게이션 — TDS 사이드바 문법.
  * 토스 사이드바 실측: 폭 244px, 배경 투명, 테두리·그림자 모두 없음.
- * 경계를 긋지 않고 흰 네비와 회색 본문의 면 대비만으로 영역을 나눈다.
+ * 경계를 긋지 않고, 창 바닥(--surface-shell) 위에 얹힌 네비와 그 위에 둥글게
+ * 떠 있는 회색 본문의 면 대비만으로 영역을 나눈다. 네비가 자기 배경을 칠하면
+ * 본문 패널의 둥근 모서리가 어느 면 위에 놓였는지 읽히지 않으므로 투명하게 둔다.
  * 항목은 15px/400, padding 9px 14px, 라운드 10px, 높이 42px이다.
  */
 .nav {
@@ -11,7 +13,7 @@
   width: var(--nav-width);
   height: 100%;
   padding: var(--space-5) var(--space-3);
-  background: var(--surface-nav);
+  background: transparent;
   transition: width var(--duration-base) var(--ease-out);
   overflow: hidden;
   z-index: var(--z-nav);
