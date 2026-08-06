@@ -3,6 +3,11 @@
   margin-bottom: var(--space-4);
 }
 
+/* CCTV 탭 격자와 같은 화면비. 같은 카메라를 여기서 봐도 잘려 보이지 않게 한다. */
+.camera > * {
+  aspect-ratio: var(--camera-aspect);
+}
+
 /* 바뀌기 전과 후를 나란히 놓아, 어느 방향으로 가는지 문장 없이도 읽히게 한다. */
 .transition {
   display: flex;
