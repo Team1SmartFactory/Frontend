@@ -1,7 +1,6 @@
 import { useEffect, useId, useRef, type MouseEvent, type ReactNode } from 'react';
 import { useEscapeKey } from '../hooks/useEscapeKey';
 import { Button } from './Button';
-import type { Tone } from './tone';
 import styles from './ConfirmDialog.module.css';
 
 interface ConfirmDialogProps {
@@ -14,10 +13,14 @@ interface ConfirmDialogProps {
   cancelLabel?: string;
   /** 확인 버튼 성격. 로봇을 움직이는 등 되돌리기 번거로운 동작은 'danger'. */
   confirmVariant?: 'primary' | 'danger';
-  /** 테두리 색. 어떤 상태에 대한 확인인지 색으로도 읽히게 한다. */
-  tone?: Tone;
   /** 요청이 진행 중이면 연타를 막는다. */
   busy?: boolean;
+  /**
+   * 판단 근거로 카메라처럼 넓은 것을 넣어 세로로 길어질 때 켠다.
+   * 팝업 폭을 넓혀 children이 2단으로 배치될 여지를 만든다 — 단을 나누는 것은
+   * 내용을 아는 호출부의 몫이라 여기서는 폭만 내어 준다.
+   */
+  wide?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -35,8 +38,8 @@ export function ConfirmDialog({
   confirmLabel,
   cancelLabel = '취소',
   confirmVariant = 'primary',
-  tone = 'accent',
   busy = false,
+  wide = false,
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
@@ -62,7 +65,7 @@ export function ConfirmDialog({
       <div
         ref={dialogRef}
         className={styles.dialog}
-        data-tone={tone}
+        data-wide={wide}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}

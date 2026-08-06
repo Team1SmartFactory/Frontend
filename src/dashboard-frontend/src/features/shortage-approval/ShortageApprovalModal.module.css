@@ -11,14 +11,24 @@
 }
 
 /*
- * 원본의 기획전 토스트 문법을 그대로 가져왔다 — 흰 표면에 상태색 2px 테두리를
- * 사방으로 두르고, 같은 색 계열의 옅은 그림자를 깐다.
- * 상단 3px 띠보다 이쪽이 "조치가 필요한 알림"이라는 신호를 더 강하게 준다.
+ * 바깥 테두리는 두지 않는다.
+ * 예전에는 상태색 2px 테두리를 사방에 둘렀는데, 안의 카메라가 이미 같은 색 링을
+ * 두르고 있어(CameraFeed의 data-alert) 같은 말을 두 번 하는 셈이었다. 링이 두 겹이면
+ * 어느 쪽이 무엇을 가리키는지도 흐려진다 — 지금은 카메라의 링만 남아 "이 화면 속
+ * 라인이 부족하다"를 정확히 가리킨다.
+ *
+ * 긴급하다는 신호는 테두리 말고도 충분하다: 상단의 깜박이는 빨간 LED와 상태색
+ * 제목, 어두워진 배경, 그리고 카메라의 링. 팝업이 떠 있다는 사실 자체는 흰 표면과
+ * 그림자가 말한다.
  */
 .dialog {
-  width: min(26rem, 100%);
+  /*
+   * 알림 팝업은 가로로 눕는 것이 일반적인 문법이다. 세로로 길어지면 화면을
+   * 가로막는 문서처럼 보여, 잠깐 보고 판단하는 알림이라는 성격과 어긋난다.
+   * 카메라와 정보를 2단으로 나눠 폭을 쓰고 높이를 줄인다(아래 .body).
+   */
+  width: min(46rem, 100%);
   padding: var(--space-6);
-  border: 2px solid var(--status-critical);
   border-radius: var(--radius-lg);
   background: var(--surface-card);
   box-shadow: var(--shadow-ambient);
@@ -46,9 +56,29 @@
   font-weight: var(--weight-bold);
 }
 
-/* 라인명 바로 아래 — 수치를 읽기 전에 눈으로 먼저 확인하게 하는 자리. */
+/*
+ * 근거(왼쪽)와 수치·설명(오른쪽)을 나란히 둔다.
+ * align-items: start가 있어야 카메라가 오른쪽 칸 높이를 따라 늘어나지 않고
+ * 자기 화면비를 지킨다.
+ */
+.body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-5);
+  align-items: start;
+  margin: var(--space-4) 0 var(--space-5);
+}
+
+/* 팝업이 화면 폭에 눌리면 2단을 포기한다. 좁은 칸에 카메라와 글을 같이 넣으면 둘 다 못 읽는다. */
+@media (max-width: 44rem) {
+  .body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* 수치를 읽기 전에 눈으로 먼저 확인하게 하는 자리. */
 .camera {
-  margin-top: var(--space-4);
+  min-width: 0;
 }
 
 /* CCTV 탭 격자와 같은 화면비. 카메라가 없어 대체 문구가 들어와도 자리 크기는 그대로 둔다. */
@@ -56,8 +86,16 @@
   aspect-ratio: var(--camera-aspect);
 }
 
+/* 오른쪽 칸 — 수치 목록과 설명을 쌓는다. */
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
 .details {
-  margin: var(--space-5) 0;
+  margin: 0;
   display: flex;
   flex-direction: column;
 }
@@ -88,7 +126,7 @@
 }
 
 .note {
-  margin-bottom: var(--space-5);
+  margin: 0;
   padding: var(--space-3);
   border-radius: var(--radius-md);
   background: var(--surface-sunken);

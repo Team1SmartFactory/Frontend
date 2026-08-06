@@ -56,43 +56,48 @@ export function ShortageApprovalModal() {
           {line?.name ?? current.lineId}
         </h2>
 
-        <div className={styles.camera}>
-          {camera ? (
-            <CameraFeed
-              cameraId={camera.id}
-              label={camera.label}
-              tone="critical"
-              alertLabel="부품 부족"
-              streamUrl={camera.streamUrl}
-            />
-          ) : (
-            <EmptyState
-              message="이 라인에 연결된 카메라가 없습니다."
-              hint="현장을 직접 확인한 뒤 판단해 주세요."
-            />
-          )}
+        {/* 왼쪽에 근거(카메라), 오른쪽에 수치와 설명 — 눈으로 보고 숫자로 확인하는 순서. */}
+        <div className={styles.body}>
+          <div className={styles.camera}>
+            {camera ? (
+              <CameraFeed
+                cameraId={camera.id}
+                label={camera.label}
+                tone="critical"
+                alertLabel="부품 부족"
+                streamUrl={camera.streamUrl}
+              />
+            ) : (
+              <EmptyState
+                message="이 라인에 연결된 카메라가 없습니다."
+                hint="현장을 직접 확인한 뒤 판단해 주세요."
+              />
+            )}
+          </div>
+
+          <div className={styles.side}>
+            <dl className={styles.details}>
+              <div className={styles.detailRow}>
+                <dt>부품</dt>
+                <dd>{current.partName}</dd>
+              </div>
+              <div className={styles.detailRow}>
+                <dt>필요 수량</dt>
+                <dd>{current.requiredQty}개</dd>
+              </div>
+              <div className={styles.detailRow}>
+                <dt>감지 시각</dt>
+                <dd>{formatClock(current.detectedAt)}</dd>
+              </div>
+            </dl>
+
+            <p className={styles.note}>
+              승인하면 보관소 OMX-F가 부품을 적재하고 Beagle이 해당 라인으로 운반합니다.
+              카메라로 보기에 부족이 아니라면 반려하세요 — 라인은 정상으로 돌아가고,
+              이 판단은 객체 인식 모델 학습에 반영됩니다.
+            </p>
+          </div>
         </div>
-
-        <dl className={styles.details}>
-          <div className={styles.detailRow}>
-            <dt>부품</dt>
-            <dd>{current.partName}</dd>
-          </div>
-          <div className={styles.detailRow}>
-            <dt>필요 수량</dt>
-            <dd>{current.requiredQty}개</dd>
-          </div>
-          <div className={styles.detailRow}>
-            <dt>감지 시각</dt>
-            <dd>{formatClock(current.detectedAt)}</dd>
-          </div>
-        </dl>
-
-        <p className={styles.note}>
-          승인하면 보관소 OMX-F가 부품을 적재하고 Beagle이 해당 라인으로 운반합니다.
-          카메라로 보기에 부족이 아니라면 반려하세요 — 라인은 정상으로 돌아가고,
-          이 판단은 객체 인식 모델 학습에 반영됩니다.
-        </p>
 
         <div className={styles.actions}>
           <Button variant="secondary" disabled={isBusy} onClick={() => reject(current)}>

@@ -1,6 +1,25 @@
-/* 판단 근거가 먼저 오고 그 아래에 바뀔 값을 둔다 — 보고 나서 정하는 순서. */
+/*
+ * 근거(카메라)를 왼쪽에, 바뀔 값을 오른쪽에 나란히 둔다 — 보고 나서 정하는 순서를
+ * 세로 스택이 아니라 가로로 편다. 알림성 팝업이 세로로 길어지면 잠깐 보고 판단하는
+ * 성격과 어긋나기 때문이다.
+ * align-items: start가 있어야 카메라가 오른쪽 칸 높이를 따라 늘어나지 않는다.
+ */
+.layout[data-split='true'] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-5);
+  align-items: start;
+}
+
+/* 팝업이 화면 폭에 눌리면 2단을 포기한다. 좁은 칸에 카메라와 글을 같이 넣으면 둘 다 못 읽는다. */
+@media (max-width: 38rem) {
+  .layout[data-split='true'] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .camera {
-  margin-bottom: var(--space-4);
+  min-width: 0;
 }
 
 /* CCTV 탭 격자와 같은 화면비. 같은 카메라를 여기서 봐도 잘려 보이지 않게 한다. */
@@ -8,11 +27,19 @@
   aspect-ratio: var(--camera-aspect);
 }
 
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
 /* 바뀌기 전과 후를 나란히 놓아, 어느 방향으로 가는지 문장 없이도 읽히게 한다. */
 .transition {
   display: flex;
   align-items: center;
   gap: var(--space-3);
+  margin: 0;
 }
 
 .arrow {
@@ -20,7 +47,7 @@
 }
 
 .note {
-  margin-top: var(--space-3);
+  margin: 0;
   padding: var(--space-3);
   border-radius: var(--radius-md);
   background: var(--surface-sunken);
@@ -29,7 +56,7 @@
 }
 
 .error {
-  margin-top: var(--space-3);
+  margin: 0;
   font-size: var(--text-xs);
   color: var(--status-critical-text);
 }
