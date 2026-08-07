@@ -51,6 +51,11 @@
   margin-top: var(--space-4);
 }
 
+/* CCTV 탭 격자와 같은 화면비. 카메라가 없어 대체 문구가 들어와도 자리 크기는 그대로 둔다. */
+.camera > * {
+  aspect-ratio: var(--camera-aspect);
+}
+
 .details {
   margin: var(--space-5) 0;
   display: flex;

@@ -16,5 +16,5 @@
 }
 
 .tile > * {
-  aspect-ratio: 16 / 10;
+  aspect-ratio: var(--camera-aspect);
 }
