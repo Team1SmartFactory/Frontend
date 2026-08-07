@@ -53,7 +53,10 @@ function linkSignals(timeoutMs: number, external?: AbortSignal): {
  */
 export async function request<T>(
   path: string,
-  schema: z.ZodType<T>,
+  // Input을 T로 고정하지 않는다 — null → undefined 정규화처럼 Input과 Output이
+  // 다른(z.ZodEffects) 스키마도 받아야 하는데, 여기서는 항상 안전하지 않은 raw JSON을
+  // safeParse에 넘기므로 Input 타입 자체가 의미 없다.
+  schema: z.ZodType<T, z.ZodTypeDef, unknown>,
   options: RequestOptions = {},
 ): Promise<T> {
   const { method = 'GET', body, signal: externalSignal, timeoutMs = DEFAULT_TIMEOUT_MS } = options;
