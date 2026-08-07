@@ -1,13 +1,26 @@
+/*
+ * 페이지 전체를 가로로 나눈다 — 왼쪽이 헤더+본문, 오른쪽이 상세 패널.
+ * 패널을 헤더 아래가 아니라 헤더와 나란히 두어 화면 높이를 끝까지 채운다.
+ * 평면도 탭과 같은 구조라, 같은 ShortageSidePanel이 두 탭에서 똑같이 놓인다.
+ */
 .page {
   display: flex;
-  flex-direction: column;
   height: 100%;
   min-height: 0;
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 /* 좌우 여백은 헤더와 같은 거터를 쓴다. 원본의 화면 거터가 전 화면 공통 축이다. */
 .scroll {
   flex: 1;
+  min-width: 0;
   min-height: 0;
   overflow: auto;
   display: flex;
@@ -31,6 +44,20 @@
 }
 
 /*
+ * 알림과 진행 중인 동작.
+ * 둘 다 목록이라, 한 건만 보이고 잘리면 "몇 건이나 있는지"가 안 읽힌다.
+ * 높이를 고정해 여러 행이 함께 보이게 하고, 넘치는 만큼은 카드가 안에서 스크롤한다
+ * (Card fill + .body의 overflow: auto). 두 카드 높이가 같아야 나란히 읽히므로
+ * 내용 길이가 달라도 행 높이는 이 값으로 묶인다.
+ */
+.feedRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-4);
+  height: 20rem;
+}
+
+/*
  * 로봇 현황과 액션 로그를 나란히 둔다.
  * 좁은 화면에서는 세로로 쌓아 가로 스크롤이 생기지 않게 한다.
  */
@@ -42,6 +69,16 @@
 }
 
 @media (max-width: 60rem) {
+  .feedRow {
+    grid-template-columns: minmax(0, 1fr);
+    /* 세로로 쌓이면 고정 높이가 두 배로 늘어나 화면을 잡아먹는다. 내용에 맡긴다. */
+    height: auto;
+  }
+
+  .feedRow > * {
+    min-height: 16rem;
+  }
+
   .columns {
     grid-template-columns: minmax(0, 1fr);
   }

@@ -14,6 +14,31 @@
   background: var(--surface-card);
   box-shadow: -1px 0 var(--border-hairline);
   z-index: var(--z-panel);
+  animation: panelIn var(--duration-base) var(--ease-out);
+}
+
+/*
+ * 열릴 때만 오른쪽에서 밀려 들어온다. 패널이 튀어나오듯 나타나면 화면이 갑자기
+ * 좁아진 것처럼 읽히는데, 옆에서 들어오면 "새 면이 덮였다"로 읽힌다.
+ *
+ * animation이 끝나면 transform이 남지 않는 점이 중요하다 — forwards로 붙들면
+ * 이 패널이 position:fixed 자손(현황 변경 확인 팝업)의 기준 상자가 되어,
+ * 화면 전체를 덮어야 할 오버레이가 패널 안에 갇힌다.
+ *
+ * 닫힘은 조건부 렌더라 즉시 사라진다. 사라지는 쪽은 이미 본 것을 치우는 일이라
+ * 굳이 기다리게 할 이유가 없다.
+ *
+ * 모션을 줄이도록 설정한 사용자에게는 global.css의 규칙이 이 시간을 0으로 만든다.
+ */
+@keyframes panelIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 /* TDS는 제목과 본문을 선으로 나누지 않는다. 여백이 그 일을 한다. */
@@ -58,11 +83,18 @@
  * 스크롤과 맞닿는 경계라 여기서는 1px 선을 긋는다 — 내용이 잘린 게 아니라
  * 다른 층이라는 표시가 필요한 유일한 자리다.
  */
+/*
+ * 유일하게 무언가를 바꾸는 자리라, 읽기만 하는 위쪽 내용과 면으로 구분한다.
+ * 패널 본문이 흰 면(--surface-card)이므로 여기만 옅은 회색을 깔면 한 단 내려앉아
+ * 보이고, 스크롤이 길어져도 "조작은 여기"라는 자리가 눈에 남는다.
+ * 강조를 색이 아니라 밝기 차로 주는 이유는, 상태 팔레트를 쓰면 부족/정상 색과
+ * 섞여 무엇을 뜻하는 색인지 흐려지기 때문이다.
+ */
 .footer {
   flex-shrink: 0;
   padding: var(--space-4) var(--gutter);
   border-top: 1px solid var(--border-hairline);
-  background: var(--surface-card);
+  background: var(--surface-sunken);
 }
 
 /*

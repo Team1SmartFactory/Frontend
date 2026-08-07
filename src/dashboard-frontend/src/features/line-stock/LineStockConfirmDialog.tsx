@@ -41,36 +41,52 @@ export function LineStockConfirmDialog({ line, onClose }: LineStockConfirmDialog
       }
       confirmLabel="변경"
       confirmVariant={toShortage ? 'danger' : 'primary'}
-      tone={toShortage ? 'critical' : 'good'}
       busy={isPending}
+      wide={Boolean(camera)}
       onConfirm={handleConfirm}
       onCancel={onClose}
     >
-      {camera && (
-        <div className={styles.camera}>
-          <CameraFeed cameraId={camera.id} label={camera.label} streamUrl={camera.streamUrl} />
+      {/* 카메라가 있을 때만 2단으로 눕힌다. 없으면 예전처럼 좁은 팝업에 글만 쌓인다. */}
+      <div className={styles.layout} data-split={Boolean(camera)}>
+        {camera && (
+          <div className={styles.camera}>
+            {/*
+              링은 팝업이 무엇을 하려는지가 아니라 지금 라인이 어떤 상태인지를 말한다.
+              화면에 흐르는 것이 라인의 현재 모습이므로, 여기 바꿀 방향의 색을 씌우면
+              보이는 것과 다른 말을 하게 된다. 평면도 사이드 패널과 같은 규칙이다.
+            */}
+            <CameraFeed
+              cameraId={camera.id}
+              label={camera.label}
+              tone={toneForLine(line) === 'critical' ? 'critical' : undefined}
+              alertLabel="부품 부족"
+              streamUrl={camera.streamUrl}
+            />
+          </div>
+        )}
+
+        <div className={styles.side}>
+          <p className={styles.transition}>
+            <Badge tone={toneForLine(line)} led>
+              {isTreatedAsShortage(line) ? '부족' : '정상'}
+            </Badge>
+            <span className={styles.arrow} aria-hidden="true">
+              →
+            </span>
+            <Badge tone={toShortage ? 'critical' : 'good'} led>
+              {toShortage ? '부족' : '정상'}
+            </Badge>
+          </p>
+
+          <p className={styles.note}>이 판단은 객체 인식 모델 학습에 반영됩니다.</p>
+
+          {error && (
+            <p className={styles.error} role="alert">
+              현황을 바꾸지 못했습니다. {error.message}
+            </p>
+          )}
         </div>
-      )}
-
-      <p className={styles.transition}>
-        <Badge tone={toneForLine(line)} led>
-          {isTreatedAsShortage(line) ? '부족' : '정상'}
-        </Badge>
-        <span className={styles.arrow} aria-hidden="true">
-          →
-        </span>
-        <Badge tone={toShortage ? 'critical' : 'good'} led>
-          {toShortage ? '부족' : '정상'}
-        </Badge>
-      </p>
-
-      <p className={styles.note}>이 판단은 객체 인식 모델 학습에 반영됩니다.</p>
-
-      {error && (
-        <p className={styles.error} role="alert">
-          현황을 바꾸지 못했습니다. {error.message}
-        </p>
-      )}
+      </div>
     </ConfirmDialog>
   );
 }

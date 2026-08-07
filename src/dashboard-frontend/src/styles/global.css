@@ -33,7 +33,8 @@ body {
   font-family: var(--font-sans);
   font-size: var(--text-base);
   line-height: var(--leading-normal);
-  background: var(--surface-page);
+  /* 창 바깥까지 이어지는 바닥색. 본문의 회색은 .main 패널 안쪽에만 있다. */
+  background: var(--surface-shell);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   /* 모바일 사파리에서 가로 회전 시 글자가 커지는 것을 막는다. */

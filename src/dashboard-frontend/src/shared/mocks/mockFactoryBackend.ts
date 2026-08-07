@@ -56,6 +56,10 @@ function nowIso(): string {
   return new Date().toISOString();
 }
 
+function minutesAgoIso(minutes: number): string {
+  return new Date(Date.now() - minutes * 60_000).toISOString();
+}
+
 function makeId(prefix: string): string {
   return `${prefix}-${Math.random().toString(36).slice(2, 9)}`;
 }
@@ -93,13 +97,28 @@ const LINE_ARM_POSITIONS: Record<string, Position> = {
   'line-f': { x: 66.7, y: 72.2 },
 };
 
+/**
+ * ─── 데모용 고정 고장 ────────────────────────────────────────────────
+ *
+ * 대시보드 알림 섹션(ExceptionFeed)이 잡는 네 신호를 목에서도 볼 수 있게,
+ * 고장 난 장비를 처음부터 한 대씩 심어 둔다. 실제 백엔드가 붙으면 이 값들은
+ * 그쪽이 내려주는 상태로 대체된다.
+ *
+ * 고장을 심을 대상은 작업 흐름이 건드리지 않는 장비로 고른다. advanceTask가
+ * omxf-storage-1 / beagle-1 / omxf-<lineId>의 state를 working·idle로 덮어쓰기
+ * 때문에, 이들에 고장을 심으면 첫 보충 작업이 지나가는 순간 지워진다.
+ */
+const FAULTY_CAMERA_ID = 'cam-line-c';
+const STALLED_LINE_ID = 'line-f';
+
 const INITIAL_QTY: Record<string, number> = {
   'line-a': 82,
   'line-b': 75,
   'line-c': 68,
   'line-d': 90,
   'line-e': 61,
-  'line-f': 78,
+  // 보충이 멈춘 라인이라 낮은 값에서 시작한다.
+  'line-f': 12,
 };
 
 const INITIAL_LINES: Line[] = Object.entries(LINE_POSITIONS).map(([id, position]) => ({
@@ -107,7 +126,12 @@ const INITIAL_LINES: Line[] = Object.entries(LINE_POSITIONS).map(([id, position]
   name: `${id.slice(-1).toUpperCase()}라인`,
   threshold: SHORTAGE_THRESHOLD,
   currentQty: INITIAL_QTY[id] ?? 80,
-  status: 'normal',
+  /*
+   * 멈춘 보충 건이 걸린 라인은 '보충 중'으로 시작한다.
+   * decayRandomLine이 restocking 라인을 건너뛰므로 재고가 더 떨어지지 않고,
+   * "지시는 나갔는데 진행이 없다"는 상태로 고정된다.
+   */
+  status: id === STALLED_LINE_ID ? 'restocking' : 'normal',
   updatedAt: nowIso(),
   position,
 }));
@@ -127,6 +151,24 @@ const INITIAL_ROBOTS: RobotStatus[] = [
     position: { ...position },
     updatedAt: nowIso(),
   })),
+  /*
+   * 예비 장비 2대는 고장 상태로 둔다. 작업 흐름이 이 id들을 찾지 않으므로
+   * 보충 작업이 몇 번 지나가도 상태가 덮이지 않는다 — 그래서 고정 고장이 된다.
+   */
+  {
+    robotId: 'omxf-storage-2',
+    type: 'omxf_storage',
+    state: 'error',
+    position: { ...STORAGE_ARM_POSITION },
+    updatedAt: minutesAgoIso(42),
+  },
+  {
+    robotId: 'beagle-2',
+    type: 'beagle',
+    state: 'offline',
+    position: { ...STORAGE_POSITION },
+    updatedAt: minutesAgoIso(180),
+  },
 ];
 
 const PART_NAMES = ['M6 볼트 세트', '베어링 유닛', '알루미늄 브래킷', '센서 하우징'];
@@ -153,9 +195,26 @@ const INITIAL_CAMERAS: Camera[] = [
     scope: 'line' as const,
     lineId: line.id,
     label: `${line.name} 천장 카메라`,
-    online: true,
+    // 한 대는 꺼져 있다. 이 라인은 승인 팝업에서 영상 없이 판단하게 되므로 알림 대상이다.
+    online: `cam-${line.id}` !== FAULTY_CAMERA_ID,
   })),
 ];
+
+/**
+ * 15분째 끝나지 않는 보충 건.
+ * activeTasks에 짝이 없으므로 step()이 진행시키지 않는다 — 운반 도중 로봇이
+ * 멈춰 선 상황이 이렇게 보인다. 알림 섹션이 '보충 지연'으로 잡는다.
+ */
+const STALLED_EVENT: ShortageEvent = {
+  id: 'shortage-stalled-demo',
+  lineId: STALLED_LINE_ID,
+  detectedAt: minutesAgoIso(16),
+  status: 'in_transit',
+  partName: '베어링 유닛',
+  requiredQty: 24,
+  approvedBy: 'admin',
+  approvedAt: minutesAgoIso(15),
+};
 
 function readStoredPermissions(): Permissions {
   try {
@@ -171,7 +230,9 @@ function readStoredPermissions(): Permissions {
 class MockFactoryBackend {
   private lines = new Map<string, Line>(INITIAL_LINES.map((line) => [line.id, { ...line }]));
   private robots = new Map<string, RobotStatus>(INITIAL_ROBOTS.map((robot) => [robot.robotId, { ...robot }]));
-  private shortageEvents = new Map<string, ShortageEvent>();
+  private shortageEvents = new Map<string, ShortageEvent>([
+    [STALLED_EVENT.id, { ...STALLED_EVENT }],
+  ]);
   private activeTasks = new Map<string, ActiveTask>();
   private cooldownUntilTick = new Map<string, number>();
   private cameras: Camera[] = INITIAL_CAMERAS.map((camera) => ({ ...camera }));

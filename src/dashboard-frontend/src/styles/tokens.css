@@ -178,6 +178,7 @@
   --radius-sm: 0.5rem; /*   8px  — 버튼, 썸네일 */
   --radius-md: 0.625rem; /* 10px — 인풋, 네비 항목 (TDS 실측) */
   --radius-lg: 1rem; /*     16px — 카드, 콜아웃 (TDS 실측) */
+  --radius-xl: 1.25rem; /*  20px — 본문 패널처럼 화면만 한 면 */
   --radius-full: 62.4375rem; /* 999px */
 
   /* ─── 원시: 그림자 ─────────────────────────────────────────── */
@@ -202,7 +203,11 @@
   --surface-page: #f2f4f6;
   --surface-card: var(--c-white);
   --surface-sunken: var(--c-grey-100);
-  --surface-nav: var(--c-white);
+  /*
+   * 창 전체의 바닥. 네비게이션은 자기 배경을 갖지 않고 이 위에 얹히며,
+   * 본문(--surface-page)이 둥근 패널로 이 바닥 위에 떠 있다.
+   */
+  --surface-shell: var(--c-white);
   --surface-overlay: rgba(0, 0, 0, 0.2);
   --surface-hover: var(--c-ink-a50);
   --surface-active: var(--c-ink-a100);
@@ -355,7 +360,7 @@
   --surface-page: var(--c-ink-950);
   --surface-card: var(--c-ink-900);
   --surface-sunken: var(--c-ink-950);
-  --surface-nav: var(--c-ink-900);
+  --surface-shell: var(--c-ink-900);
   --surface-overlay: rgba(0, 0, 0, 0.56);
   --surface-hover: var(--c-ink-d-a50);
   --surface-active: var(--c-ink-d-a100);
