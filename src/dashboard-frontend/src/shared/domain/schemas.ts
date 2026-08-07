@@ -6,6 +6,18 @@ import { z } from 'zod';
  * 형식이 어긋난 데이터는 화면을 깨뜨리지 않고 무시/로깅한다.
  */
 
+/**
+ * 백엔드(FastAPI/Pydantic)는 값이 없는 optional 문자열 필드를 생략하지 않고
+ * 명시적으로 `null`을 내려준다(예: 대기 중인 로봇의 `currentTaskId: null`). 그래서 이
+ * 필드는 와이어 상에서는 "생략 가능"이 아니라 "항상 있지만 null일 수 있음"이다 —
+ * `.optional()`이 아니라 `.nullable()`이 실제 계약과 맞는다.
+ * `.nullable()`만 쓰면 출력 타입이 `string | null`이 되므로, 도메인 타입(`?: string`)에
+ * 맞추기 위해 `null`을 `undefined`로 바꾸는 transform을 하나 더 얹는다.
+ *
+ * 지금 쓰이는 대상이 전부 문자열이라 이 하나로 통일해 쓴다.
+ */
+const optionalString = z.string().nullable().transform((value) => value ?? undefined);
+
 export const PositionSchema = z.object({
   x: z.number(),
   y: z.number(),
@@ -45,8 +57,8 @@ export const ShortageEventSchema = z.object({
   status: ShortageEventStatusSchema,
   partName: z.string(),
   requiredQty: z.number(),
-  approvedBy: z.string().optional(),
-  approvedAt: z.string().optional(),
+  approvedBy: optionalString,
+  approvedAt: optionalString,
 });
 
 export const StockVerdictSchema = z.enum(['shortage', 'sufficient']);
@@ -60,7 +72,7 @@ export const DetectionFeedbackSchema = z.object({
   source: FeedbackSourceSchema,
   by: z.string(),
   at: z.string(),
-  shortageEventId: z.string().optional(),
+  shortageEventId: optionalString,
 });
 
 export const RobotTypeSchema = z.enum(['beagle', 'omxf_storage', 'omxf_line']);
@@ -70,7 +82,7 @@ export const RobotStatusSchema = z.object({
   robotId: z.string(),
   type: RobotTypeSchema,
   state: RobotStateSchema,
-  currentTaskId: z.string().optional(),
+  currentTaskId: optionalString,
   position: PositionSchema,
   updatedAt: z.string(),
 });
@@ -109,9 +121,9 @@ export const CameraScopeSchema = z.enum(['overview', 'line']);
 export const CameraSchema = z.object({
   id: z.string(),
   scope: CameraScopeSchema,
-  lineId: z.string().optional(),
+  lineId: optionalString,
   label: z.string(),
-  streamUrl: z.string().optional(),
+  streamUrl: optionalString,
   online: z.boolean(),
 });
 export const CameraListSchema = z.array(CameraSchema);
