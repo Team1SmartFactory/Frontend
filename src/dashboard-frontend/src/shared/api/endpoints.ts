@@ -39,16 +39,16 @@ export const ENDPOINTS = {
  * 백엔드에 라우터가 생기면 이 배열에서 이름만 빼면 실제 호출로 전환된다.
  * (연동 순서를 코드 한 줄로 통제하기 위한 장치)
  *
- * lineStock은 일부러 넣지 않는다. 폴백할 안전한 기본값이 없는 명령이기 때문이다.
- * 관리자가 "부족으로 바꿔라"를 눌렀는데 조용히 아무 일도 안 일어나는 것보다,
- * 404로 실패해 화면에 오류가 뜨는 편이 낫다.
+ * cameras/permissions/inventoryHistory/detectionFeedback은 T1BE#27(PR #28)에서
+ * 전부 구현돼 비웠다. cameras는 아직 실제 카메라가 배선되지 않아 응답이 전부
+ * `online:false`로 오는데, 그건 이 배열과 무관한 정상 상태다 — 프론트는 그
+ * 경우 자리표시자를 보여주도록 이미 구현돼 있다.
+ *
+ * lineStock은 넣지 않는다(앞으로도 마찬가지). 폴백할 안전한 기본값이 없는
+ * 명령이기 때문이다. 관리자가 "부족으로 바꿔라"를 눌렀는데 조용히 아무 일도
+ * 안 일어나는 것보다, 404로 실패해 화면에 오류가 뜨는 편이 낫다.
  */
-export const NOT_YET_IMPLEMENTED: ReadonlyArray<keyof typeof ENDPOINTS> = [
-  'cameras',
-  'permissions',
-  'inventoryHistory',
-  'detectionFeedback',
-];
+export const NOT_YET_IMPLEMENTED: ReadonlyArray<keyof typeof ENDPOINTS> = [];
 
 export function isImplemented(name: keyof typeof ENDPOINTS): boolean {
   return !NOT_YET_IMPLEMENTED.includes(name);
