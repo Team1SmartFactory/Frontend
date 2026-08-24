@@ -25,6 +25,9 @@ export const mockFactoryApi: FactoryApi = {
 
   overrideLineStock: ({ lineId, verdict, by }) =>
     mockFactoryBackend.overrideLineStock(lineId, verdict, by),
+  // mock 시뮬레이터는 라인 단위로만 재고를 흉내낸다 — 모든 라인의 bins가 항상
+  // 빈 배열이라 화면에서 이 경로가 호출될 일이 없다(방어적으로만 구현).
+  overrideBinStock: () => Promise.reject(new Error('overrideBinStock은 mock 모드에서 지원하지 않습니다')),
   submitDetectionFeedback: (input) => mockFactoryBackend.submitDetectionFeedback(input),
 
   fetchCameras: () => delayed(() => mockFactoryBackend.getCameras()),

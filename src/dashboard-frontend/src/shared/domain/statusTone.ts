@@ -7,8 +7,15 @@ import type { Line, RobotState, ShortageEventStatus, StockVerdict } from './type
  * 색 기준이 바뀌면 여기만 고치면 전 화면에 반영된다.
  */
 
+/**
+ * 아래 세 함수가 실제로 필요로 하는 최소 형태 — Line뿐 아니라 Bin도 status/
+ * currentQty/threshold를 그대로 갖고 있어서 별도 변환 없이 쓸 수 있다
+ * (line-a 칸 단위 화면이 이 함수들을 그대로 재사용한다).
+ */
+type StockLevel = Pick<Line, 'status' | 'currentQty' | 'threshold'>;
+
 /** 임계치 대비 여유분으로 심각도를 나눈다. (임계치 이하 = 부족) */
-export function toneForLine(line: Line): Tone {
+export function toneForLine(line: StockLevel): Tone {
   if (line.status === 'restocking') return 'accent';
   if (line.currentQty <= line.threshold) return 'critical';
   if (line.currentQty <= line.threshold * 1.5) return 'serious';
@@ -23,12 +30,12 @@ export function toneForLine(line: Line): Tone {
  * 보충 중(restocking)도 포함해야 한다 — 색은 파랑이지만 "부족해서 로봇이 가는 중"이므로,
  * 관리자가 지금 누를 수 있는 버튼은 '정상으로 되돌리기'(=작업 취소)여야 한다.
  */
-export function isTreatedAsShortage(line: Line): boolean {
+export function isTreatedAsShortage(line: StockLevel): boolean {
   return line.status === 'restocking' || line.currentQty <= line.threshold;
 }
 
 /** 관리자가 토글했을 때 넘어갈 반대 판정. */
-export function oppositeVerdict(line: Line): StockVerdict {
+export function oppositeVerdict(line: StockLevel): StockVerdict {
   return isTreatedAsShortage(line) ? 'sufficient' : 'shortage';
 }
 
@@ -36,6 +43,21 @@ export function oppositeVerdict(line: Line): StockVerdict {
 export function detectedVerdict(line: Line): StockVerdict {
   return isTreatedAsShortage(line) ? 'shortage' : 'sufficient';
 }
+
+/**
+ * toneForLine 결과를 사람이 읽는 라벨로. 색만으로 의미를 전달하면 안 되므로
+ * (색맹 접근성) 뱃지는 항상 이 텍스트와 함께 보여준다 — line-a 칸 단위 화면도
+ * 같은 라벨을 써야 '보충 중'과 '부족'이 갈라지지 않는다(라이브 확인 중 발견,
+ * 칸 목록이 tone은 파랑인데 라벨은 '부족'으로 남아있던 버그).
+ */
+export const STOCK_TONE_LABEL: Record<Tone, string> = {
+  critical: '부족',
+  accent: '보충 중',
+  serious: '주의',
+  warning: '관찰',
+  good: '정상',
+  idle: '대기',
+};
 
 const ROBOT_STATE_TONE: Record<RobotState, Tone> = {
   idle: 'idle',

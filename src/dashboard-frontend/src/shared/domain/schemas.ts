@@ -25,6 +25,19 @@ export const PositionSchema = z.object({
 
 export const LineStatusSchema = z.enum(['normal', 'restocking']);
 
+export const BinSchema = z.object({
+  id: z.string(),
+  lineId: z.string(),
+  label: z.string(),
+  partId: z.string(),
+  partName: z.string(),
+  capacity: z.number(),
+  threshold: z.number(),
+  currentQty: z.number(),
+  status: LineStatusSchema,
+  updatedAt: z.string(),
+});
+
 export const LineSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -33,6 +46,7 @@ export const LineSchema = z.object({
   status: LineStatusSchema,
   updatedAt: z.string(),
   position: PositionSchema,
+  bins: z.array(BinSchema).default([]),
 });
 
 export const InventoryEventSchema = z.object({
@@ -53,6 +67,7 @@ export const ShortageEventStatusSchema = z.enum([
 export const ShortageEventSchema = z.object({
   id: z.string(),
   lineId: z.string(),
+  binId: optionalString,
   detectedAt: z.string(),
   status: ShortageEventStatusSchema,
   partName: z.string(),

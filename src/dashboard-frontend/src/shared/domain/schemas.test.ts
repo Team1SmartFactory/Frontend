@@ -1,5 +1,50 @@
 import { describe, expect, it } from 'vitest';
-import { RealtimeMessageSchema, RobotStatusSchema, ShortageEventSchema } from './schemas';
+import { LineSchema, RealtimeMessageSchema, RobotStatusSchema, ShortageEventSchema } from './schemas';
+
+const BASE_LINE = {
+  id: 'line-a',
+  name: 'A라인',
+  threshold: 5,
+  currentQty: 20,
+  status: 'normal',
+  updatedAt: '2026-08-03T00:00:00.000Z',
+  position: { x: 0, y: 0 },
+};
+
+describe('LineSchema.bins', () => {
+  it('bins 필드가 없으면 빈 배열로 기본값 처리한다 (bins 없는 라인)', () => {
+    const result = LineSchema.safeParse(BASE_LINE);
+
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data.bins).toEqual([]);
+  });
+
+  it('bins가 있으면 칸별 정보를 그대로 파싱한다 (line-a처럼 칸 단위 라인)', () => {
+    const result = LineSchema.safeParse({
+      ...BASE_LINE,
+      bins: [
+        {
+          id: 'line-a-bin-a',
+          lineId: 'line-a',
+          label: 'a',
+          partId: 'P-101',
+          partName: 'M6 볼트 세트',
+          capacity: 50,
+          threshold: 5,
+          currentQty: 20,
+          status: 'restocking',
+          updatedAt: '2026-08-03T00:00:00.000Z',
+        },
+      ],
+    });
+
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.bins).toHaveLength(1);
+      expect(result.data.bins[0]?.status).toBe('restocking');
+    }
+  });
+});
 
 describe('nullable optional 필드 (백엔드 FastAPI/Pydantic이 명시적 null을 보내는 경우)', () => {
   it('RobotStatus.currentTaskId가 null이어도 undefined로 정규화해 통과시킨다', () => {
@@ -20,6 +65,7 @@ describe('nullable optional 필드 (백엔드 FastAPI/Pydantic이 명시적 null
     const result = ShortageEventSchema.safeParse({
       id: 'evt-1',
       lineId: 'L1',
+      binId: null,
       detectedAt: '2026-08-03T00:00:00.000Z',
       status: 'pending_approval',
       partName: 'M6 볼트 세트',

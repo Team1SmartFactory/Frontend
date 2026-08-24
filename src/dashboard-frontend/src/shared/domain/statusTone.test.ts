@@ -18,6 +18,7 @@ function makeLine(overrides: Partial<Line> = {}): Line {
     status: 'normal',
     updatedAt: '2026-08-03T00:00:00.000Z',
     position: { x: 0, y: 0 },
+    bins: [],
     ...overrides,
   };
 }

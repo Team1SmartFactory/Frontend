@@ -5,6 +5,24 @@ export interface Position {
 
 export type LineStatus = 'normal' | 'restocking';
 
+/**
+ * 라인 안의 부품 적재 위치(칸). line-a처럼 실물 로봇팔 하나가 닿을 수 있는 칸
+ * 여러 개에 서로 다른 부품을 적재하는 라인만 값이 있다 — 대부분의 라인은
+ * bins가 빈 배열이고, 그때는 Line 자체가 부족 판정 단위다.
+ */
+export interface Bin {
+  id: string;
+  lineId: string;
+  label: string;
+  partId: string;
+  partName: string;
+  capacity: number;
+  threshold: number;
+  currentQty: number;
+  status: LineStatus;
+  updatedAt: string;
+}
+
 export interface Line {
   id: string;
   name: string;
@@ -16,6 +34,8 @@ export interface Line {
   updatedAt: string;
   /** 평면도 상 좌표 (0~100 상대 좌표) */
   position: Position;
+  /** 비어있으면 라인 단위로, 있으면 칸(bin) 단위로 부족을 판정한다. */
+  bins: Bin[];
 }
 
 export interface InventoryEvent {
@@ -35,6 +55,8 @@ export type ShortageEventStatus =
 export interface ShortageEvent {
   id: string;
   lineId: string;
+  /** bins가 있는 라인의 이벤트만 있다 — 어느 칸이 부족한지. */
+  binId?: string;
   detectedAt: string;
   status: ShortageEventStatus;
   partName: string;

@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { factoryApi } from '../api';
 import type { ApiError } from '../api/ApiError';
-import type { Line, StockVerdict } from '../domain/types';
+import type { Bin, Line, StockVerdict } from '../domain/types';
 import { queryKeys } from './queryKeys';
 import type { FactoryData } from './useFactoryData';
 
@@ -20,6 +20,24 @@ export function useOverrideLineStock() {
       queryClient.setQueryData<FactoryData>(queryKeys.factory.snapshot(), (prev) =>
         prev ? { ...prev, lines: { ...prev.lines, [line.id]: line } } : prev,
       );
+    },
+  });
+}
+
+/** useOverrideLineStock의 칸(bin) 단위 버전 — 라인 전체가 아니라 그 라인의
+ * bins 배열 안 해당 칸 하나만 캐시에서 갱신한다. */
+export function useOverrideBinStock() {
+  const queryClient = useQueryClient();
+
+  return useMutation<Bin, ApiError, { lineId: string; binId: string; verdict: StockVerdict; by: string }>({
+    mutationFn: (input) => factoryApi.overrideBinStock(input),
+    onSuccess: (bin) => {
+      queryClient.setQueryData<FactoryData>(queryKeys.factory.snapshot(), (prev) => {
+        const line = prev?.lines[bin.lineId];
+        if (!prev || !line) return prev;
+        const bins = line.bins.map((b) => (b.id === bin.id ? bin : b));
+        return { ...prev, lines: { ...prev.lines, [line.id]: { ...line, bins } } };
+      });
     },
   });
 }

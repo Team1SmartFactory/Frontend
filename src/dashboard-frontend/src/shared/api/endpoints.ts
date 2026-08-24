@@ -18,6 +18,10 @@ export const ENDPOINTS = {
   /** 관리자가 카메라로 확인한 부품 현황을 직접 지정한다. 로봇 동작까지 이어진다. */
   lineStock: (lineId: string) => `/lines/${encodeURIComponent(lineId)}/stock`,
 
+  /** lineStock의 칸(bin) 단위 버전 — bins가 있는 라인(line-a)만 쓴다. */
+  binStock: (lineId: string, binId: string) =>
+    `/lines/${encodeURIComponent(lineId)}/bins/${encodeURIComponent(binId)}/stock`,
+
   /** 비전 판정 대 관리자 판정 기록. 객체 인식 모델 재학습 라벨로 쌓인다. */
   detectionFeedback: () => '/detection-feedback',
 
