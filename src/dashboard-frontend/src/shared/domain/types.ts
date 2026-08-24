@@ -137,7 +137,8 @@ export interface Camera {
   lineId?: string;
   label: string;
   /**
-   * 실제 영상 주소. 브라우저 <video>가 직접 재생할 수 있는 형태(HLS .m3u8, mp4/webm 등)를 기대한다.
+   * 실제 영상 주소. 브라우저 <video>가 직접 재생할 수 있는 형태(HLS .m3u8, mp4/webm 등)이거나,
+   * .mjpg/.mjpeg로 끝나는 MJPEG 주소(실물 카메라 서버가 주는 형식 — CameraFeed가 <img>로 재생).
    * RTSP는 브라우저가 직접 재생하지 못하므로, 백엔드가 HLS나 WebRTC로 변환해 내려줘야 한다.
    * 비어 있으면 화면은 연결 전 자리표시자를 보여준다.
    */
