@@ -1,4 +1,5 @@
 import type { Equipment, EquipmentKind } from './floorPlanLayout';
+import type { Tone } from '../../shared/ui/tone';
 import styles from './EquipmentGlyph.module.css';
 
 /**
@@ -210,12 +211,26 @@ const GLYPHS: Record<EquipmentKind, (props: GlyphProps) => JSX.Element> = {
   pallet: Pallet,
 };
 
+interface EquipmentGlyphProps extends Equipment {
+  /**
+   * 이 설비가 대응하는 칸(bin)의 현재 상태색. binLabel이 없는 설비(칸에 안
+   * 매인 일반 장비)는 항상 undefined로 넘어와 중립색을 유지한다 — "정상"일
+   * 때도 굳이 색을 입히지 않는다(구역 상태 강조와 같은 규칙, tone='good'이면
+   * CSS가 중립으로 둔다).
+   */
+  tone?: Tone;
+}
+
 /** 설비 하나를 도면 좌표에 배치해 그린다. */
-export function EquipmentGlyph({ kind, x, y, width, height }: Equipment) {
+export function EquipmentGlyph({ kind, x, y, width, height, tone }: EquipmentGlyphProps) {
   const Glyph = GLYPHS[kind];
 
   return (
-    <g className={styles.glyph} transform={`translate(${x - width / 2}, ${y - height / 2})`}>
+    <g
+      className={styles.glyph}
+      data-tone={tone}
+      transform={`translate(${x - width / 2}, ${y - height / 2})`}
+    >
       <Glyph w={width} h={height} />
     </g>
   );

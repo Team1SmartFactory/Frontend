@@ -15,3 +15,16 @@
 .glyph path {
   stroke-width: 1;
 }
+
+/*
+ * 칸(bin) 단위 개별 색 — line-a처럼 설비 하나가 특정 칸에 대응할 때만.
+ * good(정상)이면 구역 강조와 같은 규칙으로 중립을 유지하고, 그 외(부족·보충
+ * 중 등)에만 색을 입혀 "이 칸만 빨갛게" 같은 개별 식별이 가능해진다.
+ */
+.glyph[data-tone]:not([data-tone='good']) {
+  fill: var(--tone-soft);
+  stroke: var(--tone);
+  transition:
+    fill var(--duration-base) var(--ease-out),
+    stroke var(--duration-base) var(--ease-out);
+}

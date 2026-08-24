@@ -140,9 +140,14 @@ function ZoneLayer({ zone, line, hasShortage, selected, onSelect }: ZoneLayerPro
     >
       <rect {...rect} rx={4} className={interactive ? styles.zoneBox : styles.zoneBoxStatic} />
 
-      {zone.equipment.map((item, index) => (
-        <EquipmentGlyph key={`${item.kind}-${index}`} {...item} />
-      ))}
+      {zone.equipment.map((item, index) => {
+        // binLabel이 있는 설비만 그 칸의 실제 상태색을 받는다 — 나머지는
+        // 항상 중립(라인 전체 상태와 무관, 이슈: "칸별로 따로 알아보이게").
+        const bin = item.binLabel ? line?.bins.find((b) => b.label === item.binLabel) : undefined;
+        return (
+          <EquipmentGlyph key={`${item.kind}-${index}`} {...item} tone={bin ? toneForLine(bin) : undefined} />
+        );
+      })}
 
       {/* 라벨 칩: 원본 도면처럼 구역 안쪽 상단 중앙에 놓는다. */}
       <rect
