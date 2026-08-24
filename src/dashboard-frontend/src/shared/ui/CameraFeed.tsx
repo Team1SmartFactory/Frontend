@@ -38,6 +38,10 @@ export function CameraFeed({ cameraId, label, tone, alertLabel, streamUrl, scope
   useEffect(() => setStreamFailed(false), [streamUrl]);
 
   const showStream = Boolean(streamUrl) && !streamFailed;
+  // MJPEG(multipart/x-mixed-replace)은 <video>가 아니라 <img>만 재생할 수 있다.
+  // 실물 카메라 서버(Hardware scripts/cctv_server.py)가 .mjpg 주소를 주므로
+  // 확장자로 구분한다 — HLS/mp4 등 나머지는 지금처럼 <video>로 간다.
+  const isMjpeg = Boolean(streamUrl) && /\.mjpe?g(\?|$)/i.test(streamUrl ?? '');
 
   return (
     <div
@@ -46,7 +50,15 @@ export function CameraFeed({ cameraId, label, tone, alertLabel, streamUrl, scope
       data-alert={Boolean(tone)}
       data-scope-tag={Boolean(scopeTag)}
     >
-      {showStream ? (
+      {showStream && isMjpeg ? (
+        <img
+          key={streamUrl}
+          className={styles.video}
+          src={streamUrl}
+          alt={`${label} 실시간 영상`}
+          onError={() => setStreamFailed(true)}
+        />
+      ) : showStream ? (
         // 재생 불가(잘못된 주소·지원하지 않는 코덱·연결 끊김)면 빈 검은 화면 대신
         // 자리표시자로 돌아간다. 그래야 "카메라가 있다"는 사실 자체는 계속 읽힌다.
         <video
