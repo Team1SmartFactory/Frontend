@@ -110,6 +110,7 @@ const INITIAL_LINES: Line[] = Object.entries(LINE_POSITIONS).map(([id, position]
   status: 'normal',
   updatedAt: nowIso(),
   position,
+  bins: [], // mock 시뮬레이터는 칸(bin) 단위 재고를 흉내내지 않는다
 }));
 
 /**

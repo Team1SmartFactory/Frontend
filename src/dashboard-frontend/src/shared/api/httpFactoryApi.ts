@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import {
+  BinSchema,
   CameraListSchema,
   InventoryHistorySchema,
   LineSchema,
@@ -35,6 +36,12 @@ export const httpFactoryApi: FactoryApi = {
 
   overrideLineStock: ({ lineId, verdict, by }) =>
     request(ENDPOINTS.lineStock(lineId), LineSchema, {
+      method: 'PUT',
+      body: { verdict, by },
+    }),
+
+  overrideBinStock: ({ lineId, binId, verdict, by }) =>
+    request(ENDPOINTS.binStock(lineId, binId), BinSchema, {
       method: 'PUT',
       body: { verdict, by },
     }),

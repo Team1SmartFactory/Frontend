@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Line } from '../../shared/domain/types';
-import { isTreatedAsShortage, toneForLine } from '../../shared/domain/statusTone';
+import { isTreatedAsShortage, STOCK_TONE_LABEL, toneForLine } from '../../shared/domain/statusTone';
 import { Badge, Meter } from '../../shared/ui';
 import { LineStockConfirmDialog } from '../line-stock/LineStockConfirmDialog';
 import styles from './LineStatusCard.module.css';
@@ -8,14 +8,6 @@ import styles from './LineStatusCard.module.css';
 interface LineStatusCardProps {
   line: Line;
 }
-
-const TONE_LABEL: Record<string, string> = {
-  critical: '부족',
-  accent: '보충 중',
-  serious: '주의',
-  warning: '관찰',
-  good: '정상',
-};
 
 /**
  * 라인별 실시간 재고 현황 카드. 상태 색은 항상 텍스트 배지와 함께 표시한다(색만으로 의미 전달 금지).
@@ -28,7 +20,7 @@ export function LineStatusCard({ line }: LineStatusCardProps) {
 
   const tone = toneForLine(line);
   const needsAction = tone === 'critical';
-  const label = TONE_LABEL[tone] ?? '정상';
+  const label = STOCK_TONE_LABEL[tone];
   const nextLabel = isTreatedAsShortage(line) ? '정상' : '부족';
 
   return (

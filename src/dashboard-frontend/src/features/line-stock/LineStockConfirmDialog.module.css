@@ -33,3 +33,40 @@
   font-size: var(--text-xs);
   color: var(--status-critical-text);
 }
+
+/* 칸(bin) 목록 — line-a처럼 칸 단위로 부품을 관리하는 라인의 확인 팝업. */
+.binList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.binRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--surface-sunken);
+}
+
+.binLabel {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.binToggle {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.binToggle:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}

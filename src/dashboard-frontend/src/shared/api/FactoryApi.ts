@@ -1,5 +1,6 @@
 import type { Snapshot } from '../domain/schemas';
 import type {
+  Bin,
   Camera,
   DetectionFeedbackInput,
   InventoryPoint,
@@ -37,6 +38,14 @@ export interface FactoryApi {
    * 취소하고 로봇을 되돌린다. 관리자의 명시적 지시이므로 승인 절차를 다시 타지 않는다.
    */
   overrideLineStock(input: { lineId: string; verdict: StockVerdict; by: string }): Promise<Line>;
+
+  /** overrideLineStock의 칸(bin) 단위 버전 — bins가 있는 라인만 쓴다. */
+  overrideBinStock(input: {
+    lineId: string;
+    binId: string;
+    verdict: StockVerdict;
+    by: string;
+  }): Promise<Bin>;
 
   /**
    * 비전 판정과 관리자 판정의 대조 기록을 남긴다.
