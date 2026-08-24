@@ -45,6 +45,12 @@ export interface Equipment {
   y: number;
   width: number;
   height: number;
+  /**
+   * 이 설비가 어느 칸(bin)에 대응하는지 — line-a처럼 bins가 있는 라인에서만
+   * 쓴다("a"|"b"|"c"|"d", Bin.label과 매칭). 없으면 라인 전체 상태와 무관하게
+   * 항상 중립색으로 그린다. FactoryMap이 이 값으로 Bin을 찾아 개별 색을 입힌다.
+   */
+  binLabel?: string;
 }
 
 export interface FloorZone {
@@ -85,11 +91,18 @@ export const FLOOR_ZONES: FloorZone[] = [
     lineId: 'line-a',
     label: 'A라인',
     rect: { x: 65, y: 120, width: 482, height: 355 },
+    // CNC 6대 중 4대만 칸(bin)에 대응한다(이슈 #37) — 하단 2대가 a/b, 상단 2대가
+    // c/d. 나머지 2대(각 행 오른쪽 끝)와 카트는 특정 칸에 매이지 않는 일반
+    // 설비라 항상 중립색으로 남는다.
     equipment: [
-      ...row('cnc', { count: 3, startX: 155, gap: 130, y: 248, width: 112, height: 92 }),
-      ...row('cnc', { count: 3, startX: 155, gap: 130, y: 378, width: 112, height: 92 }),
-      ...row('cart', { count: 1, startX: 508, gap: 0, y: 252, width: 42, height: 78 }),
-      ...row('cart', { count: 1, startX: 508, gap: 0, y: 382, width: 42, height: 78 }),
+      { kind: 'cnc', x: 155, y: 248, width: 112, height: 92, binLabel: 'c' },
+      { kind: 'cnc', x: 285, y: 248, width: 112, height: 92, binLabel: 'd' },
+      { kind: 'cnc', x: 415, y: 248, width: 112, height: 92 },
+      { kind: 'cnc', x: 155, y: 378, width: 112, height: 92, binLabel: 'a' },
+      { kind: 'cnc', x: 285, y: 378, width: 112, height: 92, binLabel: 'b' },
+      { kind: 'cnc', x: 415, y: 378, width: 112, height: 92 },
+      { kind: 'cart', x: 508, y: 252, width: 42, height: 78 },
+      { kind: 'cart', x: 508, y: 382, width: 42, height: 78 },
     ],
   },
   {
