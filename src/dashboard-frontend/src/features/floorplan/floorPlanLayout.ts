@@ -36,7 +36,8 @@ export type EquipmentKind =
   | 'conveyor'
   | 'towerMachine'
   | 'rack'
-  | 'pallet';
+  | 'pallet'
+  | 'bin';
 
 export interface Equipment {
   kind: EquipmentKind;
@@ -91,18 +92,16 @@ export const FLOOR_ZONES: FloorZone[] = [
     lineId: 'line-a',
     label: 'A라인',
     rect: { x: 65, y: 120, width: 482, height: 355 },
-    // CNC 6대 중 4대만 칸(bin)에 대응한다(이슈 #37) — 하단 2대가 a/b, 상단 2대가
-    // c/d. 나머지 2대(각 행 오른쪽 끝)와 카트는 특정 칸에 매이지 않는 일반
-    // 설비라 항상 중립색으로 남는다.
+    // 실제 배치(이슈 #37 후속): OMX-F 로봇팔이 위·아래로 한 대씩 있고, 그 사이에
+    // 칸 4개가 있다 — 상단(c/d)은 가로로, 하단(a/b)은 세로로 놓여있다. 로봇팔
+    // 2대는 특정 칸에 매이지 않는 일반 설비라 항상 중립색.
     equipment: [
-      { kind: 'cnc', x: 155, y: 248, width: 112, height: 92, binLabel: 'c' },
-      { kind: 'cnc', x: 285, y: 248, width: 112, height: 92, binLabel: 'd' },
-      { kind: 'cnc', x: 415, y: 248, width: 112, height: 92 },
-      { kind: 'cnc', x: 155, y: 378, width: 112, height: 92, binLabel: 'a' },
-      { kind: 'cnc', x: 285, y: 378, width: 112, height: 92, binLabel: 'b' },
-      { kind: 'cnc', x: 415, y: 378, width: 112, height: 92 },
-      { kind: 'cart', x: 508, y: 252, width: 42, height: 78 },
-      { kind: 'cart', x: 508, y: 382, width: 42, height: 78 },
+      { kind: 'robotArm', x: 306, y: 210, width: 100, height: 90 },
+      { kind: 'bin', x: 236, y: 285, width: 100, height: 50, binLabel: 'c' },
+      { kind: 'bin', x: 376, y: 285, width: 100, height: 50, binLabel: 'd' },
+      { kind: 'bin', x: 236, y: 365, width: 60, height: 90, binLabel: 'a' },
+      { kind: 'bin', x: 376, y: 365, width: 60, height: 90, binLabel: 'b' },
+      { kind: 'robotArm', x: 306, y: 428, width: 100, height: 90 },
     ],
   },
   {

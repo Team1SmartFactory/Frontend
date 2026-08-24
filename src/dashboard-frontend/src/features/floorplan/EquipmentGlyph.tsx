@@ -196,6 +196,21 @@ function Pallet({ w, h }: GlyphProps) {
   );
 }
 
+/**
+ * 부품 적재 칸(bin). line-a처럼 하나의 설비가 칸별 상태색을 받는 자리라
+ * 가로/세로 어느 비율로 넣어도 자연스럽게 읽히도록 단순하게 그렸다 — 겉박스 +
+ * 위쪽 라벨 칸 + 가운데 구분선.
+ */
+function Bin({ w, h }: GlyphProps) {
+  return (
+    <>
+      <rect x={0} y={0} width={w} height={h} rx={3} />
+      <rect x={w * 0.1} y={h * 0.12} width={w * 0.8} height={h * 0.2} rx={1} />
+      <line x1={w * 0.1} y1={h * 0.5} x2={w * 0.9} y2={h * 0.5} />
+    </>
+  );
+}
+
 const GLYPHS: Record<EquipmentKind, (props: GlyphProps) => JSX.Element> = {
   cnc: Cnc,
   cart: Cart,
@@ -209,6 +224,7 @@ const GLYPHS: Record<EquipmentKind, (props: GlyphProps) => JSX.Element> = {
   towerMachine: TowerMachine,
   rack: Rack,
   pallet: Pallet,
+  bin: Bin,
 };
 
 interface EquipmentGlyphProps extends Equipment {
