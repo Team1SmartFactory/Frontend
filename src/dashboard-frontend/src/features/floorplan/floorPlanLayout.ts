@@ -96,12 +96,13 @@ export const FLOOR_ZONES: FloorZone[] = [
     // 각 팔의 양옆에 하나씩 붙는다 — 위 팔이 c(우)/d(좌)를, 아래 팔이 a(좌)/b(우)를
     // 맡는다. 로봇팔 2대는 특정 칸에 매이지 않는 일반 설비라 항상 중립색.
     // 상단 두 칸은 팔보다 조금 아래에 둔다 — 위로 붙이면 범례에 가린다.
+    // 좌우 간격은 실물과 맞춘 비대칭이다: c는 팔 바로 옆, d는 한참 떨어져 있다.
     // 좌우를 실물과 맞춤(2026-08-31): 반대로 그려져 있으면 부족한 칸을 찾을 때
     // 엉뚱한 칸을 보게 되고, 그 칸은 정상이라 알림이 틀린 것처럼 읽힌다.
     equipment: [
       { kind: 'robotArm', x: 306, y: 210, width: 100, height: 90 },
-      { kind: 'bin', x: 426, y: 250, width: 60, height: 90, binLabel: 'c' },
-      { kind: 'bin', x: 226, y: 250, width: 60, height: 90, binLabel: 'd' },
+      { kind: 'bin', x: 416, y: 250, width: 60, height: 90, binLabel: 'c' },
+      { kind: 'bin', x: 166, y: 250, width: 60, height: 90, binLabel: 'd' },
       { kind: 'bin', x: 236, y: 365, width: 60, height: 90, binLabel: 'a' },
       { kind: 'bin', x: 376, y: 365, width: 60, height: 90, binLabel: 'b' },
       { kind: 'robotArm', x: 306, y: 428, width: 100, height: 90 },
