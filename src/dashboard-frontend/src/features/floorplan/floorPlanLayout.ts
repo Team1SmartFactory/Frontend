@@ -101,7 +101,7 @@ export const FLOOR_ZONES: FloorZone[] = [
     // 엉뚱한 칸을 보게 되고, 그 칸은 정상이라 알림이 틀린 것처럼 읽힌다.
     equipment: [
       { kind: 'robotArm', x: 306, y: 210, width: 100, height: 90 },
-      { kind: 'bin', x: 408, y: 250, width: 60, height: 90, binLabel: 'c' },
+      { kind: 'bin', x: 398, y: 250, width: 60, height: 90, binLabel: 'c' },
       { kind: 'bin', x: 166, y: 250, width: 60, height: 90, binLabel: 'd' },
       { kind: 'bin', x: 236, y: 365, width: 60, height: 90, binLabel: 'a' },
       { kind: 'bin', x: 376, y: 365, width: 60, height: 90, binLabel: 'b' },
