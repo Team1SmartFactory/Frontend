@@ -6,6 +6,7 @@ import type {
   InventoryPoint,
   Line,
   Permissions,
+  RobotStatus,
   ShortageEvent,
   StockVerdict,
 } from '../domain/types';
@@ -30,6 +31,14 @@ export interface FactoryApi {
 
   /** 반려 → 감지가 틀렸다고 보고 라인을 정상으로 되돌린다 */
   rejectShortage(input: { id: string }): Promise<ShortageEvent>;
+
+  /**
+   * 작업 실패로 스스로 멈춘 팔을 다시 지시를 받는 상태로 되돌린다.
+   *
+   * 응답은 그 로봇의 현재 상태다 — 복구가 먹혔는지를 응답만으로 판단하지는
+   * 않지만(WebSocket이 최종 근거다), 버튼을 누른 직후 화면을 맞추는 데 쓴다.
+   */
+  resumeRobot(input: { robotId: string }): Promise<RobotStatus>;
 
   /**
    * 관리자가 카메라로 확인한 결과로 라인 현황을 직접 지정한다.

@@ -23,6 +23,8 @@ export const mockFactoryApi: FactoryApi = {
   approveShortage: ({ id, approvedBy }) => mockFactoryBackend.approveShortage(id, approvedBy),
   rejectShortage: ({ id }) => mockFactoryBackend.rejectShortage(id),
 
+  resumeRobot: ({ robotId }) => mockFactoryBackend.resumeRobot(robotId),
+
   overrideLineStock: ({ lineId, verdict, by }) =>
     mockFactoryBackend.overrideLineStock(lineId, verdict, by),
   // mock 시뮬레이터는 라인 단위로만 재고를 흉내낸다 — 모든 라인의 bins가 항상

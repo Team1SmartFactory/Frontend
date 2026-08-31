@@ -82,6 +82,44 @@ describe('nullable optional 필드 (백엔드 FastAPI/Pydantic이 명시적 null
   });
 });
 
+describe('RobotStatus.blocked (작업 실패 후 스스로 멈춘 팔)', () => {
+  const BLOCKED_ROBOT = {
+    robotId: 'omxf-line-a',
+    type: 'omxf_line',
+    state: 'blocked',
+    currentTaskId: null,
+    position: { x: 0, y: 0 },
+    updatedAt: '2026-08-03T00:00:00.000Z',
+  };
+
+  it('blocked 상태와 실패 사유를 그대로 파싱한다', () => {
+    const result = RobotStatusSchema.safeParse({
+      ...BLOCKED_ROBOT,
+      blockedReason: '그리퍼가 부품을 잡지 못했습니다 (grasp width 0mm)',
+    });
+
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.state).toBe('blocked');
+      expect(result.data.blockedReason).toContain('그리퍼');
+    }
+  });
+
+  it('blockedReason 필드가 아예 없어도 통과시킨다 (사유 필드 이전 백엔드)', () => {
+    const result = RobotStatusSchema.safeParse(BLOCKED_ROBOT);
+
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data.blockedReason).toBeUndefined();
+  });
+
+  it('blockedReason이 null이면 undefined로 정규화한다', () => {
+    const result = RobotStatusSchema.safeParse({ ...BLOCKED_ROBOT, blockedReason: null });
+
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data.blockedReason).toBeUndefined();
+  });
+});
+
 describe('RealtimeMessageSchema', () => {
   it('유효한 line.inventory 메시지를 허용한다', () => {
     const result = RealtimeMessageSchema.safeParse({

@@ -15,6 +15,12 @@ export const ENDPOINTS = {
   approveShortage: (id: string) => `/shortage-events/${encodeURIComponent(id)}/approve`,
   rejectShortage: (id: string) => `/shortage-events/${encodeURIComponent(id)}/reject`,
 
+  /**
+   * 작업 실패로 스스로 멈춘(blocked) 팔을 다시 지시를 받는 상태로 되돌린다.
+   * 본문이 없고 여러 번 눌러도 같은 결과라, 팝업에서 재시도해도 안전하다.
+   */
+  resumeRobot: (robotId: string) => `/robots/${encodeURIComponent(robotId)}/resume`,
+
   /** 관리자가 카메라로 확인한 부품 현황을 직접 지정한다. 로봇 동작까지 이어진다. */
   lineStock: (lineId: string) => `/lines/${encodeURIComponent(lineId)}/stock`,
 

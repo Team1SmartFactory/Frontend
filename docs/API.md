@@ -31,7 +31,7 @@
 
 ## 2. REST API — 현재 프론트가 호출 중
 
-`httpApiClient.ts`에 이미 구현되어 있어, 백엔드가 아래 4개만 제공하면 `VITE_USE_MOCK=false`로 바로 연동됩니다.
+`httpApiClient.ts`에 이미 구현되어 있어, 백엔드가 아래 5개만 제공하면 `VITE_USE_MOCK=false`로 바로 연동됩니다.
 
 | # | 기능 | Method | Path | 요청 Body | 응답 | 호출 시점 |
 |---|---|---|---|---|---|---|
@@ -39,6 +39,7 @@
 | 2 | 보충 승인 | `POST` | `/shortage-events/{id}/approve` | `{ "approvedBy": string }` | [`ShortageEvent`](#43-shortageevent) | 승인 팝업 · 보충 승인 |
 | 3 | 보충 반려 | `POST` | `/shortage-events/{id}/reject` | — | [`ShortageEvent`](#43-shortageevent) | 승인 팝업 · 반려 |
 | 4 | 현황 직접 지정 | `PUT` | `/lines/{id}/stock` | `{ "verdict": "shortage" \| "sufficient", "by": string }` | [`Line`](#42-lineupdate) | 대시보드 배지 · 평면도 사이드바 토글 |
+| 5 | 정지 로봇 복구 | `POST` | `/robots/{robotId}/resume` | — | [`RobotStatus`](#44-robotstatus) | 로봇 작업 정지 팝업 · 복구 |
 
 ### 동작 요구사항
 
@@ -47,6 +48,7 @@
 | `GET /snapshot` | 현재 전체 라인·로봇·부족 이벤트를 한 번에 반환. 화면 첫 진입 시 이 응답만으로 전 탭이 채워져야 함 |
 | `POST .../approve` | 상태를 `dispatched`로 전이, `approvedBy`/`approvedAt` 기록, 보관소 OMX-F에 보충 지시 발행 |
 | `POST .../reject` | 상태를 `rejected`로 전이하고 **라인을 정상으로 되돌릴 것**. 반려는 "감지가 틀렸다"는 판정이므로 라인이 부족 색으로 남아 있으면 안 됨. 재감지 쿨다운도 함께 둘 것 |
+| `POST /robots/{id}/resume` | 작업 실패로 `blocked`가 된 로봇을 다시 지시받는 상태로 되돌리고 현재 상태를 반환. **여러 번 호출해도 안전해야 함**(이미 복구된 로봇이면 그대로 200). 복구 결과는 `robot.status`로도 브로드캐스트할 것 — 팝업은 응답이 아니라 이 메시지를 보고 닫힌다 |
 | `PUT /lines/{id}/stock` | `verdict: "shortage"` → 부족 이벤트를 `dispatched`로 바로 만들고 보충 지시 발행(승인 절차 생략 — 지시한 사람이 곧 승인권자). `verdict: "sufficient"` → 진행 중인 부족 건을 `rejected`로 닫고 로봇 작업을 중단·복귀시킨 뒤 라인을 정상으로 되돌림 |
 
 > 승인/반려/현황 지정 결과는 **응답 Body로도 돌려주고, WebSocket으로도 브로드캐스트**해야 합니다.
@@ -140,6 +142,7 @@
 | `type` | `RobotType` | ✅ | 아래 enum 참조 |
 | `state` | `RobotState` | ✅ | 아래 enum 참조 |
 | `currentTaskId` | `string` | ⬜ | 수행 중인 작업 id |
+| `blockedReason` | `string` | ⬜ | `state`가 `blocked`일 때 팔이 남긴 실패 사유 원문. 팝업에 그대로 표시된다 |
 | `position` | `{ x, y }` | ✅ | 평면도 좌표 (0~100) |
 | `updatedAt` | `string` | ✅ | ISO 8601 |
 
@@ -166,6 +169,7 @@
 | | `working` | 작업 중 (파랑 · 점멸) |
 | | `error` | 오류 (빨강) |
 | | `offline` | 오프라인 (회색) |
+| | `blocked` | 작업 정지 (주황 · 복구 팝업 표시) — 작업 실패 후 스스로 물러나 지시를 받지 않는 상태. 사람이 `POST /robots/{id}/resume`를 눌러야 풀린다 |
 
 ---
 

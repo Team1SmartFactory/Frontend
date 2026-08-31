@@ -1,4 +1,4 @@
-import type { Line, ShortageEvent } from '../shared/domain/types';
+import type { Line, RobotStatus, ShortageEvent } from '../shared/domain/types';
 import { isOpenShortage, toneForLine } from '../shared/domain/statusTone';
 import type { Tone } from '../shared/ui/tone';
 
@@ -29,6 +29,23 @@ export function selectPendingApprovals(events: Record<string, ShortageEvent>): S
   return Object.values(events)
     .filter((event) => event.status === 'pending_approval')
     .sort((a, b) => a.detectedAt.localeCompare(b.detectedAt));
+}
+
+/**
+ * 작업 실패 후 스스로 멈춰(blocked) 사람의 복구를 기다리는 로봇들.
+ *
+ * 승인 큐(selectPendingApprovals)와 같은 규칙으로 오래된 것부터 돌려준다 —
+ * 팝업이 한 번에 한 대씩만 보여주므로, 가장 오래 멈춰 있던 팔이 먼저 나와야
+ * 한 대가 계속 뒤로 밀리지 않는다. updatedAt이 같은 경우(로봇 여러 대가 같은
+ * 실패로 함께 멈추는 경우)에는 id로 갈라 순서가 렌더마다 흔들리지 않게 한다.
+ */
+export function selectBlockedRobots(robots: Record<string, RobotStatus>): RobotStatus[] {
+  return Object.values(robots)
+    .filter((robot) => robot.state === 'blocked')
+    .sort(
+      (a, b) =>
+        a.updatedAt.localeCompare(b.updatedAt) || a.robotId.localeCompare(b.robotId),
+    );
 }
 
 /** 평면도 탭에서 빨간 점 애니메이션을 표시할 라인 id 집합. */

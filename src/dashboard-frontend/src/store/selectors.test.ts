@@ -2,10 +2,11 @@ import { describe, expect, it } from 'vitest';
 import {
   selectActiveShortageBinIds,
   selectActiveShortageLineIds,
+  selectBlockedRobots,
   selectPendingApprovals,
   sortLinesByPriority,
 } from './selectors';
-import type { Line, ShortageEvent } from '../shared/domain/types';
+import type { Line, RobotStatus, ShortageEvent } from '../shared/domain/types';
 
 function makeLine(overrides: Partial<Line>): Line {
   return {
@@ -29,6 +30,17 @@ function makeShortageEvent(overrides: Partial<ShortageEvent>): ShortageEvent {
     status: 'pending_approval',
     partName: '부품',
     requiredQty: 10,
+    ...overrides,
+  };
+}
+
+function makeRobot(overrides: Partial<RobotStatus>): RobotStatus {
+  return {
+    robotId: 'omxf-line-a',
+    type: 'omxf_line',
+    state: 'idle',
+    position: { x: 0, y: 0 },
+    updatedAt: '2026-08-03T00:00:00.000Z',
     ...overrides,
   };
 }
@@ -90,6 +102,43 @@ describe('selectPendingApprovals', () => {
     const pending = selectPendingApprovals(events);
 
     expect(pending.map((event) => event.id)).toEqual(['e2', 'e1']);
+  });
+});
+
+describe('selectBlockedRobots', () => {
+  it('정지한 로봇만 오래 멈춘 순으로 반환한다', () => {
+    const robots: Record<string, RobotStatus> = {
+      a: makeRobot({ robotId: 'omxf-line-a', state: 'blocked', updatedAt: '2026-08-03T00:01:00.000Z' }),
+      b: makeRobot({ robotId: 'omxf-line-b', state: 'blocked', updatedAt: '2026-08-03T00:00:00.000Z' }),
+      c: makeRobot({ robotId: 'beagle-1', type: 'beagle', state: 'moving' }),
+    };
+
+    const blocked = selectBlockedRobots(robots);
+
+    expect(blocked.map((robot) => robot.robotId)).toEqual(['omxf-line-b', 'omxf-line-a']);
+  });
+
+  it('오류(error)나 오프라인은 포함하지 않는다', () => {
+    // 사람이 복구 버튼으로 되살릴 수 있는 상태는 blocked뿐이다.
+    const robots: Record<string, RobotStatus> = {
+      a: makeRobot({ robotId: 'omxf-line-a', state: 'error' }),
+      b: makeRobot({ robotId: 'omxf-line-b', state: 'offline' }),
+      c: makeRobot({ robotId: 'omxf-line-c', state: 'idle' }),
+    };
+
+    expect(selectBlockedRobots(robots)).toEqual([]);
+  });
+
+  it('같은 시각에 멈춘 로봇은 id순으로 갈라 순서가 흔들리지 않게 한다', () => {
+    const robots: Record<string, RobotStatus> = {
+      b: makeRobot({ robotId: 'omxf-line-b', state: 'blocked' }),
+      a: makeRobot({ robotId: 'omxf-line-a', state: 'blocked' }),
+    };
+
+    expect(selectBlockedRobots(robots).map((robot) => robot.robotId)).toEqual([
+      'omxf-line-a',
+      'omxf-line-b',
+    ]);
   });
 });
 

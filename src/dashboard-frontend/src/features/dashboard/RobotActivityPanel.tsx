@@ -13,8 +13,15 @@ const GROUPS: { key: string; label: string; types: RobotType[] }[] = [
   { key: 'omxf', label: 'OMX-F (적재·하역)', types: ['omxf_storage', 'omxf_line'] },
 ];
 
-/** 동작 중으로 볼 상태. 이 목록에 없으면 대기/오프라인으로 접어 둔다. */
-const ACTIVE_STATES = new Set<RobotStatus['state']>(['moving', 'working', 'error']);
+/**
+ * 동작 중으로 볼 상태. 이 목록에 없으면 대기/오프라인으로 접어 둔다.
+ * 정지(blocked)한 팔은 움직이지 않지만 '대기 N대'로 접으면 사라져 버린다 —
+ * 사람이 복구를 눌러 줘야 하는 상태이므로 항상 펼쳐 보여야 한다.
+ */
+const ACTIVE_STATES = new Set<RobotStatus['state']>(['moving', 'working', 'error', 'blocked']);
+
+/** 점멸은 "지금 움직이는 중"이라는 뜻이다. 멈춰 선 상태(오류·정지)는 점멸하지 않는다. */
+const STILL_STATES = new Set<RobotStatus['state']>(['error', 'blocked']);
 
 /**
  * 로봇 동작 현황 섹션.
@@ -51,7 +58,7 @@ export function RobotActivityPanel({ robots }: RobotActivityPanelProps) {
                 <ul className={styles.list}>
                   {active.map((robot) => (
                     <li key={robot.robotId} className={styles.item} data-tone={toneForRobotState(robot.state)}>
-                      <StatusLed tone={toneForRobotState(robot.state)} pulse={robot.state !== 'error'} size="sm" />
+                      <StatusLed tone={toneForRobotState(robot.state)} pulse={!STILL_STATES.has(robot.state)} size="sm" />
                       <span className={styles.robotId}>{robot.robotId}</span>
                       <span className={styles.state}>{ROBOT_STATE_LABEL[robot.state]}</span>
                     </li>

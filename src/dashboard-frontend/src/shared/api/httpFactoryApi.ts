@@ -5,6 +5,7 @@ import {
   InventoryHistorySchema,
   LineSchema,
   PermissionsSchema,
+  RobotStatusSchema,
   ShortageEventSchema,
   SnapshotSchema,
 } from '../domain/schemas';
@@ -33,6 +34,9 @@ export const httpFactoryApi: FactoryApi = {
 
   rejectShortage: ({ id }) =>
     request(ENDPOINTS.rejectShortage(id), ShortageEventSchema, { method: 'POST' }),
+
+  resumeRobot: ({ robotId }) =>
+    request(ENDPOINTS.resumeRobot(robotId), RobotStatusSchema, { method: 'POST' }),
 
   overrideLineStock: ({ lineId, verdict, by }) =>
     request(ENDPOINTS.lineStock(lineId), LineSchema, {

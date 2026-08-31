@@ -65,6 +65,11 @@ const ROBOT_STATE_TONE: Record<RobotState, Tone> = {
   working: 'accent',
   error: 'critical',
   offline: 'idle',
+  /*
+   * 멈춰 선 팔은 고장(critical)이 아니라 "사람이 눌러야 다시 도는" 상태다.
+   * 빨강을 함께 쓰면 화면에서 진짜 오류와 구분되지 않으므로 한 단계 낮춘다.
+   */
+  blocked: 'serious',
 };
 
 export function toneForRobotState(state: RobotState): Tone {
@@ -89,6 +94,7 @@ export const ROBOT_STATE_LABEL: Record<RobotState, string> = {
   working: '작업 중',
   error: '오류',
   offline: '오프라인',
+  blocked: '작업 정지',
 };
 
 export const SHORTAGE_STATUS_LABEL: Record<ShortageEventStatus, string> = {

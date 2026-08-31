@@ -261,6 +261,28 @@ class MockFactoryBackend {
   }
 
   /**
+   * 멈춰 선 팔을 다시 지시받는 상태로 되돌린다.
+   *
+   * 이 시뮬레이터는 blocked 상태를 스스로 만들지 않으므로 대부분 아무것도
+   * 바꾸지 않는다. 그래도 구현해 두는 이유는 실제 백엔드가 그렇듯 "이미 복구된
+   * 로봇에 다시 눌러도 성공"이어야 하기 때문이다 — 팝업이 복구 버튼을 두 번
+   * 눌러도 화면이 오류로 갈라지지 않는다.
+   */
+  async resumeRobot(robotId: string): Promise<RobotStatus> {
+    const robot = this.robots.get(robotId);
+    if (!robot) throw new Error(`알 수 없는 로봇: ${robotId}`);
+
+    if (robot.state === 'blocked') {
+      robot.state = 'idle';
+      robot.blockedReason = undefined;
+      robot.updatedAt = nowIso();
+      this.emitRobot(robot);
+    }
+
+    return { ...robot };
+  }
+
+  /**
    * 관리자가 카메라로 확인한 결과를 그대로 반영한다.
    *
    * 'sufficient'  → 진행 중인 건을 취소하고 로봇을 되돌린 뒤 측정값을 정상으로 보정
