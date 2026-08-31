@@ -7,6 +7,7 @@ import {
   toneForLine,
   toneForShortageStatus,
 } from '../../shared/domain/statusTone';
+import { describeShortageBin } from '../../shared/domain/binLabel';
 import { useCameras } from '../../shared/query/useCameras';
 import { useInventoryHistory } from '../../shared/query/useInventoryHistory';
 import { Badge, Button, CameraFeed, EmptyState, StatusLed, Switch } from '../../shared/ui';
@@ -67,16 +68,26 @@ export function ShortageSidePanel({ line, shortageEvents, onClose }: ShortageSid
             <EmptyState message="보충이 필요한 부품이 없습니다." />
           ) : (
             <ul className={styles.partList}>
-              {openEvents.map((event) => (
-                <li key={event.id} className={styles.part} data-tone={toneForShortageStatus(event.status)}>
-                  <div className={styles.partBody}>
-                    <p className={styles.partName}>{event.partName}</p>
-                    <p className={styles.partMeta}>{formatElapsed(event.detectedAt)} 감지</p>
-                  </div>
-                  <span className={styles.partQty}>{event.requiredQty}개</span>
-                  <Badge tone={toneForShortageStatus(event.status)}>{SHORTAGE_STATUS_LABEL[event.status]}</Badge>
-                </li>
-              ))}
+              {openEvents.map((event) => {
+                // 칸 단위 라인은 부품명만으로는 어디를 채워야 할지 알 수 없다.
+                // 칸이 없는 라인이면 null이라 부품명만 남는다(기존 문구 그대로).
+                const bin = describeShortageBin(line, event);
+                return (
+                  <li key={event.id} className={styles.part} data-tone={toneForShortageStatus(event.status)}>
+                    <div className={styles.partBody}>
+                      <p className={styles.partName}>{bin?.partName ?? event.partName}</p>
+                      <p className={styles.partMeta}>
+                        {bin ? `${bin.label} · ` : ''}
+                        {formatElapsed(event.detectedAt)} 감지
+                      </p>
+                    </div>
+                    <span className={styles.partQty}>{event.requiredQty}개</span>
+                    <Badge tone={toneForShortageStatus(event.status)}>
+                      {SHORTAGE_STATUS_LABEL[event.status]}
+                    </Badge>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </section>

@@ -10,6 +10,8 @@ interface FactoryMapProps {
   lines: Line[];
   robots: RobotStatus[];
   shortageLineIds: Set<string>;
+  /** 진행 중인 부족 이벤트가 걸린 칸(bin) id 집합. 칸이 있는 라인만 해당된다. */
+  shortageBinIds: Set<string>;
   selectedLineId: string | null;
   onSelectLine: (lineId: string) => void;
 }
@@ -27,7 +29,14 @@ const ROBOT_LABEL: Record<RobotType, string> = {
  * 그 위에 실시간 상태(부족 LED·로봇 위치)를 얹는 2층 구조다.
  * 배치가 바뀌면 레이아웃 데이터만 고치면 되고, 상태 표시 코드는 영향을 받지 않는다.
  */
-export function FactoryMap({ lines, robots, shortageLineIds, selectedLineId, onSelectLine }: FactoryMapProps) {
+export function FactoryMap({
+  lines,
+  robots,
+  shortageLineIds,
+  shortageBinIds,
+  selectedLineId,
+  onSelectLine,
+}: FactoryMapProps) {
   const lineById = new Map(lines.map((line) => [line.id, line]));
 
   return (
@@ -47,6 +56,7 @@ export function FactoryMap({ lines, robots, shortageLineIds, selectedLineId, onS
             zone={zone}
             line={zone.lineId ? lineById.get(zone.lineId) : undefined}
             hasShortage={Boolean(zone.lineId && shortageLineIds.has(zone.lineId))}
+            shortageBinIds={shortageBinIds}
             selected={zone.lineId === selectedLineId}
             onSelect={onSelectLine}
           />
@@ -101,13 +111,14 @@ interface ZoneLayerProps {
   zone: FloorZone;
   line?: Line;
   hasShortage: boolean;
+  shortageBinIds: Set<string>;
   selected: boolean;
   onSelect: (lineId: string) => void;
 }
 
 const LABEL_CHIP = { width: 108, height: 34, inset: 14 } as const;
 
-function ZoneLayer({ zone, line, hasShortage, selected, onSelect }: ZoneLayerProps) {
+function ZoneLayer({ zone, line, hasShortage, shortageBinIds, selected, onSelect }: ZoneLayerProps) {
   const { rect } = zone;
   // 보관소는 라인이 아니므로 선택 대상이 아니다.
   const interactive = Boolean(zone.lineId);
@@ -144,9 +155,12 @@ function ZoneLayer({ zone, line, hasShortage, selected, onSelect }: ZoneLayerPro
         // binLabel이 있는 설비만 그 칸의 실제 상태색을 받는다 — 나머지는
         // 항상 중립(라인 전체 상태와 무관, 이슈: "칸별로 따로 알아보이게").
         const bin = item.binLabel ? line?.bins.find((b) => b.label === item.binLabel) : undefined;
-        return (
-          <EquipmentGlyph key={`${item.kind}-${index}`} {...item} tone={bin ? toneForLine(bin) : undefined} />
-        );
+        // 진행 중인 부족 건이 걸린 칸은 재고 수치와 무관하게 경보색으로 고정한다.
+        // 비전 수치가 임계치 위로 잠깐 튀거나 보충 중(파랑)으로 바뀌었다고 해서
+        // 아직 안 끝난 건의 칸이 눈에서 사라지면 안 된다 — 구역 LED가 같은 기준
+        // (isOpenShortage)으로 계속 깜박이는데 칸만 정상색이면 서로 모순된다.
+        const tone = bin ? (shortageBinIds.has(bin.id) ? 'critical' : toneForLine(bin)) : undefined;
+        return <EquipmentGlyph key={`${item.kind}-${index}`} {...item} tone={tone} />;
       })}
 
       {/* 라벨 칩: 원본 도면처럼 구역 안쪽 상단 중앙에 놓는다. */}

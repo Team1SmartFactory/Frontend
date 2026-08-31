@@ -1,6 +1,6 @@
 import { useLines, useRobots, useShortageEvents } from '../../shared/query/useFactoryData';
 import { useUiStore } from '../../store/useUiStore';
-import { selectActiveShortageLineIds } from '../../store/selectors';
+import { selectActiveShortageBinIds, selectActiveShortageLineIds } from '../../store/selectors';
 import { Badge, PageHeader, QueryState } from '../../shared/ui';
 import { FactoryMap } from './FactoryMap';
 import { MapLegend } from './MapLegend';
@@ -19,6 +19,7 @@ export function FloorPlanTab() {
   const selectLine = useUiStore((state) => state.selectLine);
 
   const shortageLineIds = selectActiveShortageLineIds(shortageEvents);
+  const shortageBinIds = selectActiveShortageBinIds(shortageEvents);
   const selectedLine = selectedLineId ? lines[selectedLineId] : undefined;
 
   return (
@@ -52,6 +53,7 @@ export function FloorPlanTab() {
               lines={Object.values(lines)}
               robots={Object.values(robots)}
               shortageLineIds={shortageLineIds}
+              shortageBinIds={shortageBinIds}
               selectedLineId={selectedLineId}
               onSelectLine={selectLine}
             />

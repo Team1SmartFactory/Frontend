@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { selectActiveShortageLineIds, selectPendingApprovals, sortLinesByPriority } from './selectors';
+import {
+  selectActiveShortageBinIds,
+  selectActiveShortageLineIds,
+  selectPendingApprovals,
+  sortLinesByPriority,
+} from './selectors';
 import type { Line, ShortageEvent } from '../shared/domain/types';
 
 function makeLine(overrides: Partial<Line>): Line {
@@ -101,5 +106,20 @@ describe('selectActiveShortageLineIds', () => {
     expect(ids.has('line-a')).toBe(true);
     expect(ids.has('line-b')).toBe(false);
     expect(ids.has('line-c')).toBe(true);
+  });
+});
+
+describe('selectActiveShortageBinIds', () => {
+  it('진행 중인 건의 칸만 모으고, 칸이 없는 이벤트는 무시한다', () => {
+    const events: Record<string, ShortageEvent> = {
+      e1: makeShortageEvent({ id: 'e1', binId: 'line-a-bin-a', status: 'pending_approval' }),
+      e2: makeShortageEvent({ id: 'e2', binId: 'line-a-bin-b', status: 'in_transit' }),
+      e3: makeShortageEvent({ id: 'e3', binId: 'line-a-bin-c', status: 'completed' }),
+      e4: makeShortageEvent({ id: 'e4', status: 'pending_approval' }),
+    };
+
+    const ids = selectActiveShortageBinIds(events);
+
+    expect([...ids].sort()).toEqual(['line-a-bin-a', 'line-a-bin-b']);
   });
 });

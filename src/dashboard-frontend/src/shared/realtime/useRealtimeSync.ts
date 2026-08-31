@@ -48,6 +48,24 @@ function applyMessage(queryClient: QueryClient, message: RealtimeMessage): void 
       return;
     }
 
+    case 'line.bin.inventory': {
+      const { lineId, binId, currentQty, status, updatedAt } = message.payload;
+
+      queryClient.setQueryData<FactoryData>(queryKeys.factory.snapshot(), (prev) => {
+        const line = prev?.lines[lineId];
+        // line.inventory와 같은 이유로 스냅샷에 없는 라인/칸은 무시한다 —
+        // 부분 데이터로 칸을 새로 만들면 label, partName이 빠진 칸이 생긴다.
+        const target = line?.bins.find((bin) => bin.id === binId);
+        if (!prev || !line || !target) return prev;
+
+        const bins = line.bins.map((bin) =>
+          bin === target ? { ...bin, currentQty, status, updatedAt } : bin,
+        );
+        return { ...prev, lines: { ...prev.lines, [lineId]: { ...line, bins } } };
+      });
+      return;
+    }
+
     case 'line.shortage': {
       const event = message.payload;
       queryClient.setQueryData<FactoryData>(queryKeys.factory.snapshot(), (prev) =>

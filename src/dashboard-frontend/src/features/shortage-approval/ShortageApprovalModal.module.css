@@ -46,6 +46,17 @@
   font-weight: var(--weight-bold);
 }
 
+/*
+ * 어느 칸이 부족한지는 라인명과 같은 줄에서 읽혀야 하지만 같은 무게로 읽히면
+ * 안 된다 — 라인명이 먼저, 칸이 그 안의 위치로 따라 붙는 순서다.
+ */
+.titleBin {
+  margin-left: var(--space-2);
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+  color: var(--status-critical-text);
+}
+
 /* 라인명 바로 아래 — 수치를 읽기 전에 눈으로 먼저 확인하게 하는 자리. */
 .camera {
   margin-top: var(--space-4);
@@ -94,6 +105,42 @@
   background: var(--surface-sunken);
   font-size: var(--text-xs);
   color: var(--text-secondary);
+}
+
+/*
+ * 창고 미준비 거부 사유. 안내문(.note)과 같은 자리 문법을 쓰되 상태색을 입혀
+ * "읽고 넘어갈 설명"이 아니라 "지금 막고 있는 것"으로 읽히게 한다.
+ */
+.notReady {
+  margin-bottom: var(--space-5);
+  padding: var(--space-3);
+  border: 1px solid var(--status-critical);
+  border-radius: var(--radius-md);
+  background: var(--status-critical-soft);
+}
+
+.notReadyMessage {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--status-critical-text);
+}
+
+.notReadyReasons {
+  margin: var(--space-2) 0 0;
+  padding-left: var(--space-4);
+  list-style: disc;
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+
+.notReadyReasons li + li {
+  margin-top: var(--space-1);
+}
+
+.notReadyHint {
+  margin-top: var(--space-2);
+  font-size: var(--text-2xs);
+  color: var(--text-muted);
 }
 
 .actions {
