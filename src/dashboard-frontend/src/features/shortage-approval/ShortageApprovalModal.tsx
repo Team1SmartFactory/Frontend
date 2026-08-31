@@ -18,7 +18,16 @@ import styles from './ShortageApprovalModal.module.css';
  * 라인명 바로 아래에 해당 라인의 카메라를 띄운다. 수치만 보고 판단하면
  * 비전이 틀렸을 때 관리자도 같이 틀리므로, 승인/반려 버튼과 근거를 한 화면에 둔다.
  */
-export function ShortageApprovalModal() {
+interface ShortageApprovalModalProps {
+  /**
+   * 다른 팝업이 화면 한가운데를 쓰고 있다는 뜻. 화면만 접고 훅은 그대로 돌린다 —
+   * 컴포넌트를 통째로 떼면 자동 승인(useAutoApproval)까지 멈춰, 승인 필수를 꺼 둔
+   * 현장에서 로봇 한 대가 멈춘 동안 모든 보충이 함께 멎는다.
+   */
+  hidden?: boolean;
+}
+
+export function ShortageApprovalModal({ hidden = false }: ShortageApprovalModalProps = {}) {
   const { shortageEvents } = useShortageEvents();
   const { lines } = useLines();
   const { cameras } = useCameras();
@@ -31,7 +40,7 @@ export function ShortageApprovalModal() {
   useAutoApproval(pending, !approvalRequired, autoApprove);
 
   const current = pending[0];
-  if (!approvalRequired || !current) return null;
+  if (!approvalRequired || !current || hidden) return null;
 
   const line = lines[current.lineId];
   const camera = cameras.find((item) => item.lineId === current.lineId);

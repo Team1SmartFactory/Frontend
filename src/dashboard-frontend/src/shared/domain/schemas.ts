@@ -18,6 +18,16 @@ import { z } from 'zod';
  */
 const optionalString = z.string().nullable().transform((value) => value ?? undefined);
 
+/**
+ * optionalString의 관대한 판 — 필드 자체가 아직 응답에 없을 수도 있을 때 쓴다.
+ *
+ * 백엔드와 프론트가 따로 배포되는 동안에는 "새로 약속한 필드가 아직 안 온다"가
+ * 정상 상태다. 그런 필드까지 `.nullable()`로 잡으면 구버전 백엔드에 붙는 순간
+ * 스냅샷 전체가 계약 위반으로 떨어져 화면이 비어 버린다 — 값 하나 없다고
+ * 대시보드를 통째로 잃는 쪽이 훨씬 나쁘다.
+ */
+const nullishString = z.string().nullish().transform((value) => value ?? undefined);
+
 export const PositionSchema = z.object({
   x: z.number(),
   y: z.number(),
@@ -91,7 +101,16 @@ export const DetectionFeedbackSchema = z.object({
 });
 
 export const RobotTypeSchema = z.enum(['beagle', 'omxf_storage', 'omxf_line']);
-export const RobotStateSchema = z.enum(['idle', 'moving', 'working', 'error', 'offline']);
+export const RobotStateSchema = z.enum([
+  'idle',
+  'moving',
+  'working',
+  'error',
+  'offline',
+  // 작업에 실패한 팔이 스스로 대기 자세로 물러나 더 이상 지시를 받지 않는 상태.
+  // error와 달리 로봇은 살아 있고, 사람이 복구를 눌러야만 다시 일을 받는다.
+  'blocked',
+]);
 
 export const RobotStatusSchema = z.object({
   robotId: z.string(),
@@ -100,6 +119,11 @@ export const RobotStatusSchema = z.object({
   currentTaskId: optionalString,
   position: PositionSchema,
   updatedAt: z.string(),
+  /**
+   * 팔이 남긴 실패 사유 원문. 사람에게 그대로 보여줄 유일한 단서라 버리지 않는다.
+   * 백엔드가 이 필드를 아직 안 내려도 파싱이 깨지면 안 되므로 nullish로 받는다.
+   */
+  blockedReason: nullishString,
 });
 
 /**

@@ -106,7 +106,13 @@ export interface DetectionFeedback {
 export type DetectionFeedbackInput = Omit<DetectionFeedback, 'id' | 'at'>;
 
 export type RobotType = 'beagle' | 'omxf_storage' | 'omxf_line';
-export type RobotState = 'idle' | 'moving' | 'working' | 'error' | 'offline';
+
+/**
+ * 'blocked'는 작업에 실패한 팔이 스스로 대기 자세로 물러나 더 이상 지시를
+ * 받지 않는 상태다. 'error'와 구분하는 이유는 사람이 할 일이 다르기 때문이다 —
+ * 오류는 현장을 봐야 하지만, 이쪽은 원인을 확인한 뒤 복구를 눌러 주면 다시 돈다.
+ */
+export type RobotState = 'idle' | 'moving' | 'working' | 'error' | 'offline' | 'blocked';
 
 export interface RobotStatus {
   robotId: string;
@@ -115,6 +121,8 @@ export interface RobotStatus {
   currentTaskId?: string;
   position: Position;
   updatedAt: string;
+  /** state가 'blocked'일 때 팔이 남긴 실패 사유. 백엔드가 못 채울 수도 있다. */
+  blockedReason?: string;
 }
 
 /**
