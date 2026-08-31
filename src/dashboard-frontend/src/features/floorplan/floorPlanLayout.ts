@@ -92,15 +92,15 @@ export const FLOOR_ZONES: FloorZone[] = [
     lineId: 'line-a',
     label: 'A라인',
     rect: { x: 65, y: 120, width: 482, height: 355 },
-    // 실제 배치(이슈 #37 후속): OMX-F 로봇팔이 위·아래로 한 대씩 있고, 그 사이에
-    // 칸 4개가 있다 — 상단(c/d)은 가로로, 하단(a/b)은 세로로 놓여있다. 로봇팔
-    // 2대는 특정 칸에 매이지 않는 일반 설비라 항상 중립색.
-    // 상단 두 칸의 좌우를 실물과 맞춤(2026-08-31): c가 우측, d가 좌측이다.
-    // 어느 칸이 부족한지 평면도에서 찾을 때 반대로 그려져 있으면 엉뚱한 칸을 본다.
+    // 실제 배치(이슈 #37 후속): OMX-F 로봇팔이 위·아래로 한 대씩 있고, 칸 4개가
+    // 각 팔의 양옆에 하나씩 붙는다 — 위 팔이 c(우)/d(좌)를, 아래 팔이 a(좌)/b(우)를
+    // 맡는다. 로봇팔 2대는 특정 칸에 매이지 않는 일반 설비라 항상 중립색.
+    // 좌우를 실물과 맞춤(2026-08-31): 반대로 그려져 있으면 부족한 칸을 찾을 때
+    // 엉뚱한 칸을 보게 되고, 그 칸은 정상이라 알림이 틀린 것처럼 읽힌다.
     equipment: [
       { kind: 'robotArm', x: 306, y: 210, width: 100, height: 90 },
-      { kind: 'bin', x: 376, y: 285, width: 100, height: 50, binLabel: 'c' },
-      { kind: 'bin', x: 236, y: 285, width: 100, height: 50, binLabel: 'd' },
+      { kind: 'bin', x: 426, y: 215, width: 60, height: 90, binLabel: 'c' },
+      { kind: 'bin', x: 226, y: 215, width: 60, height: 90, binLabel: 'd' },
       { kind: 'bin', x: 236, y: 365, width: 60, height: 90, binLabel: 'a' },
       { kind: 'bin', x: 376, y: 365, width: 60, height: 90, binLabel: 'b' },
       { kind: 'robotArm', x: 306, y: 428, width: 100, height: 90 },
