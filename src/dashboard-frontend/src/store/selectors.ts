@@ -39,3 +39,18 @@ export function selectActiveShortageLineIds(events: Record<string, ShortageEvent
   });
   return ids;
 }
+
+/**
+ * 위와 같은 집합의 칸(bin) 단위 판. 평면도에서 어느 칸 글리프를 경보색으로
+ * 물들일지 정한다.
+ *
+ * binId가 있는 이벤트만 들어가므로(line-a) 칸이 없는 라인은 자연히 빠진다.
+ * Bin.id는 라인 접두어를 포함해 전역에서 유일하므로 lineId를 함께 키에 넣지 않는다.
+ */
+export function selectActiveShortageBinIds(events: Record<string, ShortageEvent>): Set<string> {
+  const ids = new Set<string>();
+  Object.values(events).forEach((event) => {
+    if (event.binId && isOpenShortage(event.status)) ids.add(event.binId);
+  });
+  return ids;
+}

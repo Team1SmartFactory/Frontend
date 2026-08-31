@@ -117,8 +117,24 @@ export const LineUpdateSchema = z.object({
 });
 export type LineUpdate = z.infer<typeof LineUpdateSchema>;
 
+/**
+ * 칸(bin) 하나의 재고 갱신. line-a처럼 칸마다 다른 부품을 쌓는 라인에서는
+ * 재고가 라인이 아니라 칸 단위로 바뀐다 — line.inventory에는 binId가 없어서
+ * 이 이벤트가 없으면 칸의 재고율은 페이지를 새로 열기 전까지 그대로 멈춘다
+ * (스냅샷은 한 번만 받고 폴링을 하지 않는다).
+ */
+export const BinUpdateSchema = z.object({
+  lineId: z.string(),
+  binId: z.string(),
+  currentQty: z.number(),
+  status: LineStatusSchema,
+  updatedAt: z.string(),
+});
+export type BinUpdate = z.infer<typeof BinUpdateSchema>;
+
 export const RealtimeMessageSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('line.inventory'), payload: LineUpdateSchema }),
+  z.object({ type: z.literal('line.bin.inventory'), payload: BinUpdateSchema }),
   z.object({ type: z.literal('line.shortage'), payload: ShortageEventSchema }),
   z.object({ type: z.literal('robot.status'), payload: RobotStatusSchema }),
 ]);

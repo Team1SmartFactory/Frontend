@@ -1,4 +1,5 @@
 import type { Line, ShortageEvent } from '../../shared/domain/types';
+import { describeShortageBin } from '../../shared/domain/binLabel';
 import { Badge, Card, EmptyState, StatusLed } from '../../shared/ui';
 import { formatElapsed } from '../../shared/utils/formatTime';
 import styles from './ShortageNotifications.module.css';
@@ -34,22 +35,30 @@ export function ShortageNotifications({ pendingEvents, lines }: ShortageNotifica
         <EmptyState message="승인 대기 중인 알림이 없습니다." hint="모든 라인이 임계치 위에서 운영 중입니다." />
       ) : (
         <ul className={styles.list} role="alert">
-          {pendingEvents.map((event) => (
-            <li key={event.id} className={styles.item} data-tone="critical">
-              <StatusLed tone="critical" pulse />
-              <div className={styles.body}>
-                <p className={styles.headline}>
-                  <strong>{lines[event.lineId]?.name ?? event.lineId}</strong> 부품 부족
-                </p>
-                <p className={styles.detail}>
-                  {event.partName} · {event.requiredQty}개 보충 필요
-                </p>
-              </div>
-              <time className={styles.time} dateTime={event.detectedAt}>
-                {formatElapsed(event.detectedAt)}
-              </time>
-            </li>
-          ))}
+          {pendingEvents.map((event) => {
+            const line = lines[event.lineId];
+            // 칸 단위 라인(line-a)은 어느 칸인지까지 말해야 사람이 바로 그 칸으로 간다.
+            // 칸이 없는 라인은 bin이 null이라 문구가 예전 그대로 유지된다.
+            const bin = describeShortageBin(line, event);
+            const lineName = line?.name ?? event.lineId;
+
+            return (
+              <li key={event.id} className={styles.item} data-tone="critical">
+                <StatusLed tone="critical" pulse />
+                <div className={styles.body}>
+                  <p className={styles.headline}>
+                    <strong>{bin ? `${lineName} ${bin.label}` : lineName}</strong> 부품 부족
+                  </p>
+                  <p className={styles.detail}>
+                    {bin?.partName ?? event.partName} · {event.requiredQty}개 보충 필요
+                  </p>
+                </div>
+                <time className={styles.time} dateTime={event.detectedAt}>
+                  {formatElapsed(event.detectedAt)}
+                </time>
+              </li>
+            );
+          })}
         </ul>
       )}
     </Card>

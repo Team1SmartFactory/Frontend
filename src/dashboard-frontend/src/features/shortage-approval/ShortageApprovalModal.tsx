@@ -1,3 +1,4 @@
+import { describeShortageBin } from '../../shared/domain/binLabel';
 import { useLines, useShortageEvents } from '../../shared/query/useFactoryData';
 import { useCameras } from '../../shared/query/useCameras';
 import { usePermissions } from '../../shared/query/useSettings';
@@ -22,7 +23,7 @@ export function ShortageApprovalModal() {
   const { lines } = useLines();
   const { cameras } = useCameras();
   const { permissions } = usePermissions();
-  const { approve, reject, autoApprove, pendingId } = useShortageActions();
+  const { approve, reject, autoApprove, pendingId, notReadyFor } = useShortageActions();
 
   const approvalRequired = permissions.approvalRequired;
   const pending = selectPendingApprovals(shortageEvents);
@@ -35,6 +36,9 @@ export function ShortageApprovalModal() {
   const line = lines[current.lineId];
   const camera = cameras.find((item) => item.lineId === current.lineId);
   const isBusy = pendingId === current.id;
+  // 칸 단위 라인이면 어느 칸인지까지 말해야 관리자가 카메라에서 그 칸을 찾는다.
+  const bin = describeShortageBin(line, current);
+  const notReady = notReadyFor(current.id);
 
   return (
     <div className={styles.overlay}>
@@ -54,6 +58,7 @@ export function ShortageApprovalModal() {
 
         <h2 id="shortage-approval-title" className={styles.title}>
           {line?.name ?? current.lineId}
+          {bin && <span className={styles.titleBin}>{bin.label}</span>}
         </h2>
 
         <div className={styles.camera}>
@@ -76,7 +81,7 @@ export function ShortageApprovalModal() {
         <dl className={styles.details}>
           <div className={styles.detailRow}>
             <dt>부품</dt>
-            <dd>{current.partName}</dd>
+            <dd>{bin?.partName ?? current.partName}</dd>
           </div>
           <div className={styles.detailRow}>
             <dt>필요 수량</dt>
@@ -94,12 +99,32 @@ export function ShortageApprovalModal() {
           이 판단은 객체 인식 모델 학습에 반영됩니다.
         </p>
 
+        {/*
+          창고가 부품을 낼 수 없어 승인이 거부된 경우. 이 건은 승인 대기로 남아
+          있으므로, 현장을 고친 뒤 같은 버튼을 다시 누르면 된다는 것까지 적는다.
+        */}
+        {notReady && (
+          <div className={styles.notReady} role="alert">
+            <p className={styles.notReadyMessage}>{notReady.message}</p>
+            {notReady.reasons.length > 0 && (
+              <ul className={styles.notReadyReasons}>
+                {notReady.reasons.map((reason) => (
+                  <li key={reason}>{reason}</li>
+                ))}
+              </ul>
+            )}
+            <p className={styles.notReadyHint}>
+              이 건은 승인 대기로 남아 있습니다. 위 문제를 해결한 뒤 다시 승인해 주세요.
+            </p>
+          </div>
+        )}
+
         <div className={styles.actions}>
           <Button variant="secondary" disabled={isBusy} onClick={() => reject(current)}>
             반려
           </Button>
           <Button variant="primary" disabled={isBusy} onClick={() => approve(current)}>
-            {isBusy ? '처리 중…' : '보충 승인'}
+            {isBusy ? '처리 중…' : notReady ? '다시 승인' : '보충 승인'}
           </Button>
         </div>
       </div>
