@@ -4,6 +4,10 @@ import {
   selectActiveShortageLineIds,
   selectBlockedRobots,
   selectPendingApprovals,
+  selectPendingShortageBinIds,
+  selectPendingShortageLineIds,
+  selectRestockingBinIds,
+  selectRestockingLineIds,
   sortLinesByPriority,
 } from './selectors';
 import type { Line, RobotStatus, ShortageEvent } from '../shared/domain/types';
@@ -170,5 +174,55 @@ describe('selectActiveShortageBinIds', () => {
     const ids = selectActiveShortageBinIds(events);
 
     expect([...ids].sort()).toEqual(['line-a-bin-a', 'line-a-bin-b']);
+  });
+});
+
+describe('승인 대기/보충 중 분리 (이슈 #38)', () => {
+  // 승인을 누르면 화면은 '부족'(빨강)이 아니라 '보충 중'(파랑)이어야 한다 —
+  // 계속 빨가면 관리자는 승인이 안 먹었다고 판단해 같은 건을 다시 조치한다.
+  const events: Record<string, ShortageEvent> = {
+    pending: makeShortageEvent({
+      id: 'pending',
+      lineId: 'line-a',
+      binId: 'line-a-bin-a',
+      status: 'pending_approval',
+    }),
+    dispatched: makeShortageEvent({
+      id: 'dispatched',
+      lineId: 'line-a',
+      binId: 'line-a-bin-b',
+      status: 'dispatched',
+    }),
+    transit: makeShortageEvent({
+      id: 'transit',
+      lineId: 'line-b',
+      binId: 'line-b-bin-a',
+      status: 'in_transit',
+    }),
+    done: makeShortageEvent({
+      id: 'done',
+      lineId: 'line-c',
+      binId: 'line-c-bin-a',
+      status: 'completed',
+    }),
+  };
+
+  it('pending은 승인 대기 건만 모은다', () => {
+    expect([...selectPendingShortageBinIds(events)]).toEqual(['line-a-bin-a']);
+    expect([...selectPendingShortageLineIds(events)]).toEqual(['line-a']);
+  });
+
+  it('restocking은 지시됨/운반 중만 모으고, 완료된 건은 강제색을 푼다', () => {
+    expect([...selectRestockingBinIds(events)].sort()).toEqual([
+      'line-a-bin-b',
+      'line-b-bin-a',
+    ]);
+    expect([...selectRestockingLineIds(events)].sort()).toEqual(['line-a', 'line-b']);
+    expect(selectRestockingBinIds(events).has('line-c-bin-a')).toBe(false);
+  });
+
+  it('같은 라인에 두 상태가 겹치면 라인은 양쪽 집합에 다 들어간다 (LED는 pending 우선)', () => {
+    expect(selectPendingShortageLineIds(events).has('line-a')).toBe(true);
+    expect(selectRestockingLineIds(events).has('line-a')).toBe(true);
   });
 });

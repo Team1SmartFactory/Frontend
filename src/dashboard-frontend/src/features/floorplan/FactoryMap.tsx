@@ -9,9 +9,13 @@ import styles from './FactoryMap.module.css';
 interface FactoryMapProps {
   lines: Line[];
   robots: RobotStatus[];
-  shortageLineIds: Set<string>;
-  /** 진행 중인 부족 이벤트가 걸린 칸(bin) id 집합. 칸이 있는 라인만 해당된다. */
-  shortageBinIds: Set<string>;
+  /** 승인 대기(pending_approval) 부족 건이 걸린 라인 — 경보색(빨강) 유지 대상. */
+  pendingLineIds: Set<string>;
+  /** 승인이 떨어져 보충이 진행 중(dispatched/in_transit)인 라인 — '보충 중'(파랑). */
+  restockingLineIds: Set<string>;
+  /** 위 두 집합의 칸(bin) 단위 판. 칸이 있는 라인만 해당된다 (이슈 #38). */
+  pendingBinIds: Set<string>;
+  restockingBinIds: Set<string>;
   selectedLineId: string | null;
   onSelectLine: (lineId: string) => void;
 }
@@ -32,8 +36,10 @@ const ROBOT_LABEL: Record<RobotType, string> = {
 export function FactoryMap({
   lines,
   robots,
-  shortageLineIds,
-  shortageBinIds,
+  pendingLineIds,
+  restockingLineIds,
+  pendingBinIds,
+  restockingBinIds,
   selectedLineId,
   onSelectLine,
 }: FactoryMapProps) {
@@ -55,8 +61,10 @@ export function FactoryMap({
             key={zone.label}
             zone={zone}
             line={zone.lineId ? lineById.get(zone.lineId) : undefined}
-            hasShortage={Boolean(zone.lineId && shortageLineIds.has(zone.lineId))}
-            shortageBinIds={shortageBinIds}
+            hasPending={Boolean(zone.lineId && pendingLineIds.has(zone.lineId))}
+            hasRestocking={Boolean(zone.lineId && restockingLineIds.has(zone.lineId))}
+            pendingBinIds={pendingBinIds}
+            restockingBinIds={restockingBinIds}
             selected={zone.lineId === selectedLineId}
             onSelect={onSelectLine}
           />
@@ -110,15 +118,26 @@ function FactoryShell() {
 interface ZoneLayerProps {
   zone: FloorZone;
   line?: Line;
-  hasShortage: boolean;
-  shortageBinIds: Set<string>;
+  hasPending: boolean;
+  hasRestocking: boolean;
+  pendingBinIds: Set<string>;
+  restockingBinIds: Set<string>;
   selected: boolean;
   onSelect: (lineId: string) => void;
 }
 
 const LABEL_CHIP = { width: 108, height: 34, inset: 14 } as const;
 
-function ZoneLayer({ zone, line, hasShortage, shortageBinIds, selected, onSelect }: ZoneLayerProps) {
+function ZoneLayer({
+  zone,
+  line,
+  hasPending,
+  hasRestocking,
+  pendingBinIds,
+  restockingBinIds,
+  selected,
+  onSelect,
+}: ZoneLayerProps) {
   const { rect } = zone;
   // 보관소는 라인이 아니므로 선택 대상이 아니다.
   const interactive = Boolean(zone.lineId);
@@ -145,7 +164,9 @@ function ZoneLayer({ zone, line, hasShortage, shortageBinIds, selected, onSelect
       tabIndex={interactive ? 0 : undefined}
       aria-label={
         interactive && line
-          ? `${line.name}, 재고 ${line.currentQty.toFixed(0)}퍼센트${hasShortage ? ', 부품 부족' : ''}`
+          ? `${line.name}, 재고 ${line.currentQty.toFixed(0)}퍼센트${
+              hasPending ? ', 부품 부족' : hasRestocking ? ', 보충 중' : ''
+            }`
           : zone.label
       }
     >
@@ -155,11 +176,18 @@ function ZoneLayer({ zone, line, hasShortage, shortageBinIds, selected, onSelect
         // binLabel이 있는 설비만 그 칸의 실제 상태색을 받는다 — 나머지는
         // 항상 중립(라인 전체 상태와 무관, 이슈: "칸별로 따로 알아보이게").
         const bin = item.binLabel ? line?.bins.find((b) => b.label === item.binLabel) : undefined;
-        // 진행 중인 부족 건이 걸린 칸은 재고 수치와 무관하게 경보색으로 고정한다.
-        // 비전 수치가 임계치 위로 잠깐 튀거나 보충 중(파랑)으로 바뀌었다고 해서
-        // 아직 안 끝난 건의 칸이 눈에서 사라지면 안 된다 — 구역 LED가 같은 기준
-        // (isOpenShortage)으로 계속 깜박이는데 칸만 정상색이면 서로 모순된다.
-        const tone = bin ? (shortageBinIds.has(bin.id) ? 'critical' : toneForLine(bin)) : undefined;
+        // 아직 안 끝난 건이 걸린 칸은 재고 수치와 무관하게 그 건의 단계색으로
+        // 고정한다: 승인 대기는 경보색(빨강), 승인 후 로봇이 움직이는 동안은
+        // '보충 중'(파랑, 이슈 #38). 완료/반려로 건이 닫히면 강제색이 풀려 칸의
+        // 실제 재고색(카메라 확인 후 정상)으로 돌아온다 — 구역 LED가 아래에서
+        // 같은 기준으로 깜박이므로 칸과 LED가 서로 모순되지 않는다.
+        const tone = bin
+          ? pendingBinIds.has(bin.id)
+            ? 'critical'
+            : restockingBinIds.has(bin.id)
+              ? 'accent'
+              : toneForLine(bin)
+          : undefined;
         return <EquipmentGlyph key={`${item.kind}-${index}`} {...item} tone={tone} />;
       })}
 
@@ -181,10 +209,12 @@ function ZoneLayer({ zone, line, hasShortage, shortageBinIds, selected, onSelect
         {zone.label}
       </text>
 
-      {/* 부족 LED는 구역 우상단 안쪽에 둔다. 라벨 칩과 겹치지 않는 자리다. */}
-      {hasShortage && (
+      {/* 부족/보충 LED는 구역 우상단 안쪽에 둔다. 라벨 칩과 겹치지 않는 자리다.
+          승인 대기가 하나라도 있으면 빨강이 이긴다 — 아직 사람 손이 필요한 건이
+          로봇이 움직인다는 파랑에 가려지면 안 된다. */}
+      {(hasPending || hasRestocking) && (
         <g transform={`translate(${rect.x + rect.width - 26}, ${rect.y + 26})`}>
-          <MapLed tone="critical" pulse radius={7} />
+          <MapLed tone={hasPending ? 'critical' : 'accent'} pulse radius={7} />
         </g>
       )}
     </g>

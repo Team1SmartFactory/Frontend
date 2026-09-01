@@ -1,5 +1,5 @@
 import type { Line, RobotStatus, ShortageEvent } from '../shared/domain/types';
-import { isOpenShortage, toneForLine } from '../shared/domain/statusTone';
+import { isOpenShortage, isRefillInProgress, toneForLine } from '../shared/domain/statusTone';
 import type { Tone } from '../shared/ui/tone';
 
 /**
@@ -68,6 +68,47 @@ export function selectActiveShortageBinIds(events: Record<string, ShortageEvent>
   const ids = new Set<string>();
   Object.values(events).forEach((event) => {
     if (event.binId && isOpenShortage(event.status)) ids.add(event.binId);
+  });
+  return ids;
+}
+
+/**
+ * 아래 넷은 위 "열린 부족 건" 집합을 시급도로 가른 것이다 (이슈 #38).
+ *
+ * pending(승인 대기)은 아직 사람이 손을 못 쓴 건이라 경보색(빨강)을 유지해야
+ * 하고, restocking(dispatched/in_transit)은 승인이 떨어져 로봇이 움직이는 중이라
+ * '보충 중'(파랑)으로 보여야 한다 — 승인을 눌렀는데 화면이 계속 빨가면 관리자는
+ * 승인이 안 먹었다고 판단한다. 한 칸에 두 상태가 겹칠 일은 없지만(칸당 활성
+ * 이벤트 1개), 칸이 여럿인 라인은 겹칠 수 있으므로 라인 LED는 pending을 우선한다.
+ */
+export function selectPendingShortageLineIds(events: Record<string, ShortageEvent>): Set<string> {
+  const ids = new Set<string>();
+  Object.values(events).forEach((event) => {
+    if (event.status === 'pending_approval') ids.add(event.lineId);
+  });
+  return ids;
+}
+
+export function selectRestockingLineIds(events: Record<string, ShortageEvent>): Set<string> {
+  const ids = new Set<string>();
+  Object.values(events).forEach((event) => {
+    if (isRefillInProgress(event.status)) ids.add(event.lineId);
+  });
+  return ids;
+}
+
+export function selectPendingShortageBinIds(events: Record<string, ShortageEvent>): Set<string> {
+  const ids = new Set<string>();
+  Object.values(events).forEach((event) => {
+    if (event.binId && event.status === 'pending_approval') ids.add(event.binId);
+  });
+  return ids;
+}
+
+export function selectRestockingBinIds(events: Record<string, ShortageEvent>): Set<string> {
+  const ids = new Set<string>();
+  Object.values(events).forEach((event) => {
+    if (event.binId && isRefillInProgress(event.status)) ids.add(event.binId);
   });
   return ids;
 }

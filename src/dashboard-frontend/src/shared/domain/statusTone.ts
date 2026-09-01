@@ -121,3 +121,18 @@ export const OPEN_SHORTAGE_STATUSES = new Set<ShortageEventStatus>([
 export function isOpenShortage(status: ShortageEventStatus): boolean {
   return OPEN_SHORTAGE_STATUSES.has(status);
 }
+
+/**
+ * 승인이 떨어져 로봇이 실제로 움직이고 있는 건 — OPEN_SHORTAGE_STATUSES의
+ * 부분집합이다. 평면도는 이 상태를 '부족'(빨강)이 아니라 '보충 중'(파랑)으로
+ * 갈라 보여야 한다(이슈 #38): 승인을 눌렀는데도 화면이 계속 빨갛게 경보를
+ * 울리면, 관리자는 승인이 안 먹었다고 판단해 같은 건을 다시 조치하려 든다.
+ */
+export const REFILL_IN_PROGRESS_STATUSES = new Set<ShortageEventStatus>([
+  'dispatched',
+  'in_transit',
+]);
+
+export function isRefillInProgress(status: ShortageEventStatus): boolean {
+  return REFILL_IN_PROGRESS_STATUSES.has(status);
+}
