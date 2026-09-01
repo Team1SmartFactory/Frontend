@@ -1,12 +1,14 @@
 import { CameraFeed } from '../../shared/ui';
+import type { Tone } from '../../shared/ui/tone';
 import styles from './CameraTile.module.css';
 
 interface CameraTileProps {
   cameraId: string;
   label: string;
-  hasShortage: boolean;
+  /** 경보 단계색: critical(부족)·accent(보충 중). 없으면 강조하지 않는다 (이슈 #40). */
+  alertTone?: Tone;
+  alertLabel?: string;
   streamUrl?: string;
-  alertLabel: string;
   scopeTag?: string;
   onZoom: () => void;
 }
@@ -15,9 +17,9 @@ interface CameraTileProps {
 export function CameraTile({
   cameraId,
   label,
-  hasShortage,
-  streamUrl,
+  alertTone,
   alertLabel,
+  streamUrl,
   scopeTag,
   onZoom,
 }: CameraTileProps) {
@@ -26,7 +28,7 @@ export function CameraTile({
       <CameraFeed
         cameraId={cameraId}
         label={label}
-        tone={hasShortage ? 'critical' : undefined}
+        tone={alertTone}
         alertLabel={alertLabel}
         streamUrl={streamUrl}
         scopeTag={scopeTag}

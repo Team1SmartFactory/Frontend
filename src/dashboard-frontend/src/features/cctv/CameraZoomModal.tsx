@@ -1,5 +1,6 @@
 import type { MouseEvent } from 'react';
 import { Badge, Button, CameraFeed } from '../../shared/ui';
+import type { Tone } from '../../shared/ui/tone';
 import { CloseIcon } from '../../shared/ui/icons';
 import { useEscapeKey } from '../../shared/hooks/useEscapeKey';
 import styles from './CameraZoomModal.module.css';
@@ -7,9 +8,10 @@ import styles from './CameraZoomModal.module.css';
 interface CameraZoomModalProps {
   cameraId: string;
   label: string;
-  hasShortage: boolean;
+  /** 경보 단계색: critical(부족)·accent(보충 중). 없으면 강조하지 않는다 (이슈 #40). */
+  alertTone?: Tone;
+  alertLabel?: string;
   streamUrl?: string;
-  alertLabel: string;
   scopeTag?: string;
   onClose: () => void;
 }
@@ -18,9 +20,9 @@ interface CameraZoomModalProps {
 export function CameraZoomModal({
   cameraId,
   label,
-  hasShortage,
-  streamUrl,
+  alertTone,
   alertLabel,
+  streamUrl,
   scopeTag,
   onClose,
 }: CameraZoomModalProps) {
@@ -40,8 +42,8 @@ export function CameraZoomModal({
             <span className={styles.cameraId}>{cameraId}</span>
           </div>
           <div className={styles.headerActions}>
-            {hasShortage && (
-              <Badge tone="critical" led pulse>
+            {alertTone && alertLabel && (
+              <Badge tone={alertTone} led pulse>
                 {alertLabel}
               </Badge>
             )}
@@ -55,7 +57,7 @@ export function CameraZoomModal({
           <CameraFeed
             cameraId={cameraId}
             label={label}
-            tone={hasShortage ? 'critical' : undefined}
+            tone={alertTone}
             alertLabel={alertLabel}
             streamUrl={streamUrl}
             scopeTag={scopeTag}

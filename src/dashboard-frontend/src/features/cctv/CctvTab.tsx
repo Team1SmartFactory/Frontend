@@ -1,8 +1,9 @@
 import { useCameras } from '../../shared/query/useCameras';
 import { useShortageEvents } from '../../shared/query/useFactoryData';
 import { useUiStore } from '../../store/useUiStore';
-import { selectActiveShortageLineIds } from '../../store/selectors';
+import { selectPendingShortageLineIds, selectRestockingLineIds } from '../../store/selectors';
 import { Badge, EmptyState, PageHeader, QueryState } from '../../shared/ui';
+import type { Tone } from '../../shared/ui/tone';
 import { CameraTile } from './CameraTile';
 import { CameraZoomModal } from './CameraZoomModal';
 import styles from './CctvTab.module.css';
@@ -20,28 +21,48 @@ export function CctvTab() {
   const zoomedCameraId = useUiStore((state) => state.zoomedCameraId);
   const zoomCamera = useUiStore((state) => state.zoomCamera);
 
-  const shortageLineIds = selectActiveShortageLineIds(shortageEvents);
+  // 평면도(#38)와 같은 기준으로 가른다: 승인 대기는 경보(빨강), 승인 후 로봇이
+  // 움직이는 동안은 보충 중(파랑). 한 화면만 계속 빨가면 관리자는 승인이 안
+  // 먹었다고 판단한다.
+  const pendingLineIds = selectPendingShortageLineIds(shortageEvents);
+  const restockingLineIds = selectRestockingLineIds(shortageEvents);
 
-  // 카메라는 서버가 주는 목록을 그대로 쓰고, 부족 여부만 실시간 상태에서 덧입힌다.
-  // 전체 뷰 카메라는 특정 라인에 속하지 않으므로, 어디든 부족이 있으면 강조한다.
+  function alertFor(camera: { scope: string; lineId?: string | null }): {
+    tone: Tone;
+    label: string;
+  } | null {
+    if (camera.scope === 'overview') {
+      // 전체 뷰는 특정 라인에 속하지 않으므로, 어디든 해당 상태가 있으면 강조한다.
+      if (pendingLineIds.size > 0) return { tone: 'critical', label: '부족 라인 있음' };
+      if (restockingLineIds.size > 0) return { tone: 'accent', label: '보충 중 라인 있음' };
+      return null;
+    }
+    if (camera.lineId && pendingLineIds.has(camera.lineId))
+      return { tone: 'critical', label: '부품 부족' };
+    if (camera.lineId && restockingLineIds.has(camera.lineId))
+      return { tone: 'accent', label: '부품 보충 중' };
+    return null;
+  }
+
+  // 카메라는 서버가 주는 목록을 그대로 쓰고, 상태만 실시간에서 덧입힌다.
   const decorated = cameras
     .map((camera) => ({
       ...camera,
-      hasShortage:
-        camera.scope === 'overview'
-          ? shortageLineIds.size > 0
-          : Boolean(camera.lineId && shortageLineIds.has(camera.lineId)),
-      alertLabel: camera.scope === 'overview' ? '부족 라인 있음' : '부품 부족',
+      alert: alertFor(camera),
       // 부족 경보와 뜻이 겹치지 않게, 특정 라인이 아닌 카메라에만 붙는 별도 태그.
       scopeTag: camera.scope === 'overview' ? '전체' : undefined,
     }))
     .sort((a, b) => {
       if (a.scope !== b.scope) return a.scope === 'overview' ? -1 : 1;
-      return Number(b.hasShortage) - Number(a.hasShortage) || a.label.localeCompare(b.label);
+      // 부족(빨강)이 보충 중(파랑)보다, 보충 중이 무표시보다 앞에 온다.
+      const rank = (alert: { tone: Tone } | null) =>
+        alert === null ? 2 : alert.tone === 'critical' ? 0 : 1;
+      return rank(a.alert) - rank(b.alert) || a.label.localeCompare(b.label);
     });
 
   const zoomed = decorated.find((camera) => camera.id === zoomedCameraId);
-  const alertCount = decorated.filter((camera) => camera.hasShortage).length;
+  const alertCount = decorated.filter((camera) => camera.alert?.tone === 'critical').length;
+  const restockingCount = decorated.filter((camera) => camera.alert?.tone === 'accent').length;
 
   return (
     <div className={styles.page}>
@@ -49,15 +70,23 @@ export function CctvTab() {
         title="CCTV"
         description="카메라를 클릭하면 확대 화면이 열립니다."
         actions={
-          alertCount > 0 ? (
-            <Badge tone="critical" led pulse>
-              주의 {alertCount}대
-            </Badge>
-          ) : (
-            <Badge tone="good" led>
-              전체 정상
-            </Badge>
-          )
+          <>
+            {alertCount > 0 && (
+              <Badge tone="critical" led pulse>
+                주의 {alertCount}대
+              </Badge>
+            )}
+            {restockingCount > 0 && (
+              <Badge tone="accent" led pulse>
+                보충 중 {restockingCount}대
+              </Badge>
+            )}
+            {alertCount === 0 && restockingCount === 0 && (
+              <Badge tone="good" led>
+                전체 정상
+              </Badge>
+            )}
+          </>
         }
       />
 
@@ -77,9 +106,9 @@ export function CctvTab() {
                   key={camera.id}
                   cameraId={camera.id}
                   label={camera.label}
-                  hasShortage={camera.hasShortage}
+                  alertTone={camera.alert?.tone}
+                  alertLabel={camera.alert?.label}
                   streamUrl={camera.streamUrl}
-                  alertLabel={camera.alertLabel}
                   scopeTag={camera.scopeTag}
                   onZoom={() => zoomCamera(camera.id)}
                 />
@@ -93,9 +122,9 @@ export function CctvTab() {
         <CameraZoomModal
           cameraId={zoomed.id}
           label={zoomed.label}
-          hasShortage={zoomed.hasShortage}
+          alertTone={zoomed.alert?.tone}
+          alertLabel={zoomed.alert?.label}
           streamUrl={zoomed.streamUrl}
-          alertLabel={zoomed.alertLabel}
           scopeTag={zoomed.scopeTag}
           onClose={() => zoomCamera(null)}
         />
