@@ -1,6 +1,11 @@
 import { useLines, useRobots, useShortageEvents } from '../../shared/query/useFactoryData';
 import { useUiStore } from '../../store/useUiStore';
-import { selectActiveShortageBinIds, selectActiveShortageLineIds } from '../../store/selectors';
+import {
+  selectPendingShortageBinIds,
+  selectPendingShortageLineIds,
+  selectRestockingBinIds,
+  selectRestockingLineIds,
+} from '../../store/selectors';
 import { Badge, PageHeader, QueryState } from '../../shared/ui';
 import { FactoryMap } from './FactoryMap';
 import { MapLegend } from './MapLegend';
@@ -18,8 +23,12 @@ export function FloorPlanTab() {
   const selectedLineId = useUiStore((state) => state.selectedLineId);
   const selectLine = useUiStore((state) => state.selectLine);
 
-  const shortageLineIds = selectActiveShortageLineIds(shortageEvents);
-  const shortageBinIds = selectActiveShortageBinIds(shortageEvents);
+  // 승인 대기(빨강)와 보충 중(파랑)을 갈라 든다 (이슈 #38) — 승인을 누른 뒤에도
+  // 화면이 계속 '부족'으로 경보하면 관리자는 승인이 안 먹었다고 판단한다.
+  const pendingLineIds = selectPendingShortageLineIds(shortageEvents);
+  const restockingLineIds = selectRestockingLineIds(shortageEvents);
+  const pendingBinIds = selectPendingShortageBinIds(shortageEvents);
+  const restockingBinIds = selectRestockingBinIds(shortageEvents);
   const selectedLine = selectedLineId ? lines[selectedLineId] : undefined;
 
   return (
@@ -28,15 +37,23 @@ export function FloorPlanTab() {
         title="평면도"
         description="라인을 선택하면 부족 상세와 카메라 뷰가 열립니다."
         actions={
-          shortageLineIds.size > 0 ? (
-            <Badge tone="critical" led pulse>
-              부족 {shortageLineIds.size}개 라인
-            </Badge>
-          ) : (
-            <Badge tone="good" led>
-              전 라인 정상
-            </Badge>
-          )
+          <>
+            {pendingLineIds.size > 0 && (
+              <Badge tone="critical" led pulse>
+                부족 {pendingLineIds.size}개 라인
+              </Badge>
+            )}
+            {restockingLineIds.size > 0 && (
+              <Badge tone="accent" led pulse>
+                보충 중 {restockingLineIds.size}개 라인
+              </Badge>
+            )}
+            {pendingLineIds.size === 0 && restockingLineIds.size === 0 && (
+              <Badge tone="good" led>
+                전 라인 정상
+              </Badge>
+            )}
+          </>
         }
       />
 
@@ -52,8 +69,10 @@ export function FloorPlanTab() {
             <FactoryMap
               lines={Object.values(lines)}
               robots={Object.values(robots)}
-              shortageLineIds={shortageLineIds}
-              shortageBinIds={shortageBinIds}
+              pendingLineIds={pendingLineIds}
+              restockingLineIds={restockingLineIds}
+              pendingBinIds={pendingBinIds}
+              restockingBinIds={restockingBinIds}
               selectedLineId={selectedLineId}
               onSelectLine={selectLine}
             />
