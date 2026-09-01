@@ -24,16 +24,13 @@ const ACTIVE_ROBOT_STATES = new Set<RobotStatus['state']>(['moving', 'working'])
 /**
  * 대시보드 최상단 요약 타일.
  * 명세의 "기본 대시보드 탭만으로도 전체 상황 파악"을 위해,
- * 세부 섹션을 읽기 전에 먼저 확인할 4개 지표를 한 줄로 고정한다.
+ * 세부 섹션을 읽기 전에 먼저 확인할 3개 지표를 한 줄로 고정한다.
  *
  * 추세가 아닌 현재값 하나씩이므로 차트가 아니라 수치 타일로 둔다.
  */
 export function SummaryStrip({ lines, robots, pendingCount }: SummaryStripProps) {
   const shortageLines = lines.filter((line) => toneForLine(line) === 'critical');
   const activeRobots = robots.filter((robot) => ACTIVE_ROBOT_STATES.has(robot.state));
-  const averageQty = lines.length
-    ? lines.reduce((sum, line) => sum + line.currentQty, 0) / lines.length
-    : 0;
 
   const stats: Stat[] = [
     {
@@ -59,14 +56,6 @@ export function SummaryStrip({ lines, robots, pendingCount }: SummaryStripProps)
       unit: `/ ${robots.length}`,
       caption: activeRobots.length > 0 ? '보충 작업 진행 중' : '전 대수 대기',
       tone: activeRobots.length > 0 ? 'accent' : 'idle',
-    },
-    {
-      key: 'average',
-      label: '평균 재고 면적',
-      value: averageQty.toFixed(0),
-      unit: '%',
-      caption: '전 라인 평균',
-      tone: 'idle',
     },
   ];
 
