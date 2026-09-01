@@ -15,6 +15,10 @@ export const ENDPOINTS = {
   approveShortage: (id: string) => `/shortage-events/${encodeURIComponent(id)}/approve`,
   rejectShortage: (id: string) => `/shortage-events/${encodeURIComponent(id)}/reject`,
 
+  /** 반려했던 건의 최종 확인 (이슈 #46): 되살려 바로 보충 / 완전히 삭제 */
+  restockShortage: (id: string) => `/shortage-events/${encodeURIComponent(id)}/restock`,
+  deleteShortage: (id: string) => `/shortage-events/${encodeURIComponent(id)}`,
+
   /**
    * 작업 실패로 스스로 멈춘(blocked) 팔을 다시 지시를 받는 상태로 되돌린다.
    * 본문이 없고 여러 번 눌러도 같은 결과라, 팝업에서 재시도해도 안전하다.

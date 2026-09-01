@@ -338,6 +338,30 @@ class MockFactoryBackend {
     console.info('[detection-feedback] 학습 라벨 수집:', input);
   }
 
+  /** 반려했던 건을 되살려 바로 보충 (이슈 #46). 실제 백엔드 restock과 같은 전이. */
+  async restockShortage(id: string, approvedBy: string): Promise<ShortageEvent> {
+    const event = this.shortageEvents.get(id);
+    if (!event) throw new Error(`알 수 없는 부족 이벤트: ${id}`);
+    if (event.status !== 'rejected') throw new Error('반려된 건만 다시 진행할 수 있습니다');
+
+    const updated: ShortageEvent = { ...event, status: 'dispatched', approvedBy, approvedAt: nowIso() };
+    this.shortageEvents.set(id, updated);
+    this.emitShortage(updated);
+    this.startReplenishment(updated);
+
+    return updated;
+  }
+
+  /** 반려로 닫힌 건을 지우고, 제거 메시지로 다른 화면 캐시에서도 뺀다 (이슈 #46). */
+  async deleteShortage(id: string): Promise<void> {
+    const event = this.shortageEvents.get(id);
+    if (!event) return; // 이미 지워진 건은 다시 눌러도 무해해야 한다
+    if (event.status !== 'rejected') throw new Error('반려된 건만 삭제할 수 있습니다');
+
+    this.shortageEvents.delete(id);
+    this.emitter.emit({ type: 'line.shortage.removed', payload: { id } });
+  }
+
   private emitShortage(event: ShortageEvent): void {
     this.emitter.emit({ type: 'line.shortage', payload: event });
   }

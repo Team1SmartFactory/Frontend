@@ -22,6 +22,8 @@ export const mockFactoryApi: FactoryApi = {
 
   approveShortage: ({ id, approvedBy }) => mockFactoryBackend.approveShortage(id, approvedBy),
   rejectShortage: ({ id }) => mockFactoryBackend.rejectShortage(id),
+  restockShortage: ({ id, approvedBy }) => mockFactoryBackend.restockShortage(id, approvedBy),
+  deleteShortage: ({ id }) => mockFactoryBackend.deleteShortage(id),
 
   resumeRobot: ({ robotId }) => mockFactoryBackend.resumeRobot(robotId),
 

@@ -35,6 +35,16 @@ export const httpFactoryApi: FactoryApi = {
   rejectShortage: ({ id }) =>
     request(ENDPOINTS.rejectShortage(id), ShortageEventSchema, { method: 'POST' }),
 
+  restockShortage: ({ id, approvedBy }) =>
+    request(ENDPOINTS.restockShortage(id), ShortageEventSchema, {
+      method: 'POST',
+      body: { approvedBy },
+    }),
+
+  deleteShortage: async ({ id }) => {
+    await request(ENDPOINTS.deleteShortage(id), z.unknown(), { method: 'DELETE' });
+  },
+
   resumeRobot: ({ robotId }) =>
     request(ENDPOINTS.resumeRobot(robotId), RobotStatusSchema, { method: 'POST' }),
 

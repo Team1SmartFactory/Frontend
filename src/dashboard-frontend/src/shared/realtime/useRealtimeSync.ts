@@ -74,6 +74,16 @@ function applyMessage(queryClient: QueryClient, message: RealtimeMessage): void 
       return;
     }
 
+    case 'line.shortage.removed': {
+      const { id } = message.payload;
+      queryClient.setQueryData<FactoryData>(queryKeys.factory.snapshot(), (prev) => {
+        if (!prev || !(id in prev.shortageEvents)) return prev;
+        const { [id]: _removed, ...rest } = prev.shortageEvents;
+        return { ...prev, shortageEvents: rest };
+      });
+      return;
+    }
+
     case 'robot.status': {
       const robot = message.payload;
       queryClient.setQueryData<FactoryData>(queryKeys.factory.snapshot(), (prev) =>

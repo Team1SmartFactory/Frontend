@@ -6,6 +6,7 @@ import {
   selectPendingApprovals,
   selectPendingShortageBinIds,
   selectPendingShortageLineIds,
+  selectRejectedEvents,
   selectRestockingBinIds,
   selectRestockingLineIds,
   sortLinesByPriority,
@@ -174,6 +175,19 @@ describe('selectActiveShortageBinIds', () => {
     const ids = selectActiveShortageBinIds(events);
 
     expect([...ids].sort()).toEqual(['line-a-bin-a', 'line-a-bin-b']);
+  });
+});
+
+describe('selectRejectedEvents (이슈 #46)', () => {
+  it('반려된 건만 오래된 순으로 돌려준다', () => {
+    const events: Record<string, ShortageEvent> = {
+      newer: makeShortageEvent({ id: 'newer', status: 'rejected', detectedAt: '2026-09-01T02:00:00.000Z' }),
+      older: makeShortageEvent({ id: 'older', status: 'rejected', detectedAt: '2026-09-01T01:00:00.000Z' }),
+      open: makeShortageEvent({ id: 'open', status: 'pending_approval' }),
+      done: makeShortageEvent({ id: 'done', status: 'completed' }),
+    };
+
+    expect(selectRejectedEvents(events).map((event) => event.id)).toEqual(['older', 'newer']);
   });
 });
 
