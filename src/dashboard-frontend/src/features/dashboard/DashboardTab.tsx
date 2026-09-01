@@ -1,5 +1,5 @@
 import { useLines, useRobots, useShortageEvents } from '../../shared/query/useFactoryData';
-import { selectPendingApprovals, sortLinesByPriority } from '../../store/selectors';
+import { selectPendingApprovals, selectRejectedEvents, sortLinesByPriority } from '../../store/selectors';
 import { Card, PageHeader, QueryState } from '../../shared/ui';
 import { ActionLog } from './ActionLog';
 import { LineStatusCard } from './LineStatusCard';
@@ -25,6 +25,7 @@ export function DashboardTab() {
   const eventList = Object.values(shortageEvents);
   const sortedLines = sortLinesByPriority(lineList);
   const pendingApprovals = selectPendingApprovals(shortageEvents);
+  const rejectedEvents = selectRejectedEvents(shortageEvents);
 
   return (
     <div className={styles.page}>
@@ -40,7 +41,11 @@ export function DashboardTab() {
         >
           <SummaryStrip lines={lineList} robots={robotList} pendingCount={pendingApprovals.length} />
 
-          <ShortageNotifications pendingEvents={pendingApprovals} lines={lines} />
+          <ShortageNotifications
+            pendingEvents={pendingApprovals}
+            rejectedEvents={rejectedEvents}
+            lines={lines}
+          />
 
           <Card
             title="부품 현황"

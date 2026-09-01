@@ -42,3 +42,17 @@
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
+
+/* 반려 확인 항목의 [물품 보충]/[삭제] 버튼 짝. 시각(time)보다 앞에 둔다. */
+.actions {
+  flex-shrink: 0;
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* 재보충이 준비 관문(409)에 걸렸을 때의 사유. 항목 안에서 바로 읽히게 한다. */
+.notReady {
+  margin-top: var(--space-1);
+  font-size: var(--text-xs);
+  color: var(--status-critical-text);
+}

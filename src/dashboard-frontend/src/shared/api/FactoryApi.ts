@@ -33,6 +33,15 @@ export interface FactoryApi {
   rejectShortage(input: { id: string }): Promise<ShortageEvent>;
 
   /**
+   * 반려했던 건을 되살려 바로 보충을 지시한다 (이슈 #46).
+   * 승인과 같은 준비 관문(창고 부품·비글 카메라 판정)을 거치므로 409가 날 수 있다.
+   */
+  restockShortage(input: { id: string; approvedBy: string }): Promise<ShortageEvent>;
+
+  /** 반려로 닫힌 건을 완전히 지운다. 활성 건은 서버가 409로 거절한다. */
+  deleteShortage(input: { id: string }): Promise<void>;
+
+  /**
    * 작업 실패로 스스로 멈춘 팔을 다시 지시를 받는 상태로 되돌린다.
    *
    * 응답은 그 로봇의 현재 상태다 — 복구가 먹혔는지를 응답만으로 판단하지는

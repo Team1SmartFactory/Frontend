@@ -42,3 +42,29 @@ export function useRejectShortage() {
     onSuccess: writeEvent,
   });
 }
+
+/** 반려했던 건을 되살려 바로 보충 (이슈 #46). 승인과 같은 준비 관문 409가 날 수 있다. */
+export function useRestockShortage() {
+  const writeEvent = useWriteShortageEvent();
+
+  return useMutation<ShortageEvent, ApiError, { id: string; approvedBy: string }>({
+    mutationFn: (input) => factoryApi.restockShortage(input),
+    onSuccess: writeEvent,
+  });
+}
+
+/** 반려로 닫힌 건을 완전히 삭제 (이슈 #46). 서버의 removed 방송보다 먼저 캐시에서 뺀다. */
+export function useDeleteShortage() {
+  const queryClient = useQueryClient();
+
+  return useMutation<void, ApiError, { id: string }>({
+    mutationFn: (input) => factoryApi.deleteShortage(input),
+    onSuccess: (_result, { id }) => {
+      queryClient.setQueryData<FactoryData>(queryKeys.factory.snapshot(), (prev) => {
+        if (!prev || !(id in prev.shortageEvents)) return prev;
+        const { [id]: _removed, ...rest } = prev.shortageEvents;
+        return { ...prev, shortageEvents: rest };
+      });
+    },
+  });
+}

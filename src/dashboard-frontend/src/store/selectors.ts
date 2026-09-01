@@ -48,6 +48,16 @@ export function selectBlockedRobots(robots: Record<string, RobotStatus>): RobotS
     );
 }
 
+/**
+ * 반려로 닫혀 사람의 최종 확인(삭제 / 물품 보충)을 기다리는 건들 (이슈 #46).
+ * 승인 큐와 같은 규칙으로 오래된 것부터 — 가장 오래 방치된 건이 먼저 보여야 한다.
+ */
+export function selectRejectedEvents(events: Record<string, ShortageEvent>): ShortageEvent[] {
+  return Object.values(events)
+    .filter((event) => event.status === 'rejected')
+    .sort((a, b) => a.detectedAt.localeCompare(b.detectedAt));
+}
+
 /** 평면도 탭에서 빨간 점 애니메이션을 표시할 라인 id 집합. */
 export function selectActiveShortageLineIds(events: Record<string, ShortageEvent>): Set<string> {
   const ids = new Set<string>();

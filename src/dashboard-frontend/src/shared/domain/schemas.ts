@@ -160,6 +160,9 @@ export const RealtimeMessageSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('line.inventory'), payload: LineUpdateSchema }),
   z.object({ type: z.literal('line.bin.inventory'), payload: BinUpdateSchema }),
   z.object({ type: z.literal('line.shortage'), payload: ShortageEventSchema }),
+  // 반려 건이 알림란에서 '삭제'되면 스냅샷을 다시 받지 않는 다른 화면의
+  // 캐시에서도 빠져야 한다 (이슈 #46). id만 오는 유일한 제거형 메시지.
+  z.object({ type: z.literal('line.shortage.removed'), payload: z.object({ id: z.string() }) }),
   z.object({ type: z.literal('robot.status'), payload: RobotStatusSchema }),
 ]);
 export type RealtimeMessage = z.infer<typeof RealtimeMessageSchema>;
