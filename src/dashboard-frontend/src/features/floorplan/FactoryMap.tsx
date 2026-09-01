@@ -70,9 +70,16 @@ export function FactoryMap({
           />
         ))}
 
-        {robots.map((robot) => (
-          <RobotNode key={robot.robotId} robot={robot} />
-        ))}
+        {/* 위치가 한 번도 보고되지 않은 로봇은 그리지 않는다 (이슈 #42) — 백엔드
+            기본값이 (0,0)이라, 위치를 안 보내는 로봇 전부(시뮬레이션 포함 19대)가
+            좌상단 구석에 라벨째 겹겹이 쌓인다. 실기 팔의 자리는 구역 안 설비
+            글리프가 이미 보여주고, TELEMETRY가 실제로 들어오기 시작하면 이 필터를
+            그대로 통과해 다시 나타난다. */}
+        {robots
+          .filter((robot) => robot.position.x !== 0 || robot.position.y !== 0)
+          .map((robot) => (
+            <RobotNode key={robot.robotId} robot={robot} />
+          ))}
       </svg>
     </div>
   );
