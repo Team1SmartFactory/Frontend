@@ -19,6 +19,7 @@ function delayed<T>(produce: () => T): Promise<T> {
  */
 export const mockFactoryApi: FactoryApi = {
   fetchSnapshot: () => delayed(() => mockFactoryBackend.getSnapshot()),
+  fetchKpi: () => delayed(() => mockFactoryBackend.fetchKpi()),
 
   approveShortage: ({ id, approvedBy }) => mockFactoryBackend.approveShortage(id, approvedBy),
   rejectShortage: ({ id }) => mockFactoryBackend.rejectShortage(id),

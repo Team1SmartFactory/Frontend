@@ -3,6 +3,7 @@ import {
   BinSchema,
   CameraListSchema,
   InventoryHistorySchema,
+  KpiSchema,
   LineSchema,
   PermissionsSchema,
   RobotStatusSchema,
@@ -23,6 +24,8 @@ import { request } from './httpClient';
  */
 export const httpFactoryApi: FactoryApi = {
   fetchSnapshot: (signal) => request(ENDPOINTS.snapshot(), SnapshotSchema, { signal }),
+
+  fetchKpi: (signal) => request(ENDPOINTS.kpi(), KpiSchema, { signal }),
 
   approveShortage: ({ id, approvedBy }) =>
     request(ENDPOINTS.approveShortage(id), ShortageEventSchema, {

@@ -156,6 +156,24 @@ export const BinUpdateSchema = z.object({
 });
 export type BinUpdate = z.infer<typeof BinUpdateSchema>;
 
+/**
+ * GET /api/kpi 응답 (이슈 #48). 운영 지표 — 평균값들이 null이면 아직 표본이
+ * 없다는 뜻이고, 화면은 0이 아니라 "—"로 보여야 한다.
+ */
+export const KpiSchema = z.object({
+  totalDetected: z.number(),
+  completed: z.number(),
+  failed: z.number(),
+  humanRejected: z.number(),
+  active: z.number(),
+  pending: z.number(),
+  successRate: z.number().nullable(),
+  avgApprovalWaitSec: z.number().nullable(),
+  avgExecutionSec: z.number().nullable(),
+  avgLeadTimeSec: z.number().nullable(),
+});
+export type Kpi = z.infer<typeof KpiSchema>;
+
 export const RealtimeMessageSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('line.inventory'), payload: LineUpdateSchema }),
   z.object({ type: z.literal('line.bin.inventory'), payload: BinUpdateSchema }),

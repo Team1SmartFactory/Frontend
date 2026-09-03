@@ -1,5 +1,5 @@
 import { Emitter } from '../utils/emitter';
-import type { RealtimeMessage } from '../domain/schemas';
+import type { Kpi, RealtimeMessage } from '../domain/schemas';
 import {
   DEFAULT_PERMISSIONS,
   type Camera,
@@ -336,6 +336,26 @@ class MockFactoryBackend {
    */
   async submitDetectionFeedback(input: DetectionFeedbackInput): Promise<void> {
     console.info('[detection-feedback] 학습 라벨 수집:', input);
+  }
+
+  /** 운영 지표 (이슈 #48). 건수는 실제 이벤트 맵에서, 평균은 실기 실측치 근사로 답한다. */
+  fetchKpi(): Kpi {
+    const events = [...this.shortageEvents.values()];
+    const completed = events.filter((event) => event.status === 'completed').length;
+    const failed = events.filter((event) => event.status === 'rejected' && event.approvedAt).length;
+    const attempted = completed + failed;
+    return {
+      totalDetected: events.length,
+      completed,
+      failed,
+      humanRejected: events.filter((event) => event.status === 'rejected' && !event.approvedAt).length,
+      active: events.filter((event) => event.status === 'dispatched' || event.status === 'in_transit').length,
+      pending: events.filter((event) => event.status === 'pending_approval').length,
+      successRate: attempted ? completed / attempted : null,
+      avgApprovalWaitSec: completed ? 43 : null,
+      avgExecutionSec: completed ? 66 : null,
+      avgLeadTimeSec: completed ? 108 : null,
+    };
   }
 
   /** 반려했던 건을 되살려 바로 보충 (이슈 #46). 실제 백엔드 restock과 같은 전이. */
