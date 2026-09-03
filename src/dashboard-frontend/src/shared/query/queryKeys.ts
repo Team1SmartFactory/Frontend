@@ -29,4 +29,9 @@ export const queryKeys = {
     all: ['inventory'] as const,
     history: (lineId: string) => [...queryKeys.inventory.all, 'history', lineId] as const,
   },
+
+  kpi: {
+    all: ['kpi'] as const,
+    summary: () => [...queryKeys.kpi.all, 'summary'] as const,
+  },
 } as const;

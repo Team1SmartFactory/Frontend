@@ -44,6 +44,9 @@ export const ENDPOINTS = {
   /** 라인별 재고 추이. 새로고침해도 그래프가 남아 있으려면 서버 이력이 필요하다. */
   inventoryHistory: (lineId: string) =>
     `/lines/${encodeURIComponent(lineId)}/inventory-history`,
+
+  /** 운영 지표 집계 (리드타임·성공률). 대시보드 KPI 카드가 쓴다. */
+  kpi: () => '/kpi',
 } as const;
 
 /**

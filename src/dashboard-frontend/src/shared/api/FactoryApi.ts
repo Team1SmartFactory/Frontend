@@ -1,4 +1,4 @@
-import type { Snapshot } from '../domain/schemas';
+import type { Kpi, Snapshot } from '../domain/schemas';
 import type {
   Bin,
   Camera,
@@ -25,6 +25,9 @@ export type { Snapshot };
 export interface FactoryApi {
   /** 부팅 시 1회. 라인·로봇·부족 이벤트 전체. */
   fetchSnapshot(signal?: AbortSignal): Promise<Snapshot>;
+
+  /** 운영 지표 집계 (리드타임·성공률). KPI 카드가 주기적으로 다시 읽는다. */
+  fetchKpi(signal?: AbortSignal): Promise<Kpi>;
 
   /** 승인 → 보관소 OMX-F 적재 + Beagle 운반 지시 */
   approveShortage(input: { id: string; approvedBy: string }): Promise<ShortageEvent>;

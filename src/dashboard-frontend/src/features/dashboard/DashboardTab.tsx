@@ -2,6 +2,7 @@ import { useLines, useRobots, useShortageEvents } from '../../shared/query/useFa
 import { selectPendingApprovals, selectRejectedEvents, sortLinesByPriority } from '../../store/selectors';
 import { Card, PageHeader, QueryState } from '../../shared/ui';
 import { ActionLog } from './ActionLog';
+import { KpiCard } from './KpiCard';
 import { LineStatusCard } from './LineStatusCard';
 import { RobotActivityPanel } from './RobotActivityPanel';
 import { ShortageNotifications } from './ShortageNotifications';
@@ -57,6 +58,8 @@ export function DashboardTab() {
               ))}
             </div>
           </Card>
+
+          <KpiCard />
 
           <div className={styles.columns}>
             <RobotActivityPanel robots={robotList} />
